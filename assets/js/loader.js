@@ -3,17 +3,17 @@ async function fetchHtmlAsText(url) {
 }
 async function loadHead() {
     const contentDiv = document.getElementById("head");
-    document.head.innerHTML += await fetchHtmlAsText("/_includes/head.html");
+    document.head.innerHTML += await fetchHtmlAsText("/includes/head.html");
 }
 async function loadNav() {
     const contentDiv = document.getElementById("nav");
     if (contentDiv !== null) {
-      contentDiv.innerHTML = await fetchHtmlAsText("/_includes/nav.html");
+      contentDiv.innerHTML = await fetchHtmlAsText("/includes/nav.html");
     }
 }
 async function loadFooter() {
     const contentDiv = document.getElementById("footer");
     if (contentDiv !== null) {
-      contentDiv.innerHTML = await fetchHtmlAsText("/_includes/footer.html");
+      contentDiv.innerHTML = await fetchHtmlAsText("/includes/footer.html");
     }
 }
