@@ -1,0 +1,74 @@
+<html>
+<head>
+  <title>Trends.cash - Settings</title>
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:creator" content="@pmitchev" />
+  <meta name="twitter:title" content="Settings for Trends.cash" />
+  <meta name="twitter:description" content="Settings for Bitcoin SV Trends" />
+  <meta name="twitter:image" content="https://trends.cash/assets/images/logo-large.png" />
+  <meta property="og:url" content="https://trends.cash/pages/settings/" />
+  <meta property="og:type"   content="website" />
+  <meta property="og:title" content="Settings for Trends.cash" />
+  <meta property="og:description" content="Settings for Bitcoin SV Trends" />
+  <meta property="og:image" content="https://trends.cash/assets/images/logo-large.png" />
+  <script src="/assets/js/loader.js"></script>
+  <script src="/assets/js/loadVars.js"></script>
+  <script src="/assets/js/common.js"></script>
+</head>
+<body>
+  <div id="app" class="container">
+    <div id="nav"></div>
+    <div class="grid">
+      <div class="s_results page">
+        <h2>Settings</h2>
+        <div class="form">
+          <div class="field-block">
+            <h4>Planaria (BOB) node</h4>
+        	   <input type="text" name="bitdbNode" id="bitdbNode" title="Planaria node" placeholder="Planaria node address"/>
+          </div>
+          <div class="field-block">
+            <h4>Planaria (BOB) API key</h4>
+            <input type="text" name="bitdbApiKey" id="bitdbApiKey" title="Planaria API key" placeholder="Planaria API key"/>
+          </div>
+          <div class="form-buttons">
+            <input value="submit" type="submit" onclick="setValues">
+            <p style="color:#666;font-size:small">Saved settings are stored only in your browser.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="footer"></div>
+  </div>
+
+<script language='javascript'>
+  document.addEventListener("DOMContentLoaded", function() {
+    loadHead()
+    loadNav().then(function(r) {
+      navSearchPerformed(window.searchPeriodDefault, 0)
+    })
+    loadFooter()
+
+    var setValues = function() {
+      var bitdbNode = document.getElementById('bitdbNode').value
+      var bitdbApiKey = document.getElementById('bitdbApiKey').value
+      if (bitdbNode && bitdbNode !== window.bitdbNodeDefault) {
+        localStorage.setItem('bitdbNode', bitdbNode)
+        window.bitdbNode = bitdbNode
+      } else {
+        localStorage.removeItem('bitdbNode')
+        window.bitdbNode = window.bitdbNodeDefault
+      }
+
+      if (bitdbApiKey && bitdbApiKey !== window.bitdbApiKeyDefault) {
+        localStorage.setItem('bitdbApiKey', bitdbApiKey)
+        window.bitdbApiKey = bitdbApiKey
+      } else {
+        localStorage.removeItem('bitdbApiKey')
+        window.bitdbApiKey = window.bitdbApiKeyDefault
+      }
+      location.reload()
+    }
+  })
+</script>
+</body>
+</html>

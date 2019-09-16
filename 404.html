@@ -6,8 +6,33 @@
             // This text is simply to make sure the 404.html file is bigger than 512 bytes, else, internet explorer will ignore it.
             // Thank you internet explorer for requiring such awesome workarounds in order to work properly
             // ====================================================================================================================
-            sessionStorage.redirect = location.href;
+//            sessionStorage.redirect = location.href;
+          var pathname = window.location.pathname
+          // /result/dGVzdA==/7/20190916
+          var match = pathname.match(/\/result\/(\S+)\/(\d+)/u)
+          var realPath = "/"
+          if (match && match[1] && match[2]) {
+            realPath = "/result/?search=" + match[1] + "&period=" + match[2]
+          }
+          // /result/dGVzdA==/7/20190916
+          var match = pathname.match(/\/result\/(\S+)\/(\d+)\/(\d+)/u)
+          if (match && match[1] && match[2] && match[3]) {
+            realPath = "/result/?search=" + match[1] + "&period=" + match[2] + "&date=" + match[3]
+          }
+          // /apps/1/actions
+          var match = pathname.match(/\/app\/(\d+)\/\S+/u)
+          if (match && match[1] && match[2]) {
+            realPath = "/ranking/?period=" + match[1]
+          }
+          // /apps/1/actions/20190916
+          var match = pathname.match(/\/app\/(\d+)\/\S+\/(\d+)/u)
+          if (match && match[1] && match[2]) {
+            realPath = "/ranking/?period=" + match[1] + "&date=" + match[2]
+          }
+          window.location.replace(realPath);
         </script>
+        <!--
         <meta http-equiv="refresh" content="0;URL='/'">
+        //-->
     </head>
 </html>

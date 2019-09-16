@@ -1,0 +1,41 @@
+<html>
+<head>
+  <title>Trends.cash - About</title>
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:creator" content="@pmitchev" />
+  <meta name="twitter:title" content="About Trends.cash" />
+  <meta name="twitter:description" content="About Bitcoin SV Trends" />
+  <meta name="twitter:image" content="https://trends.cash/assets/images/logo-large.png" />
+  <meta property="og:url" content="https://trends.cash/pages/about/" />
+  <meta property="og:type"   content="website" />
+  <meta property="og:title" content="About Trends.cash" />
+  <meta property="og:description" content="About Bitcoin SV Trends" />
+  <meta property="og:image" content="https://trends.cash/assets/images/logo-large.png" />
+  <script src="/assets/js/loader.js"></script>
+  <script src="/assets/js/loadVars.js"></script>
+  <script src="/assets/js/common.js"></script>
+</head>
+<body>
+  <div id="app" class="container">
+    <div id="nav"></div>
+    <div class="grid">
+      <div class="s_results page">
+        <h2>About</h2>
+        <p>Trends.cash is convinient way to visualize the Bitcoin SV blockchain. It's powered by BOB (<a href="https://bob.planaria.network" target="_blank">https://bob.planaria.network</a>) and only communicates with a BOB node.</p>
+        <p>Trends.cash does not store any user data. All actions are performed in user's browser.</p>
+      </div>
+    </div>
+    <div id="footer"></div>
+  </div>
+
+<script language='javascript'>
+  document.addEventListener("DOMContentLoaded", function() {
+    loadHead()
+    loadNav().then(function(r) {
+      navSearchPerformed(window.searchPeriodDefault, 0)
+    })
+    loadFooter()
+  })
+</script>
+</body>
+</html>

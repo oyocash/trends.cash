@@ -1,0 +1,14 @@
+<svg width="640" height="480" xmlns="http://www.w3.org/2000/svg">
+ <!-- Created with SVG-edit - https://github.com/SVG-Edit/svgedit-->
+
+ <g>
+  <title>background</title>
+  <rect fill="none" id="canvas_background" height="482" width="642" y="-1" x="-1"/>
+ </g>
+ <g class="layer">
+  <title>Layer 1</title>
+  <circle stroke-width="5" stroke="#000000" r="150" id="svg_3" fill-opacity="0" fill="#ffffff" cy="230" cx="200"/>
+  <circle stroke-width="5" stroke="#000000" r="150" id="svg_4" fill-opacity="0" fill="#ffffff" cy="230" cx="430"/>
+  <text xml:space="preserve" text-anchor="start" font-family="Arvo, sans-serif" font-size="52" id="svg_1" y="424" x="240" stroke-width="0" stroke="#000" fill="#000000">trends</text>
+ </g>
+</svg>

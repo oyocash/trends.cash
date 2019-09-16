@@ -1,7 +1,62 @@
-<!DOCTYPE html><html><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=twitter:card content=summary_large_image><meta name=twitter:title content=Trends.cash><meta name=twitter:description content="Explore what Bitcoin (BSV) is saying. Visual representation of what people are writing on the blockchain"><meta name=twitter:image content=https://trends.cash/logo.png><meta property=og:url content=https://trends.cash><meta property=og:type content=website><meta property=og:title content=Trends.cash><meta property=og:description content="Explore what Bitcoin (BSV) is saying. Visual representation of what people are writing on the blockchain"><meta property=og:image content=https://trends.cash/logo.png><link rel=apple-touch-icon sizes=57x57 href=/apple-icon-57x57.png><link rel=apple-touch-icon sizes=60x60 href=/apple-icon-60x60.png><link rel=apple-touch-icon sizes=72x72 href=/apple-icon-72x72.png><link rel=apple-touch-icon sizes=76x76 href=/apple-icon-76x76.png><link rel=apple-touch-icon sizes=114x114 href=/apple-icon-114x114.png><link rel=apple-touch-icon sizes=120x120 href=/apple-icon-120x120.png><link rel=apple-touch-icon sizes=144x144 href=/apple-icon-144x144.png><link rel=apple-touch-icon sizes=152x152 href=/apple-icon-152x152.png><link rel=apple-touch-icon sizes=180x180 href=/apple-icon-180x180.png><link rel=icon type=image/png sizes=192x192 href=/android-icon-192x192.png><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=96x96 href=/favicon-96x96.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=manifest href=/manifest.json><meta name=msapplication-TileColor content=#ffffff><meta name=msapplication-TileImage content=/ms-icon-144x144.png><meta name=theme-color content=#ffffff><meta name=bitcoin-address content=1bGBx5H9NRmT3TbMHjXuUzo19CXmSfd6j><title>Trends.cash</title><link href=/static/css/app.b0db6f7d198df839388ce762604634cd.css rel=stylesheet></head><body><div id=app></div><script>(function(){
-      var redirect = sessionStorage.redirect;
-      delete sessionStorage.redirect;
-      if (redirect && redirect != location.href) {
-          history.replaceState(null, null, redirect);
+<html>
+<head>
+  <title>Trends.cash - Chart Bitcoin SV</title>
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:creator" content="@pmitchev" />
+  <meta name="twitter:title" content="Bitcoin SV Trends" />
+  <meta name="twitter:description" content="Chart Bitcoin SV. Analyzes the popularity of top apps and mentions on the Bitcoin blockchain" />
+  <meta name="twitter:image" content="https://trends.cash/assets/images/logo-large.png" />
+  <meta property="og:url" content="https://trends.cash" />
+  <meta property="og:type"   content="website" />
+  <meta property="og:title" content="Bitcoin SV Trends" />
+  <meta property="og:description" content="Chart Bitcoin SV. Analyzes the popularity of top apps and mentions on the Bitcoin blockchain" />
+  <meta property="og:image" content="https://trends.cash/assets/images/logo-large.png" />
+  <script src="/assets/js/loader.js"></script>
+  <script src="/assets/js/loadVars.js"></script>
+</head>
+<body>
+  <noscript>Trends.cash is charting tool for the Bitcoin SV blockchain. You can chart phrase mentions or protocol/app onchain usage.</noscript>
+  <div id="app" class="container">
+    <div id="landingPage">
+      <center>
+        <img src="/assets/images/logo-large.png" srcset="/assets/images/logo-large@2x.png 2x, /assets/images/logo-large@3x.png 3x">
+        <h1>Chart Bitcoin SV</h1>
+      	<div class="main">
+      		<div class="sbox">
+      			<input type="text" name="searchText" id="searchText" title="Explore Bitcoin" placeholder="Enter a search term or a topic" autocomplete="off" autofocus>
+      		</div>
+
+      		<div class="buttons">
+      			<input value="Explore" type="submit" id="searchButton">
+      		</div>
+      	</div>
+
+      	<div class="promo">
+      		<a href="/ranking/" title="popular Bitcoin SV apps">Popular apps</a> |
+      		<a href="https://oyo.cash/" title="search Bitcoin SV">Oyo.cash</a>
+      	</div>
+      </center>
+
+      <div id="footer"></div>
+    </div>
+  </div>
+
+<script language='javascript'>
+  document.addEventListener("DOMContentLoaded", function() {
+    loadHead()
+    loadNav()
+    loadFooter()
+    // Search clicked
+    document.getElementById('searchButton').addEventListener("click", function() {
+      window.open('/result/?search=' + btoa(document.getElementById('searchText').value) + '&period=' + window.searchPeriodDefault, "_self")
+    })
+    document.getElementById('searchText').addEventListener("keydown", function(event) {
+      if (event.keyCode === 13) {
+       event.preventDefault();
+       document.getElementById("searchButton").click();
       }
-    })();</script><script type=text/javascript src=/static/js/manifest.2ae2e69a05c33dfc65f8.js></script><script type=text/javascript src=/static/js/vendor.f7b393d64a14629c7cec.js></script><script type=text/javascript src=/static/js/app.46485c2149fedb341b0a.js></script></body></html>
+    });
+  })
+</script>
+</body>
+</html>

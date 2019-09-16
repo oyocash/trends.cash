@@ -1,0 +1,370 @@
+<html>
+<head>
+  <title>Trends.cash - Search results</title>
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:creator" content="@pmitchev" />
+  <meta name="twitter:title" content="Trends.cash - Search results" />
+  <meta name="twitter:description" content="Search result for apps and mentions on the Bitcoin blockchain" />
+  <meta name="twitter:image" content="https://trends.cash/assets/images/logo-large.png" />
+  <meta property="og:url" content="https://trends.cash" />
+  <meta property="og:type"   content="website" />
+  <meta property="og:title" content="Trends.cash - Search results" />
+  <meta property="og:description" content="Search result for apps and mentions on the Bitcoin blockchain" />
+  <meta property="og:image" content="https://trends.cash/assets/images/logo-large.png" />
+
+  <script src="/assets/js/loader.js"></script>
+  <script src="/assets/js/loadVars.js"></script>
+  <script src="/assets/js/common.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js" integrity="sha256-4iQZ6BVL4qNKlQ27TExEhBN1HFPvAvAMbFavKKosSWQ=" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" integrity="sha256-Uv9BNBucvCPipKQ2NS9wYpJmi8DTOEfTA/nH2aoJALw=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.8.0/pikaday.min.js" integrity="sha256-+B1vOR24Jpk4oWE/+SWu7AxoQqrqDT4SF+12bixBdjw=" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.8.0/css/pikaday.min.css" integrity="sha256-+RIb33VoW3hHdfmp0+G4FrGAxzlKBXiwo6thzduwZdU=" crossorigin="anonymous" />
+</head>
+<body>
+  <noscript>Search result for mentions or apps usage on the Bitcoin SV blockchain</noscript>
+  <div id="app" class="container">
+    <div id="nav"></div>
+    <div class="grid">
+        <div class="s_results" id="loaded">
+          <div class="chartNav">
+            <div class="chartNavLeft">Zoom:
+              <button class="periodButton" value="7">7d</button>
+              <button class="periodButton" value="30">1m</button>
+              <button class="periodButton" value="90">3m</button>
+              <button class="periodButton" value="365">1y</button>
+              <a id="oyoLink" style="margin-left:20px;">See on Oyo</a>
+            </div>
+            <div class="chartNavCenter">
+            </div>
+            <div class="chartNavRight">
+              From: <input type="text" name="startDateForm" id="startDateForm" title="Search date start" placeholder="YYYY-MM-DD" disabled/>
+              To: <input type="text" name="endDateForm" id="endDateForm" title="Search date end" placeholder="YYYY-MM-DD"/>
+            </div>
+          </div>
+          <canvas id="myChart"></canvas>
+        </div>
+        <div class="s_results" id="loading">
+          <div class="n_results">
+            Loading...
+          </div>
+        </div>
+      </div>
+    <div id="footer"></div>
+  </div>
+
+<script language='javascript'>
+  // initiate loading
+  document.getElementById("loading").style.display = "block";
+  document.getElementById("loaded").style.display = "none";
+
+  // populate search phrases
+  var searchPhrases = []
+  var searchText = atob(getUrlVars()["search"])
+  searchPhrases = searchText.replace(/['"]+/g, '').split(/\s*,\s*/)
+  // populate period
+  var periodInput = parseInt(getUrlVars()["period"]) || window.searchPeriodDefault
+  // populate date
+  var dateTimestamp, dateForm
+  var dateInput = getUrlVars()["date"] || 0
+  if (parseInt(dateInput) && parseInt(dateInput) !== 0) {
+    let dateReal = new Date(Date.UTC(dateInput.substring(0,4), parseInt(dateInput.substring(4,6)) - 1, dateInput.substring(6,8), 23, 59, 59, 0))
+    dateTimestamp = parseInt(dateReal.getTime() / 1000) + 1
+    dateForm = dateReal.toISOString().substring(0, 10)
+  } else {
+    dateTimestamp = parseInt(new Date().getTime() / 1000)
+    dateForm = new Date().toISOString().substring(0, 10)
+  }
+  document.getElementById('endDateForm').value = dateForm
+  var startDateTimestamp = dateTimestamp - (periodInput * 24 * 60 * 60)
+  var startDateForm = new Date(startDateTimestamp * 1000).toISOString().substring(0, 10)
+  document.getElementById('startDateForm').value = startDateForm
+  var changeSearchEndDate = function(date) {
+    if (date === 0) {
+      date = new Date().toISOString().substring(0, 10)
+    }
+    if (date.length !== 10) {
+      return
+    }
+    dateInput = date.substring(0,4) + date.substring(5,7) + date.substring(8,10)
+    changeSearchRoute(searchText, periodInput, dateInput)
+  }
+  // oyo link
+  var oyoSearchString = searchPhrases.map(searchPhrases => `"${searchPhrases}"`).join(' ');
+  var oyoLink = document.getElementById('oyoLink')
+  oyoLink.setAttribute("href", "https://oyo.cash/result/" + btoa(oyoSearchString) + "/0");
+  oyoLink.setAttribute("title", "Search Bitcoin for " + oyoSearchString);
+
+  // create chart
+  var ctx = document.getElementById('myChart').getContext('2d');
+  ctx.canvas.width = 1000;
+  ctx.canvas.height = 300;
+  var cfg = {
+    type: 'line',
+    data: {
+      datasets: []
+	  },
+		options: {
+      responsive: true,
+			scales: {
+				xAxes: [{
+					type: 'time',
+          time: {
+            displayFormats: {
+              quarter: 'D MMM'
+            },
+            parser: 'MM/DD/YYYY HH:mm',
+            tooltipFormat: 'MMM D, YYYY',
+            unit: 'day'
+          }
+				}],
+				yAxes: [{
+          ticks: {
+            beginAtZero: true,
+            callback: function(value) {if (value % 1 === 0) {return value;}}
+          }
+				}]
+			},
+      tooltips: {
+    		mode: 'index',
+    		intersect: false
+    	},
+    	hover: {
+    		mode: 'nearest',
+    		intersect: true
+    	}
+		}
+  }
+  var myChart = new Chart(ctx, cfg);
+
+  var picker = new Pikaday(
+  {
+      field: document.getElementById('endDateForm'),
+      firstDay: 1,
+      minDate: new Date(2009, 01, 03),
+      maxDate: new Date()
+  });
+
+  document.addEventListener("DOMContentLoaded", function() {
+    // on date change
+    document.getElementById('startDateForm').addEventListener("change", function() {
+      changeStartDate(document.getElementById('startDateForm').value)
+    })
+    // on date change
+    document.getElementById('endDateForm').addEventListener("change", function() {
+      changeSearchEndDate(document.getElementById('endDateForm').value)
+    })
+    // on period button click
+    let periodButtons = document.getElementsByClassName('periodButton');
+    for(let i=0; i<periodButtons.length; i++){
+      if (parseInt(periodInput) === parseInt(periodButtons[i].value)) {
+        periodButtons[i].classList.add("active")
+      }
+      periodButtons[i].addEventListener("click", function() {
+        periodInput = periodButtons[i].value
+        changeSearchRoute(searchText, periodInput, dateInput)
+      })
+    }
+    // load partials
+    loadHead()
+    loadNav().then(function(r) {
+      navSearchPerformed(periodInput, dateInput)
+      document.getElementById('navSearchText').value = searchText;
+    })
+    loadFooter()
+
+    var queryCreator = function(searchPhrase, beginTimestamp, endTimestamp) {
+      let matchPhrase = searchPhrase
+      let queryMatch = {}
+      queryMatch['$and'] = []
+
+      // transform prefix "h" to prefix "b"
+      if (matchPhrase.match(/prefix:\s*[0-9a-fA-F]+\b\s*/)) {
+        let match = matchPhrase.match(/(?:^|\s+)prefix:\s*([0-9a-fA-F]+)\s*/u)
+        if (match && match[1]) {
+          var bPrefix = hexToBase64(match[1])
+          matchPhrase = matchPhrase.replace(/(?:^|\s+)prefix:\s*[0-9a-fA-F]+\s*/gu, ' prefix:' + bPrefix + ' ')
+        }
+      }
+
+      // prefix "b"
+      if (matchPhrase.match(/prefix:\s*\S+=\s*/)) {
+        let match = matchPhrase.match(/(?:^|\s+)prefix:\s*(\S+=)\s*/u)
+        if (match && match[1]) {
+          queryMatch['$and'].push({"out.tape.cell": {"$all": [{"$elemMatch": {"i": 0, "b": match[1]}}]}})
+          matchPhrase = matchPhrase.replace(/(?:^|\s+)prefix:\s*\S+=\s*/gu, ' ')
+        }
+      }
+      // prefix "s"
+      if (matchPhrase.match(/prefix:\s*\S+\s*/)) {
+        let match = matchPhrase.match(/(?:^|\s+)prefix:\s*(\S+)\s*/u)
+        if (match && match[1]) {
+          queryMatch['$and'].push({"out.tape.cell": {"$all": [{"$elemMatch": {"i": 0, "s": match[1]}}]}})
+          matchPhrase = matchPhrase.replace(/(?:^|\s+)prefix:\s*\S+\s*/gu, ' ')
+        }
+      }
+      // MAP app
+      if (matchPhrase.match(/app:\s*\S+\s*/)) {
+        let match = matchPhrase.match(/(?:^|\s+)app:\s*(\S+)\s*/u)
+        if (match && match[1]) {
+          queryMatch['$and'].push({"$or": [{"out.tape.cell": {"$all": [{"$elemMatch": {"i": 2, "s": "app"}}, {"$elemMatch": {"i": 3, "s": match[1]}}]}}, {"out.tape.cell": {"$all": [{"$elemMatch": {"i": 14, "s": "app"}}, {"$elemMatch": {"i": 15, "s": match[1]}}]}}, {"out.tape.cell": {"$all": [{"$elemMatch": {"i": 16, "s": "app"}}, {"$elemMatch": {"i": 17, "s": match[1]}}]}}]})
+          matchPhrase = matchPhrase.replace(/(?:^|\s+)app:\s*\S+\s*/gu, ' ')
+        }
+      }
+      if (matchPhrase.includes("from:")) {
+        let match = matchPhrase.match(/(?:^|\s+)from:\s*(\S+)\s*/u)
+        if (match && match[1]) {
+          queryMatch['$and'].push({'in.e.a': window.convertAddress(match[1])})
+          matchPhrase = matchPhrase.replace(/(?:^|\s+)from:\s*\S+\s*/gu, ' ')
+        }
+      }
+      if (matchPhrase.includes("notfrom:")) {
+        let match = matchPhrase.match(/(?:^|\s+)notfrom:\s*(\S+)\s*/u)
+        if (match && match[1]) {
+          queryMatch['$and'].push({'in.e.a': { '$ne': window.convertAddress(match[1]) }})
+          matchPhrase = matchPhrase.replace(/(?:^|\s+)notfrom:\s*\S+\s*/gu, ' ')
+        }
+      }
+      if (matchPhrase.includes("to:")) {
+        let match = matchPhrase.match(/(?:^|\s+)to:\s*(\S+)\s*/u)
+        if (match && match[1]) {
+          queryMatch['$and'].push({'out.e.a': window.convertAddress(match[1])})
+          matchPhrase = matchPhrase.replace(/(?:^|\s+)to:\s*\S+\s*/gu, ' ')
+        }
+      }
+      if (matchPhrase.includes("notto:")) {
+        let match = matchPhrase.match(/(?:^|\s+)notto:\s*(\S+)\s*/u)
+        if (match && match[1]) {
+          queryMatch['$and'].push({'out.e.a': { '$ne': window.convertAddress(match[1]) }})
+          matchPhrase = matchPhrase.replace(/(?:^|\s+)notto:\s*\S+\s*/gu, ' ')
+        }
+      }
+      matchPhrase = matchPhrase.trim()
+
+      if (matchPhrase) {
+        queryMatch['$and'].push({'$text': {'$search': '\"' + matchPhrase + '\"'}})
+      }
+      queryMatch['$and'].push({'blk.t': {'$gte': beginTimestamp, '$lte': endTimestamp}})
+
+      return queryMatch
+    }
+    var populateChart = async function(searchStrings) {
+      for (let pcIndex = 0; pcIndex < searchStrings.length; ++pcIndex) {
+        getMatchCountArray(searchStrings[pcIndex], pcIndex)
+      }
+    }
+    var getMatchCountArray = async function(searchPhrase, index) {
+      let beginNotCorrectedTimestamp = new Date(parseInt(dateTimestamp - ((periodInput) * 24 * 60 * 60)) * 1000).toISOString()
+      let beginTimestamp = new Date(Date.UTC(beginNotCorrectedTimestamp.substring(0,4), parseInt(beginNotCorrectedTimestamp.substring(5,7)) - 1, beginNotCorrectedTimestamp.substring(8,10), 0, 0, 0, 0)).getTime() / 1000
+      let endTimestamp = parseInt(dateTimestamp)
+      let periodFormat = '%Y-%m-%d'
+
+      let queryMatch = queryCreator(searchPhrase, beginTimestamp, endTimestamp)
+
+      let query = {
+        'v': 3,
+        'q': {
+          'aggregate': [{
+            '$match': queryMatch
+          }, {
+            '$group': {
+              '_id': {
+                '$dateToString': {
+                  'format': periodFormat,
+                  'date': {
+                    '$toDate': {
+                      '$multiply': [1000, '$blk.t']
+                    }
+                  }
+                }
+              },
+              'count': {
+                '$sum': 1
+              }
+            }
+          }],
+          'limit': 10000,
+          'sort': {'_id': 1}
+        }
+      }
+
+      var b64 = btoa(JSON.stringify(query));
+      let url = window.bitdbNode + b64
+
+      let header
+      if (window.bitdbApiKey) {
+        header = {
+          headers: { key: window.bitdbApiKey }
+        }
+      }
+
+      fetch(url, header).then(function(r) {
+        return r.json()
+      }).then(response => {
+        if (response.c.length >= 0) {
+          let prevItemDate = null
+          let singleChartData = []
+          for (let index = 0; index < response.c.length; ++index) {
+              let itemDate = new Date(response.c[index]['_id'])
+              if (index === 0) {
+                // fill with 0 if it's not the beginning
+                let timeDiff = Math.abs(itemDate.getTime() - (beginTimestamp * 1000))
+                let diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24))
+                if (diffDays > 0) {
+                  for (let j = diffDays; j > 0; --j) {
+                    let fillDate = new Date(itemDate)
+                    fillDate.setDate(itemDate.getDate() - j)
+                    singleChartData.push({"t": fillDate.getTime(), "y": 0})
+                  }
+                }
+              } else {
+                let timeDiff = Math.abs(itemDate.getTime() - prevItemDate.getTime())
+                let diffDays = Math.floor(timeDiff / (1000 * 3600 * 24))
+                // fill empty dates with 0
+                if (diffDays > 1) {
+                  for (let j = 1; j < diffDays; ++j) {
+                    let fillDate = new Date(prevItemDate)
+                    fillDate.setDate(prevItemDate.getDate() + j)
+                    singleChartData.push({"t": fillDate.getTime(), "y": 0})
+                  }
+                }
+              }
+
+              // push real data
+              var chartItemDate = new Date(Date.UTC(response.c[index]['_id'].substring(0,4), parseInt(response.c[index]['_id'].substring(5,7)) - 1, response.c[index]['_id'].substring(8,10), 0, 0, 0, 0)).getTime()
+              singleChartData.push({"t": chartItemDate, "y": response.c[index]['count']})
+              prevItemDate = itemDate
+          }
+
+          // fill with 0 till the end
+          if (prevItemDate === null) {
+            prevItemDate = new Date(beginTimestamp * 1000)
+          }
+          let timeDiff = Math.abs(dateTimestamp * 1000 - prevItemDate.getTime())
+          let diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24))
+          if (diffDays > 1) {
+            for (let j = 1; j < diffDays; ++j) {
+              let fillDate = new Date(prevItemDate)
+              fillDate.setDate(prevItemDate.getDate() + j)
+              singleChartData.push({"t": fillDate.getTime(), "y": 0})
+            }
+          }
+          // push data to chart
+          var dataset = {"label": searchPhrase, "data": singleChartData, "backgroundColor": window.colors[0][index], "borderColor": window.colors[1][index], "pointRadius": 0, "fill": false, "lineTension": 0, "borderWidth": 2}
+          myChart.config.data.datasets.push(dataset)
+          myChart.update();
+          // show loaded
+          document.getElementById("loading").style.display = "none";
+          document.getElementById("loaded").style.display = "block";
+        }
+      })
+      .catch(error => {
+        errored = true
+      })
+    }
+
+    // populate chart
+    populateChart(searchPhrases)
+  })
+</script>
+</body>
+</html>
