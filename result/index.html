@@ -43,6 +43,11 @@
           </div>
           <canvas id="myChart"></canvas>
         </div>
+        <div class="s_results">
+          <div class="n_results">
+            Error occured while loading. <a href="javascript:void(0)" onClick="window.location.reload();">Try again</a>
+          </div>
+        </div>
         <div class="s_results" id="loading">
           <div class="n_results">
             Loading...
@@ -55,6 +60,7 @@
 <script language='javascript'>
   // initiate loading
   document.getElementById("loading").style.display = "block";
+  document.getElementById("error").style.display = "none";
   document.getElementById("loaded").style.display = "none";
 
   // populate search phrases
@@ -354,11 +360,15 @@
           myChart.update();
           // show loaded
           document.getElementById("loading").style.display = "none";
+          document.getElementById("error").style.display = "none";
           document.getElementById("loaded").style.display = "block";
         }
       })
       .catch(error => {
-        errored = true
+        document.getElementById("loading").style.display = "none";
+        document.getElementById("error").style.display = "block";
+        document.getElementById("loaded").style.display = "none";
+        console.log(error)
       })
     }
 

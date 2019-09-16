@@ -27,9 +27,16 @@
   <div id="app" class="container">
     <div id="nav"></div>
       <div class="grid" id="loading">
-        <div class="s_results" v-else>
+        <div class="s_results">
           <div class="n_results">
             Loading...
+          </div>
+        </div>
+      </div>
+      <div class="grid" id="error">
+        <div class="s_results">
+          <div class="n_results">
+            Error occured while loading. <a href="javascript:void(0)" onClick="window.location.reload();">Try again</a>
           </div>
         </div>
       </div>
@@ -66,6 +73,7 @@
 <script language='javascript'>
   // initiate loading
   document.getElementById("loading").style.display = "block";
+  document.getElementById("error").style.display = "none";
   document.getElementById("loaded").style.display = "none";
 
   var itemsOnChart = 10
@@ -313,6 +321,9 @@
           })
         })
         .catch(error => {
+          document.getElementById("loading").style.display = "none";
+          document.getElementById("error").style.display = "block";
+          document.getElementById("loaded").style.display = "none";
           console.log(error)
         })
     }
@@ -334,6 +345,7 @@
       rankingTable("tableContent", chartDataFull, window.colors[1])
       // show loaded
       document.getElementById("loading").style.display = "none";
+      document.getElementById("error").style.display = "none";
       document.getElementById("loaded").style.display = "grid";
     }
 
