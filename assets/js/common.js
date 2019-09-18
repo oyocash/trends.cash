@@ -84,7 +84,6 @@ var addRankingRow = function(parentElementId, index, item, color)
   row.appendChild(cell2);
   row.appendChild(cell3);
   document.getElementById(parentElementId).appendChild(row)
-
 }
 var getTrendsLink = function(base64Ids, type) {
   let query = 'prefix:' + base64Ids.join(', prefix:')
