@@ -11,7 +11,7 @@
   <meta property="og:title" content="Trends.cash - Search results" />
   <meta property="og:description" content="Search result for apps and mentions on the Bitcoin blockchain" />
   <meta property="og:image" content="https://trends.cash/assets/images/logo-large.png" />
-  
+
   <link rel="stylesheet" href="/assets/css/styles.css">
   <link rel="apple-touch-icon" sizes="57x57" href="/assets/icons/apple-icon-57x57.png">
   <link rel="apple-touch-icon" sizes="60x60" href="/assets/icons/apple-icon-60x60.png">
@@ -35,6 +35,7 @@
   <script src="/assets/js/loader.js"></script>
   <script src="/assets/js/loadVars.js"></script>
   <script src="/assets/js/common.js"></script>
+  <script src="/assets/js/bob.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js" integrity="sha256-4iQZ6BVL4qNKlQ27TExEhBN1HFPvAvAMbFavKKosSWQ=" crossorigin="anonymous"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" integrity="sha256-Uv9BNBucvCPipKQ2NS9wYpJmi8DTOEfTA/nH2aoJALw=" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.8.0/pikaday.min.js" integrity="sha256-+B1vOR24Jpk4oWE/+SWu7AxoQqrqDT4SF+12bixBdjw=" crossorigin="anonymous"></script>
@@ -198,81 +199,6 @@
     })
     loadFooter()
 
-    var queryCreator = function(searchPhrase, beginTimestamp, endTimestamp) {
-      let matchPhrase = searchPhrase
-      let queryMatch = {}
-      queryMatch['$and'] = []
-
-      // transform prefix "h" to prefix "b"
-      if (matchPhrase.match(/prefix:\s*[0-9a-fA-F]+\b\s*/)) {
-        let match = matchPhrase.match(/(?:^|\s+)prefix:\s*([0-9a-fA-F]+)\s*/u)
-        if (match && match[1]) {
-          var bPrefix = hexToBase64(match[1])
-          matchPhrase = matchPhrase.replace(/(?:^|\s+)prefix:\s*[0-9a-fA-F]+\s*/gu, ' prefix:' + bPrefix + ' ')
-        }
-      }
-
-      // prefix "b"
-      if (matchPhrase.match(/prefix:\s*\S+=\s*/)) {
-        let match = matchPhrase.match(/(?:^|\s+)prefix:\s*(\S+=)\s*/u)
-        if (match && match[1]) {
-          queryMatch['$and'].push({"out.tape.cell": {"$all": [{"$elemMatch": {"i": 0, "b": match[1]}}]}})
-          matchPhrase = matchPhrase.replace(/(?:^|\s+)prefix:\s*\S+=\s*/gu, ' ')
-        }
-      }
-      // prefix "s"
-      if (matchPhrase.match(/prefix:\s*\S+\s*/)) {
-        let match = matchPhrase.match(/(?:^|\s+)prefix:\s*(\S+)\s*/u)
-        if (match && match[1]) {
-          queryMatch['$and'].push({"out.tape.cell": {"$all": [{"$elemMatch": {"i": 0, "s": match[1]}}]}})
-          matchPhrase = matchPhrase.replace(/(?:^|\s+)prefix:\s*\S+\s*/gu, ' ')
-        }
-      }
-      // MAP app
-      if (matchPhrase.match(/app:\s*\S+\s*/)) {
-        let match = matchPhrase.match(/(?:^|\s+)app:\s*(\S+)\s*/u)
-        if (match && match[1]) {
-          queryMatch['$and'].push({"$or": [{"out.tape.cell": {"$all": [{"$elemMatch": {"i": 2, "s": "app"}}, {"$elemMatch": {"i": 3, "s": match[1]}}]}}, {"out.tape.cell": {"$all": [{"$elemMatch": {"i": 14, "s": "app"}}, {"$elemMatch": {"i": 15, "s": match[1]}}]}}, {"out.tape.cell": {"$all": [{"$elemMatch": {"i": 16, "s": "app"}}, {"$elemMatch": {"i": 17, "s": match[1]}}]}}]})
-          matchPhrase = matchPhrase.replace(/(?:^|\s+)app:\s*\S+\s*/gu, ' ')
-        }
-      }
-      if (matchPhrase.includes("from:")) {
-        let match = matchPhrase.match(/(?:^|\s+)from:\s*(\S+)\s*/u)
-        if (match && match[1]) {
-          queryMatch['$and'].push({'in.e.a': window.convertAddress(match[1])})
-          matchPhrase = matchPhrase.replace(/(?:^|\s+)from:\s*\S+\s*/gu, ' ')
-        }
-      }
-      if (matchPhrase.includes("notfrom:")) {
-        let match = matchPhrase.match(/(?:^|\s+)notfrom:\s*(\S+)\s*/u)
-        if (match && match[1]) {
-          queryMatch['$and'].push({'in.e.a': { '$ne': window.convertAddress(match[1]) }})
-          matchPhrase = matchPhrase.replace(/(?:^|\s+)notfrom:\s*\S+\s*/gu, ' ')
-        }
-      }
-      if (matchPhrase.includes("to:")) {
-        let match = matchPhrase.match(/(?:^|\s+)to:\s*(\S+)\s*/u)
-        if (match && match[1]) {
-          queryMatch['$and'].push({'out.e.a': window.convertAddress(match[1])})
-          matchPhrase = matchPhrase.replace(/(?:^|\s+)to:\s*\S+\s*/gu, ' ')
-        }
-      }
-      if (matchPhrase.includes("notto:")) {
-        let match = matchPhrase.match(/(?:^|\s+)notto:\s*(\S+)\s*/u)
-        if (match && match[1]) {
-          queryMatch['$and'].push({'out.e.a': { '$ne': window.convertAddress(match[1]) }})
-          matchPhrase = matchPhrase.replace(/(?:^|\s+)notto:\s*\S+\s*/gu, ' ')
-        }
-      }
-      matchPhrase = matchPhrase.trim()
-
-      if (matchPhrase) {
-        queryMatch['$and'].push({'$text': {'$search': '\"' + matchPhrase + '\"'}})
-      }
-      queryMatch['$and'].push({'blk.t': {'$gte': beginTimestamp, '$lte': endTimestamp}})
-
-      return queryMatch
-    }
     var populateChart = async function(searchStrings) {
       for (let pcIndex = 0; pcIndex < searchStrings.length; ++pcIndex) {
         getMatchCountArray(searchStrings[pcIndex], pcIndex)
@@ -284,7 +210,7 @@
       let endTimestamp = parseInt(dateTimestamp)
       let periodFormat = '%Y-%m-%d'
 
-      let queryMatch = queryCreator(searchPhrase, beginTimestamp, endTimestamp)
+      let queryMatch = searchQueryCreator(searchPhrase, beginTimestamp, endTimestamp)
 
       let query = {
         'v': 3,
