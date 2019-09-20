@@ -11,7 +11,7 @@
   <meta property="og:title" content="Trends.cash - Popular Bitcoin SV apps (sorted by actions)" />
   <meta property="og:description" content="Ranking of popular Bitcoins SV apps sorted by performed actions" />
   <meta property="og:image" content="https://trends.cash/assets/images/logo-large.png" />
-  
+
   <link rel="stylesheet" href="/assets/css/styles.css">
   <link rel="apple-touch-icon" sizes="57x57" href="/assets/icons/apple-icon-57x57.png">
   <link rel="apple-touch-icon" sizes="60x60" href="/assets/icons/apple-icon-60x60.png">
@@ -204,9 +204,12 @@
     var getActionsChartData = function() {
       let urlType = {}
       let requests = []
-      for (let i = periodInput; i > 0; --i) {
-        let beginTimestamp = dateTimestamp - (i * 24 * 60 * 60)
-        let endTimestamp = dateTimestamp - ((i - 1) * 24 * 60 * 60)
+//      for (let i = periodInput; i > 0; --i) {
+//        let beginTimestamp = dateTimestamp - (i * 24 * 60 * 60)
+//        let endTimestamp = dateTimestamp - ((i - 1) * 24 * 60 * 60)
+      for (let i = periodInput * 6; i > 0; --i) {
+        let beginTimestamp = dateTimestamp - (i * 4 * 60 * 60)
+        let endTimestamp = dateTimestamp - ((i - 1) * 4 * 60 * 60)
 
         // get vanilla protocol count
         var queryMatch = {}

@@ -71,8 +71,6 @@ var addRankingRow = function(parentElementId, index, item, color)
   var textNode3=document.createTextNode(item[1]);
   var a = document.createElement("a");
   var href = getTrendsLink(item[2], item[4])
-  console.log("2: " + item[2])
-  console.log("3: " + item[3])
   if (item[2].length == 1 && item[3] && item[2][0] == btoa(item[3])) {
     href = getTrendsLink([item[3]], item[4])
   }
