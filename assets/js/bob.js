@@ -16,12 +16,12 @@
           }
         }
         let b64 = btoa(JSON.stringify(query))
-        let url = bitdbNode + b64
+        let url = bobNode + b64
 
         let header
-        if (window.bitdbApiKey) {
+        if (window.bobApiKey) {
           header = {
-            headers: { key: window.bitdbApiKey }
+            headers: { key: window.bobApiKey }
           }
         }
 

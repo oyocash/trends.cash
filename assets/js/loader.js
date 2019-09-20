@@ -2,7 +2,6 @@ async function fetchHtmlAsText(url) {
     return await (await fetch(url)).text();
 }
 async function loadHead() {
-    const contentDiv = document.getElementById("head");
     document.head.innerHTML += await fetchHtmlAsText("/includes/head.html");
 }
 async function loadNav() {

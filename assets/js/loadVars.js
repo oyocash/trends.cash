@@ -2,25 +2,25 @@
 window.searchPeriodDefault = 7
 window.rankingPeriodDefault = 1
 // bitdb babel node
-window.bitdbNodeDefault = 'https://bob.planaria.network/q/1GgmC7Cg782YtQ6R9QkM58voyWeQJmJJzG/'
-window.bitdbNode = window.bitdbNodeDefault
-if (localStorage.getItem('bitdbNode')) {
-  if (window.bitdbNodeDefault === localStorage.getItem('bitdbNode'))
+window.bobNodeDefault = 'https://bob.planaria.network/q/1GgmC7Cg782YtQ6R9QkM58voyWeQJmJJzG/'
+window.bobNode = window.bobNodeDefault
+if (localStorage.getItem('bobNode')) {
+  if (window.bobNodeDefault === localStorage.getItem('bobNode'))
   {
-    localStorage.removeItem('bitdbNode')
+    localStorage.removeItem('bobNode')
   } else {
-    window.bitdbNode = localStorage.getItem('bitdbNode')
+    window.bobNode = localStorage.getItem('bobNode')
   }
 }
 // bitdb api key
-window.bitdbApiKeyDefault = 'qpl84tsdqd6yxd3hpxhj5ngr3rp0pvlweqy7p7rzfy'
-window.bitdbApiKey = window.bitdbApiKeyDefault
-if (localStorage.getItem('bitdbApiKey')) {
-  if (window.bitdbApiKeyDefault === localStorage.getItem('bitdbApiKey'))
+window.bobApiKeyDefault = 'qpl84tsdqd6yxd3hpxhj5ngr3rp0pvlweqy7p7rzfy'
+window.bobApiKey = window.bobApiKeyDefault
+if (localStorage.getItem('bobApiKey')) {
+  if (window.bobApiKeyDefault === localStorage.getItem('bobApiKey'))
   {
-    localStorage.removeItem('bitdbApiKey')
+    localStorage.removeItem('bobApiKey')
   } else {
-    window.bitdbApiKey = localStorage.getItem('bitdbApiKey')
+    window.bobApiKey = localStorage.getItem('bobApiKey')
   }
 }
 // protocols
