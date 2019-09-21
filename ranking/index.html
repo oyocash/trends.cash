@@ -207,9 +207,9 @@
 //      for (let i = periodInput; i > 0; --i) {
 //        let beginTimestamp = dateTimestamp - (i * 24 * 60 * 60)
 //        let endTimestamp = dateTimestamp - ((i - 1) * 24 * 60 * 60)
-      for (let i = periodInput * 6; i > 0; --i) {
-        let beginTimestamp = dateTimestamp - (i * 4 * 60 * 60)
-        let endTimestamp = dateTimestamp - ((i - 1) * 4 * 60 * 60)
+      for (let i = periodInput * 12; i > 0; --i) {
+        let beginTimestamp = dateTimestamp - (i * 2 * 60 * 60)
+        let endTimestamp = dateTimestamp - ((i - 1) * 2 * 60 * 60)
 
         // get vanilla protocol count
         var queryMatch = {}
