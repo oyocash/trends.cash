@@ -337,8 +337,17 @@
             }
           }
           chartDataUnordered.sort((a, b) => parseFloat(b[1]) - parseFloat(a[1]))
+          var dummyChartObj = {}
           dummyChartObj.chartData = JSON.parse(JSON.stringify(chartDataUnordered));
           getBitcomProtocols().then(function() {
+            for (let key in bitcomProtocols) {
+              if (!bitcomProtocols.hasOwnProperty(key)) continue;
+              for (let ii = 0; ii < dummyChartObj.chartData.length; ii++) {
+                if (dummyChartObj.chartData[ii][0] === key) {
+                  dummyChartObj.chartData[ii][0] = bitcomProtocols[key]['name']
+                }
+              }
+            }
             chartDataUnordered = JSON.parse(JSON.stringify(dummyChartObj.chartData))
             populateRankings()
           })

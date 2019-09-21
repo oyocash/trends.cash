@@ -1,5 +1,5 @@
 var bitcomPrefixes = []
-var dummyChartObj = {}
+var bitcomProtocols = {}
 var getBitcomProtocols =  function() {
   return new Promise(function(resolve, reject) {
     let queryMatch = {}
@@ -37,7 +37,6 @@ var getBitcomProtocols =  function() {
           bitcomEchoResults = bitcomEchoResults.concat(response.c)
         }
 
-        let bitcomProtocols = {}
         for (let i = 0; i < bitcomEchoResults.length; ++i) {
           for (let j = 0; j < bitcomEchoResults[i]['out'].length; ++j) {
             if (!bitcomEchoResults[i]['out'][j]) {
@@ -58,15 +57,7 @@ var getBitcomProtocols =  function() {
             }
           }
         }
-        for (let key in bitcomProtocols) {
-          if (!bitcomProtocols.hasOwnProperty(key)) continue;
-          for (let ii = 0; ii < dummyChartObj.chartData.length; ii++) {
-            if (dummyChartObj.chartData[ii][0] === key) {
-              dummyChartObj.chartData[ii][0] = bitcomProtocols[key]['name']
-            }
-          }
-        }
-        resolve(dummyChartObj.chartData)
+        resolve(bitcomProtocols)
       }
     })
     .catch(error => {
