@@ -13,14 +13,14 @@ if (localStorage.getItem('bobNode')) {
   }
 }
 // bitdb api key
-window.bobApiKeyDefault = 'qpl84tsdqd6yxd3hpxhj5ngr3rp0pvlweqy7p7rzfy'
-window.bobApiKey = window.bobApiKeyDefault
-if (localStorage.getItem('bobApiKey')) {
-  if (window.bobApiKeyDefault === localStorage.getItem('bobApiKey'))
+window.bitdbApiKeyDefault = 'qpl84tsdqd6yxd3hpxhj5ngr3rp0pvlweqy7p7rzfy'
+window.bitdbApiKey = window.bitdbApiKeyDefault
+if (localStorage.getItem('bitdbApiKey')) {
+  if (window.bitdbApiKeyDefault === localStorage.getItem('bitdbApiKey'))
   {
-    localStorage.removeItem('bobApiKey')
+    localStorage.removeItem('bitdbApiKey')
   } else {
-    window.bobApiKey = localStorage.getItem('bobApiKey')
+    window.bitdbApiKey = localStorage.getItem('bitdbApiKey')
   }
 }
 // protocols

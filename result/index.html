@@ -116,7 +116,15 @@
     changeSearchRoute(searchText, periodInput, dateInput)
   }
   // oyo link
-  var oyoSearchString = searchPhrases.map(searchPhrases => `"${searchPhrases}"`).join(' ');
+  var oyoSearchString = ""
+  for(let i=0; i<searchPhrases.length; i++){
+    if (searchPhrases[i].startsWith("prefix:") || searchPhrases[i].startsWith("app:")) {
+      oyoSearchString += searchPhrases[i] + " "
+    } else {
+      oyoSearchString += "\"" + searchPhrases[i] + "\" "
+    }
+  }
+//  var oyoSearchString = searchPhrases.map(searchPhrases => `"${searchPhrases}"`).join(' ');
   var oyoLink = document.getElementById('oyoLink')
   oyoLink.setAttribute("href", "https://oyo.cash/result/" + btoa(oyoSearchString) + "/0");
   oyoLink.setAttribute("title", "Search Bitcoin for " + oyoSearchString);
@@ -243,9 +251,9 @@
       let url = window.bobNode + b64
 
       let header
-      if (window.bobApiKey) {
+      if (window.bitdbApiKey) {
         header = {
-          headers: { key: window.bobApiKey }
+          headers: { key: window.bitdbApiKey }
         }
       }
 

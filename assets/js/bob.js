@@ -19,9 +19,9 @@ var getBitcomProtocols =  function() {
     let url = bobNode + b64
 
     let header
-    if (window.bobApiKey) {
+    if (window.bitdbApiKey) {
       header = {
-        headers: { key: window.bobApiKey }
+        headers: { key: window.bitdbApiKey }
       }
     }
 
