@@ -62,6 +62,9 @@
   </div>
 
 <script language='javascript'>
+  document.getElementById('bobNode').value =window.bobNode
+  document.getElementById('bitdbApiKey').value = window.bitdbApiKey
+
   document.addEventListener("DOMContentLoaded", function() {
     loadHead()
     loadNav().then(function(r) {

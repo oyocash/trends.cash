@@ -80,11 +80,17 @@ h1{
 .form .field-block {
   border-bottom: 1px solid #eee;
   color: #222;
+  width:90%;
   min-width: 400px;
   padding-top: 18px;
   padding-bottom: 10px;
   padding-right: 20px;
   position: relative;
+}
+.form .field-block input{
+  width:90%;
+  height: 22px;
+  font-size: 15px;
 }
 .form h4 {
   display: block;
