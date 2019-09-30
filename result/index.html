@@ -126,7 +126,7 @@
   }
 //  var oyoSearchString = searchPhrases.map(searchPhrases => `"${searchPhrases}"`).join(' ');
   var oyoLink = document.getElementById('oyoLink')
-  oyoLink.setAttribute("href", "https://oyo.cash/result/" + btoa(oyoSearchString) + "/0");
+  oyoLink.setAttribute("href", "https://oyo.cash/result/?search=" + btoa(oyoSearchString) + "&offset=0");
   oyoLink.setAttribute("title", "Search Bitcoin for " + oyoSearchString);
 
   // create chart
