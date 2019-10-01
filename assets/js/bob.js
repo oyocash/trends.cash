@@ -4,7 +4,7 @@ var getBitcomProtocols =  function() {
   return new Promise(function(resolve, reject) {
     let queryMatch = {}
     queryMatch['$and'] = []
-    queryMatch['$and'].push({"out.tape.cell": {"$all": [{"$elemMatch": {"i": 0, "s": "$"}}, {"$elemMatch": {"i": 1, "s": "echo"}}, {"$elemMatch": {"i": 3, "s": "to"}}, {"$elemMatch": {"i": 4, "s": {'$in': ['name']}}}]}})
+    queryMatch['$and'].push({"out.tape.cell": {"$all": [{"$elemMatch": {"i": 0, "s": "$"}}, {"$elemMatch": {"i": 1, "s": "echo"}}, {"$elemMatch": {"i": 3, "s": {"$in": ["to", ">"]}}}, {"$elemMatch": {"i": 4, "s": {'$in': ['name']}}}]}})
     queryMatch['$and'].push({'in.e.a': {'$in': bitcomPrefixes}})
 
     let query = {
