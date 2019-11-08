@@ -40,7 +40,7 @@
   <script src="/assets/js/loader.js"></script>
   <script src="/assets/js/loadVars.js"></script>
   <script src="/assets/js/common.js"></script>
-  <script src="/assets/js/bob.js?0811201901"></script>
+  <script src="/assets/js/bob.js?0110201901"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.8.0/css/pikaday.min.css" integrity="sha256-+RIb33VoW3hHdfmp0+G4FrGAxzlKBXiwo6thzduwZdU=" crossorigin="anonymous" />
 </head>
 <body>
@@ -168,95 +168,102 @@
     })
     loadFooter()
 
-
-    function getPromise (url, header){
-      return fetch(url, header).then(function(r) {
-        var url = r.url
-        return r.json()
-      }).then(function(response) {
-        return {"data": response, "url": url}
-      })
-    };
-    function promiseAllSkippingErrors(promises) {
-      return Promise.all(
-        promises.map(p => p.catch(error => null))
-      )
-    }
-
     function getComputedResult (protocolAddress, txHash, computerAddress, beginTimestamp, endTimestamp, step) {
       return new Promise(function(resolve, reject) {
+        var limit = (endTimestamp - beginTimestamp) / step
 
-        let promises = [];
-        let period = Math.ceil((endTimestamp - beginTimestamp) / step)
-
-        var today = new Date().setUTCHours(0, 0, 0, 0) / 1000
-        var endTimestampDay = new Date(endTimestamp * 1000).setUTCHours(0, 0, 0, 0) / 1000
-
-        if(today === endTimestampDay && period === 1){
-          var localStep = 3600
-          var endTimestampModStep = (endTimestamp - new Date(1548979200 * 1000).setUTCHours(0, 0, 0, 0)) % localStep
-          endTimestamp -= endTimestampModStep
-          beginTimestamp -= endTimestampModStep
-          period = Math.ceil((endTimestamp - beginTimestamp) / localStep)
-          for (let i = 0; i < period; i++) {
-            var requestUrl = "https://raw.githubusercontent.com/trendscharts/output/master/c253e05c7bdfcf3498cbee22176650db307cb4bc09e7a91a1ac0828f190b222e/19vi1SG78XRZfzrxRAKPMqPjsf5Rf2hmub/" + (beginTimestamp + i * localStep) + "-" + localStep + "-all.json"
-            promises.push(getPromise(requestUrl));
-          }
-        } else {
-          beginTimestamp = new Date(beginTimestamp * 1000).setUTCHours(0, 0, 0, 0) / 1000
-          for (let i = 0; i < period; i++) {
-            var requestUrl = "https://raw.githubusercontent.com/trendscharts/output/master/c253e05c7bdfcf3498cbee22176650db307cb4bc09e7a91a1ac0828f190b222e/19vi1SG78XRZfzrxRAKPMqPjsf5Rf2hmub/" + (beginTimestamp + i * step) + "-" + step + "-all.json"
-            promises.push(getPromise(requestUrl));
+        let queryMatch = {}
+        queryMatch['$and'] = []
+        queryMatch['$and'].push({"out.tape.cell": {"$all": [{"$elemMatch": {"i": 0, "s": protocolAddress}}, {"$elemMatch": {"i": 1, "s": "result"}}, {"$elemMatch": {"i": 2, "s": txHash}}, {"$elemMatch": {"i": 5, "s": step.toString()}}, {"$elemMatch": {"i": 4, "s": {"$exists": true, "$gte": beginTimestamp.toString()}}}, {"$elemMatch": {"i": 4, "s": {"$exists": true, "$lt": (endTimestamp + periodInput).toString() }}}]}})
+        queryMatch['$and'].push({"in.e.a": computerAddress})
+        // Get tx from bob
+        var query = {
+          "v": 3,
+          "q": {
+            "find": queryMatch,
+            "project": {
+              "out.tape.cell": 1
+            },
+            "limit": limit
+          },
+          "r": {
+            "f": "[ .[] | .out[0].tape[] |  { cell: .cell } ]"
           }
         }
+        var b64 = btoa(JSON.stringify(query))
+        var url = bobNode + b64
+        console.log(url)
 
+        var header = { headers: { key: bitdbApiKey } };
+        fetch(url, header).then(function(r) {
+          return r.json()
+        }).then(function(r) {
+          // tx not found
+          if ((r.u === undefined || r.u.length === 0) && (r.c === undefined || r.c.length === 0)) {
+            return []
+          }
+          var items = []
+          if (r.c.length > 0) {
+            items.push.apply(items, r.c)
+          }
+          if (r.u.length > 0) {
+            items.push.apply(items, r.u.reverse())
+          }
 
-        promiseAllSkippingErrors(promises)
-        .then((...data) => {
-          for (let i = 0; i < data[0].length; i++) {
+          var data = []
+          for (i = 0; i < items.length; i++) {
+            if (items[i].cell[3] !== undefined && (items[i].cell[3].s || items[i].cell[3].ls)) {
+              data.push(items[i].cell)
+            }
+          }
+          resolve(data)
+          return data
+        })
+        .then(function(data) {
+          for (let i = 0; i < data.length; i++) {
             var rankingData
-            if (data[0][i]) {
-              if (data[0][i]['data'][3]) {
-                rankingData = JSON.parse(data[0][i]['data'][3])
+            if (data[i][3].s) {
+              rankingData = JSON.parse(data[i][3].s)
+            }
+            if (data[i][3].ls) {
+              var rankingData = JSON.parse(data[i][3].ls)
+            }
+            for (let ii = 0; ii < rankingData.length; ii++) {
+              const base64Id = rankingData[ii][0]
+              const count = rankingData[ii][1]
+              const type = rankingData[ii][2]
+              let itemId = atob(base64Id)
+              let itemName = ''
+              if (protocols[base64Id] !== undefined) {
+                itemName = protocols[base64Id].name
+              } else if (base64Id.length <= 6) {
+                itemName = itemId + ' (' + base64Id + ')'
+              } else {
+                itemName = itemId
               }
-
-              for (let ii = 0; ii < rankingData.length; ii++) {
-                const base64Id = rankingData[ii][0]
-                const count = rankingData[ii][1]
-                const type = rankingData[ii][2]
-                let itemId = atob(base64Id)
-                let itemName = ''
-                if (protocols[base64Id] !== undefined) {
-                  itemName = protocols[base64Id].name
-                } else if (base64Id.length <= 6) {
-                  itemName = itemId + ' (' + base64Id + ')'
-                } else {
-                  itemName = itemId
-                }
-                if (chartData[itemName] !== undefined) {
-                  chartData[itemName]['count'] = chartData[itemName]['count'] + count
-                  if (!(chartData[itemName]['base64'].includes(base64Id))) {
-                    chartData[itemName]['base64'].push(base64Id)
-                  }
-                  if (count > chartData[itemName]['count']) {
-                    chartData[itemName]['type'] = type
-                  }
-                } else {
-                  chartData[itemName] = {}
-                  chartData[itemName]['count'] = count
-                  chartData[itemName]['base64'] = []
+              if (chartData[itemName] !== undefined) {
+                chartData[itemName]['count'] = chartData[itemName]['count'] + count
+                if (!(chartData[itemName]['base64'].includes(base64Id))) {
                   chartData[itemName]['base64'].push(base64Id)
-                  chartData[itemName]['itemId'] = itemId.replace(/[^0-9a-zA-Z\.@]/g,"")
+                }
+                if (count > chartData[itemName]['count']) {
                   chartData[itemName]['type'] = type
                 }
-                // B protocol names population
-                let prefix = itemId
-                if (!(bitcomPrefixes.includes(prefix)) && protocols[prefix] === undefined) {
-                  try {
-                    bchaddr.isLegacyAddress(prefix)
-                    bitcomPrefixes.push(prefix)
-                  } catch (e) {
-                  }
+              } else {
+                chartData[itemName] = {}
+                chartData[itemName]['count'] = count
+                chartData[itemName]['base64'] = []
+                chartData[itemName]['base64'].push(base64Id)
+                chartData[itemName]['itemId'] = itemId.replace(/[^0-9a-zA-Z\.@]/g,"")
+                chartData[itemName]['type'] = type
+              }
+              // B protocol names population
+              let prefix = itemId
+              if (!(bitcomPrefixes.includes(prefix)) && protocols[prefix] === undefined) {
+                try {
+                  bchaddr.isLegacyAddress(prefix)
+                  bitcomPrefixes.push(prefix)
+                } catch (e) {
                 }
               }
             }
@@ -284,9 +291,9 @@
           })
         })
         .catch(error => {
-          // document.getElementById("loading").style.display = "none";
-          // document.getElementById("error").style.display = "block";
-          // document.getElementById("loaded").style.display = "none";
+          document.getElementById("loading").style.display = "none";
+          document.getElementById("error").style.display = "block";
+          document.getElementById("loaded").style.display = "none";
           console.log(error)
         })
       })

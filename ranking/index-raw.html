@@ -40,7 +40,7 @@
   <script src="/assets/js/loader.js"></script>
   <script src="/assets/js/loadVars.js"></script>
   <script src="/assets/js/common.js"></script>
-  <script src="/assets/js/bob.js?0811201901"></script>
+  <script src="/assets/js/bob.js?0110201901"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.8.0/css/pikaday.min.css" integrity="sha256-+RIb33VoW3hHdfmp0+G4FrGAxzlKBXiwo6thzduwZdU=" crossorigin="anonymous" />
 </head>
 <body>
@@ -97,15 +97,10 @@
   document.getElementById("error").style.display = "none";
   document.getElementById("loaded").style.display = "none";
 
-  var computedProtocolId = "19LtLM6H2CMjYKq2mSZitAGUGgYXYh4m4Z"
-  var computedTxHash = "80e81450314d8c569dc7df0ec773e831cbdb42b628a5a034fe4627531a7f6278"
-  var computerAddress = "19vi1SG78XRZfzrxRAKPMqPjsf5Rf2hmub"
-  var step = 86400
   var itemsOnChart = 10
   var chartDataUnordered = []
   var chartDataFull = []
   var chartDataSliced = []
-  let chartData = {}
 
   // populate period
   var periodInput = parseInt(getUrlVars()["period"]) || window.rankingPeriodDefault
@@ -168,62 +163,138 @@
     })
     loadFooter()
 
-
-    function getPromise (url, header){
-      return fetch(url, header).then(function(r) {
-        var url = r.url
-        return r.json()
-      }).then(function(response) {
-        return {"data": response, "url": url}
-      })
-    };
-    function promiseAllSkippingErrors(promises) {
-      return Promise.all(
-        promises.map(p => p.catch(error => null))
-      )
+    var getActionsChartQuery =  function (queryMatch, i) {
+      var query = {
+      	"v": 3,
+      	"q": {
+      		"aggregate": [{
+      				"$unwind": "$out"
+      			},
+      			{
+      				"$unwind": "$out.tape"
+      			},
+      			{
+      				"$match": queryMatch
+      			},
+      			{
+      				"$unwind": "$out.tape.cell"
+      			},
+            {
+              "$match": {
+                "out.tape.cell.i": i
+              }
+            },
+      			{
+      				"$group": {
+      					"_id": "$out.tape.cell.b",
+      					"count": {
+      						"$sum": 1
+      					}
+      				}
+      			}
+      		],
+      		"limit": 100,
+      		"sort": {
+      			"count": -1
+      		}
+      	}
+      }
+      return query
     }
 
-    function getComputedResult (protocolAddress, txHash, computerAddress, beginTimestamp, endTimestamp, step) {
-      return new Promise(function(resolve, reject) {
+    var getActionsChartData = function() {
+      let urlType = {}
+      let requests = []
+//      for (let i = periodInput; i > 0; --i) {
+//        let beginTimestamp = dateTimestamp - (i * 24 * 60 * 60)
+//        let endTimestamp = dateTimestamp - ((i - 1) * 24 * 60 * 60)
+      for (let i = periodInput * 12; i > 0; --i) {
+        let beginTimestamp = dateTimestamp - (i * 2 * 60 * 60)
+        let endTimestamp = dateTimestamp - ((i - 1) * 2 * 60 * 60)
 
-        let promises = [];
-        let period = Math.ceil((endTimestamp - beginTimestamp) / step)
+        // get vanilla protocol count
+        var queryMatch = {}
+        queryMatch['$and'] = []
+        queryMatch['$and'].push({"out.tape.cell": {"$all": [{"$elemMatch": {"i": 0, "s": {"$exists": true, "$ne": ""}}}, {"$elemMatch": {"i": 1, "s": {"$exists": true, "$ne": ""}}}]}})
+        queryMatch['$and'].push({'blk.t': {'$gte': beginTimestamp, '$lte': endTimestamp}})
+        var query = getActionsChartQuery (queryMatch, 0)
+        var b64 = btoa(JSON.stringify(query))
+        var url = window.bobNode + b64
+        requests.push(url)
+        urlType[url] = 'base'
+        // end get vanilla protocol count
 
-        var today = new Date().setUTCHours(0, 0, 0, 0) / 1000
-        var endTimestampDay = new Date(endTimestamp * 1000).setUTCHours(0, 0, 0, 0) / 1000
+        // get MAP app (i = 3) count
+        var queryMatch = {}
+        queryMatch['$and'] = []
+        queryMatch['$and'].push({"out.tape.cell": {"$all": [{"$elemMatch": {"i": 2, "s": "app"}}, {"$elemMatch": {"i": 3, "s": {"$exists": true, "$ne": ""}}}]}})
+        queryMatch['$and'].push({'blk.t': {'$gte': beginTimestamp, '$lte': endTimestamp}})
+        var query = getActionsChartQuery (queryMatch, 3)
+        var b64 = btoa(JSON.stringify(query))
+        var url = window.bobNode + b64
+        requests.push(url)
+        urlType[url] = 'mapApp'
+        // end get MAP app (i = 3) count
 
-        if(today === endTimestampDay && period === 1){
-          var localStep = 3600
-          var endTimestampModStep = (endTimestamp - new Date(1548979200 * 1000).setUTCHours(0, 0, 0, 0)) % localStep
-          endTimestamp -= endTimestampModStep
-          beginTimestamp -= endTimestampModStep
-          period = Math.ceil((endTimestamp - beginTimestamp) / localStep)
-          for (let i = 0; i < period; i++) {
-            var requestUrl = "https://raw.githubusercontent.com/trendscharts/output/master/c253e05c7bdfcf3498cbee22176650db307cb4bc09e7a91a1ac0828f190b222e/19vi1SG78XRZfzrxRAKPMqPjsf5Rf2hmub/" + (beginTimestamp + i * localStep) + "-" + localStep + "-all.json"
-            promises.push(getPromise(requestUrl));
-          }
-        } else {
-          beginTimestamp = new Date(beginTimestamp * 1000).setUTCHours(0, 0, 0, 0) / 1000
-          for (let i = 0; i < period; i++) {
-            var requestUrl = "https://raw.githubusercontent.com/trendscharts/output/master/c253e05c7bdfcf3498cbee22176650db307cb4bc09e7a91a1ac0828f190b222e/19vi1SG78XRZfzrxRAKPMqPjsf5Rf2hmub/" + (beginTimestamp + i * step) + "-" + step + "-all.json"
-            promises.push(getPromise(requestUrl));
-          }
+        // get MAP app (i = 15) count
+        var queryMatch = {}
+        queryMatch['$and'] = []
+        queryMatch['$and'].push({"out.tape.cell": {"$all": [{"$elemMatch": {"i": 14, "s": "app"}}, {"$elemMatch": {"i": 15, "s": {"$exists": true, "$ne": ""}}}]}})
+        queryMatch['$and'].push({'blk.t': {'$gte': beginTimestamp, '$lte': endTimestamp}})
+        var query = getActionsChartQuery (queryMatch, 15)
+        var b64 = btoa(JSON.stringify(query))
+        var url = window.bobNode + b64
+        requests.push(url)
+        urlType[url] = 'mapApp'
+        // end get MAP app (i = 15) count
+
+        // get MAP app (i = 17) count
+        var queryMatch = {}
+        queryMatch['$and'] = []
+        queryMatch['$and'].push({"out.tape.cell": {"$all": [{"$elemMatch": {"i": 16, "s": "app"}}, {"$elemMatch": {"i": 17, "s": {"$exists": true, "$ne": ""}}}]}})
+        queryMatch['$and'].push({'blk.t': {'$gte': beginTimestamp, '$lte': endTimestamp}})
+        var query = getActionsChartQuery (queryMatch, 17)
+        var b64 = btoa(JSON.stringify(query))
+        var url = window.bobNode + b64
+        requests.push(url)
+        urlType[url] = 'mapApp'
+        // end get MAP app (i = 17) count
+
+        // get "run" app count
+        var queryMatch = {}
+        queryMatch['$and'] = []
+        queryMatch['$and'].push({"out.tape.cell": {"$all": [{"$elemMatch": {"i": 0, "s": "run"}}, {"$elemMatch": {"i": 2, "s": {"$exists": true, "$ne": ""}}}]}})
+        queryMatch['$and'].push({'blk.t': {'$gte': beginTimestamp, '$lte': endTimestamp}})
+        var query = getActionsChartQuery (queryMatch, 2)
+        var b64 = btoa(JSON.stringify(query))
+        var url = window.bobNode + b64
+        requests.push(url)
+        urlType[url] = 'run'
+        // end get "run" app count
+      }
+      let header
+      if (window.bitdbApiKey) {
+        header = {
+          headers: { key: window.bitdbApiKey }
         }
+      }
 
+      let promises = [];
+      for (let i = 0; i < requests.length; i++) {
+          promises.push(getPromise(requests[i], header));
+      }
 
-        promiseAllSkippingErrors(promises)
-        .then((...data) => {
-          for (let i = 0; i < data[0].length; i++) {
-            var rankingData
-            if (data[0][i]) {
-              if (data[0][i]['data'][3]) {
-                rankingData = JSON.parse(data[0][i]['data'][3])
-              }
-
-              for (let ii = 0; ii < rankingData.length; ii++) {
-                const base64Id = rankingData[ii][0]
-                const count = rankingData[ii][1]
-                const type = rankingData[ii][2]
+      let chartData = {}
+      Promise.all(promises)
+        .then((...args) => {
+          for (let i = 0; i < args.length; i++) {
+            // debug purpose
+            if (args[i] !== 'undefined')
+            for (let j = 0; j < args[i].length; j++) {
+              var dataJson = args[i][j].data
+              if (dataJson !== 'undefined' && dataJson.c !== 'undefined')
+              for (let index = 0; index < dataJson.c.length; ++index) {
+                const base64Id = dataJson.c[index]['_id']
                 let itemId = atob(base64Id)
                 let itemName = ''
                 if (protocols[base64Id] !== undefined) {
@@ -234,20 +305,20 @@
                   itemName = itemId
                 }
                 if (chartData[itemName] !== undefined) {
-                  chartData[itemName]['count'] = chartData[itemName]['count'] + count
+                  chartData[itemName]['count'] = chartData[itemName]['count'] + dataJson.c[index]['count']
                   if (!(chartData[itemName]['base64'].includes(base64Id))) {
                     chartData[itemName]['base64'].push(base64Id)
                   }
-                  if (count > chartData[itemName]['count']) {
-                    chartData[itemName]['type'] = type
+                  if (dataJson.c[index]['count'] > chartData[itemName]['count']) {
+                    chartData[itemName]['type'] = urlType[args[i][j].url]
                   }
                 } else {
                   chartData[itemName] = {}
-                  chartData[itemName]['count'] = count
+                  chartData[itemName]['count'] = dataJson.c[index]['count']
                   chartData[itemName]['base64'] = []
                   chartData[itemName]['base64'].push(base64Id)
                   chartData[itemName]['itemId'] = itemId.replace(/[^0-9a-zA-Z\.@]/g,"")
-                  chartData[itemName]['type'] = type
+                  chartData[itemName]['type'] = urlType[args[i][j].url]
                 }
                 // B protocol names population
                 let prefix = itemId
@@ -261,7 +332,6 @@
               }
             }
           }
-
           for (var k in chartData){
             if (chartData.hasOwnProperty(k)) {
               chartDataUnordered.push([k, chartData[k]['count'], chartData[k]['base64'], chartData[k]['itemId'], chartData[k]['type']])
@@ -284,12 +354,11 @@
           })
         })
         .catch(error => {
-          // document.getElementById("loading").style.display = "none";
-          // document.getElementById("error").style.display = "block";
-          // document.getElementById("loaded").style.display = "none";
+          document.getElementById("loading").style.display = "none";
+          document.getElementById("error").style.display = "block";
+          document.getElementById("loaded").style.display = "none";
           console.log(error)
         })
-      })
     }
     var populateRankings = function () {
       chartDataFull = chartDataUnordered
@@ -314,9 +383,7 @@
     }
 
     // get actions chart data
-    var beginTimestamp = startDateTimestamp
-    var endTimestamp = dateTimestamp
-    getComputedResult(computedProtocolId, computedTxHash, computerAddress, beginTimestamp, endTimestamp, step)
+    getActionsChartData()
   })
 </script>
 </body>
