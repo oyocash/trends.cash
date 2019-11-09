@@ -182,7 +182,6 @@
         promises.map(p => p.catch(error => null))
       )
     }
-
     function getComputedResult (protocolAddress, txHash, computerAddress, beginTimestamp, endTimestamp, step) {
       return new Promise(function(resolve, reject) {
 
@@ -199,13 +198,13 @@
           beginTimestamp -= endTimestampModStep
           period = Math.ceil((endTimestamp - beginTimestamp) / localStep)
           for (let i = 0; i < period; i++) {
-            var requestUrl = "https://raw.githubusercontent.com/trendscharts/output/master/c253e05c7bdfcf3498cbee22176650db307cb4bc09e7a91a1ac0828f190b222e/19vi1SG78XRZfzrxRAKPMqPjsf5Rf2hmub/" + (beginTimestamp + i * localStep) + "-" + localStep + "-all.json"
+            var requestUrl = "https://raw.githubusercontent.com/trendscharts/output/master/c253e05c7bdfcf3498cbee22176650db307cb4bc09e7a91a1ac0828f190b222e/19vi1SG78XRZfzrxRAKPMqPjsf5Rf2hmub/" + (beginTimestamp + i * localStep) + "-" + localStep + "-all.0.json"
             promises.push(getPromise(requestUrl));
           }
         } else {
           beginTimestamp = new Date(beginTimestamp * 1000).setUTCHours(0, 0, 0, 0) / 1000
           for (let i = 0; i < period; i++) {
-            var requestUrl = "https://raw.githubusercontent.com/trendscharts/output/master/c253e05c7bdfcf3498cbee22176650db307cb4bc09e7a91a1ac0828f190b222e/19vi1SG78XRZfzrxRAKPMqPjsf5Rf2hmub/" + (beginTimestamp + i * step) + "-" + step + "-all.json"
+            var requestUrl = "https://raw.githubusercontent.com/trendscharts/output/master/c253e05c7bdfcf3498cbee22176650db307cb4bc09e7a91a1ac0828f190b222e/19vi1SG78XRZfzrxRAKPMqPjsf5Rf2hmub/" + (beginTimestamp + i * step) + "-" + step + "-all.0.json"
             promises.push(getPromise(requestUrl));
           }
         }
@@ -284,9 +283,6 @@
           })
         })
         .catch(error => {
-          // document.getElementById("loading").style.display = "none";
-          // document.getElementById("error").style.display = "block";
-          // document.getElementById("loaded").style.display = "none";
           console.log(error)
         })
       })

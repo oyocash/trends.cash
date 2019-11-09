@@ -180,6 +180,117 @@
       maxDate: new Date()
   });
 
+
+  function promiseAllSkippingErrors(promises) {
+    return Promise.all(
+      promises.map(p => p.catch(error => null))
+    )
+  }
+  function getComputedResult (protocolAddress, txHash, computerAddress, beginTimestamp, endTimestamp, step) {
+    return new Promise(function(resolve, reject) {
+
+      let promises = [];
+      let period = Math.ceil((endTimestamp - beginTimestamp) / step)
+
+      var today = new Date().setUTCHours(0, 0, 0, 0) / 1000
+      var endTimestampDay = new Date(endTimestamp * 1000).setUTCHours(0, 0, 0, 0) / 1000
+
+      if(today === endTimestampDay && period === 1){
+        var localStep = 3600
+        var endTimestampModStep = (endTimestamp - new Date(1548979200 * 1000).setUTCHours(0, 0, 0, 0)) % localStep
+        endTimestamp -= endTimestampModStep
+        beginTimestamp -= endTimestampModStep
+        period = Math.ceil((endTimestamp - beginTimestamp) / localStep)
+        for (let i = 0; i < period; i++) {
+          var requestUrl = "https://raw.githubusercontent.com/trendscharts/output/master/c253e05c7bdfcf3498cbee22176650db307cb4bc09e7a91a1ac0828f190b222e/19vi1SG78XRZfzrxRAKPMqPjsf5Rf2hmub/" + (beginTimestamp + i * localStep) + "-" + localStep + "-all.json"
+          promises.push(getPromise(requestUrl));
+        }
+      } else {
+        beginTimestamp = new Date(beginTimestamp * 1000).setUTCHours(0, 0, 0, 0) / 1000
+        for (let i = 0; i < period; i++) {
+          var requestUrl = "https://raw.githubusercontent.com/trendscharts/output/master/c253e05c7bdfcf3498cbee22176650db307cb4bc09e7a91a1ac0828f190b222e/19vi1SG78XRZfzrxRAKPMqPjsf5Rf2hmub/" + (beginTimestamp + i * step) + "-" + step + "-all.json"
+          promises.push(getPromise(requestUrl));
+        }
+      }
+
+      promiseAllSkippingErrors(promises)
+      .then((...data) => {
+        for (let i = 0; i < data[0].length; i++) {
+          var rankingData
+          if (data[0][i]) {
+            if (data[0][i]['data'][3]) {
+              rankingData = JSON.parse(data[0][i]['data'][3])
+            }
+
+            for (let ii = 0; ii < rankingData.length; ii++) {
+              const base64Id = rankingData[ii][0]
+              const count = rankingData[ii][1]
+              const type = rankingData[ii][2]
+              let itemId = atob(base64Id)
+              let itemName = ''
+              if (protocols[base64Id] !== undefined) {
+                itemName = protocols[base64Id].name
+              } else if (base64Id.length <= 6) {
+                itemName = itemId + ' (' + base64Id + ')'
+              } else {
+                itemName = itemId
+              }
+              if (chartData[itemName] !== undefined) {
+                chartData[itemName]['count'] = chartData[itemName]['count'] + count
+                if (!(chartData[itemName]['base64'].includes(base64Id))) {
+                  chartData[itemName]['base64'].push(base64Id)
+                }
+                if (count > chartData[itemName]['count']) {
+                  chartData[itemName]['type'] = type
+                }
+              } else {
+                chartData[itemName] = {}
+                chartData[itemName]['count'] = count
+                chartData[itemName]['base64'] = []
+                chartData[itemName]['base64'].push(base64Id)
+                chartData[itemName]['itemId'] = itemId.replace(/[^0-9a-zA-Z\.@]/g,"")
+                chartData[itemName]['type'] = type
+              }
+              // B protocol names population
+              let prefix = itemId
+              if (!(bitcomPrefixes.includes(prefix)) && protocols[prefix] === undefined) {
+                try {
+                  bchaddr.isLegacyAddress(prefix)
+                  bitcomPrefixes.push(prefix)
+                } catch (e) {
+                }
+              }
+            }
+          }
+        }
+
+        for (var k in chartData){
+          if (chartData.hasOwnProperty(k)) {
+            chartDataUnordered.push([k, chartData[k]['count'], chartData[k]['base64'], chartData[k]['itemId'], chartData[k]['type']])
+          }
+        }
+        chartDataUnordered.sort((a, b) => parseFloat(b[1]) - parseFloat(a[1]))
+        var dummyChartObj = {}
+        dummyChartObj.chartData = JSON.parse(JSON.stringify(chartDataUnordered));
+        getBitcomProtocols().then(function() {
+          for (let key in bitcomProtocols) {
+            if (!bitcomProtocols.hasOwnProperty(key)) continue;
+            for (let ii = 0; ii < dummyChartObj.chartData.length; ii++) {
+              if (dummyChartObj.chartData[ii][0] === key) {
+                dummyChartObj.chartData[ii][0] = bitcomProtocols[key]['name']
+              }
+            }
+          }
+          chartDataUnordered = JSON.parse(JSON.stringify(dummyChartObj.chartData))
+          populateRankings()
+        })
+      })
+      .catch(error => {
+        console.log(error)
+      })
+    })
+  }
+
   document.addEventListener("DOMContentLoaded", function() {
     // on date change
     document.getElementById('startDateForm').addEventListener("change", function() {
