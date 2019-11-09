@@ -202,13 +202,13 @@
         beginTimestamp -= endTimestampModStep
         period = Math.ceil((endTimestamp - beginTimestamp) / localStep)
         for (let i = 0; i < period; i++) {
-          var requestUrl = "https://raw.githubusercontent.com/trendscharts/output/master/c253e05c7bdfcf3498cbee22176650db307cb4bc09e7a91a1ac0828f190b222e/19vi1SG78XRZfzrxRAKPMqPjsf5Rf2hmub/" + (beginTimestamp + i * localStep) + "-" + localStep + "-all.json"
+          var requestUrl = "https://raw.githubusercontent.com/trendscharts/output/master/58e6840ef98531725b9260cbdfa72b6a5f757eb1ff30d98ffe8728b57b0de6b2/19vi1SG78XRZfzrxRAKPMqPjsf5Rf2hmub/" + (beginTimestamp + i * localStep) + "-" + localStep + "-all.json"
           promises.push(getPromise(requestUrl));
         }
       } else {
         beginTimestamp = new Date(beginTimestamp * 1000).setUTCHours(0, 0, 0, 0) / 1000
         for (let i = 0; i < period; i++) {
-          var requestUrl = "https://raw.githubusercontent.com/trendscharts/output/master/c253e05c7bdfcf3498cbee22176650db307cb4bc09e7a91a1ac0828f190b222e/19vi1SG78XRZfzrxRAKPMqPjsf5Rf2hmub/" + (beginTimestamp + i * step) + "-" + step + "-all.json"
+          var requestUrl = "https://raw.githubusercontent.com/trendscharts/output/master/58e6840ef98531725b9260cbdfa72b6a5f757eb1ff30d98ffe8728b57b0de6b2/19vi1SG78XRZfzrxRAKPMqPjsf5Rf2hmub/" + (beginTimestamp + i * step) + "-" + step + "-all.json"
           promises.push(getPromise(requestUrl));
         }
       }
