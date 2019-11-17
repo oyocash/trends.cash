@@ -67,8 +67,8 @@
             <div class="chartNavLeft">Zoom:
               <button class="periodButton" value="1">1d</button>
               <button class="periodButton" value="7">7d</button>
-              <button class="periodButton" value="30">1m</button>
-              <button class="periodButton" value="90">3m</button>
+              <button class="periodButton" value="30">30d</button>
+              <button class="periodButton" value="90">90d</button>
             </div>
             <div class="chartNavCenter"></div>
             <div class="chartNavRight">
@@ -98,7 +98,7 @@
   document.getElementById("loaded").style.display = "none";
 
   var computedProtocolId = "19LtLM6H2CMjYKq2mSZitAGUGgYXYh4m4Z"
-  var computedTxHash = "80e81450314d8c569dc7df0ec773e831cbdb42b628a5a034fe4627531a7f6278"
+  var computedTxHash = "35e5888c2b2a39c05f0917bb75311b8263efb53e4c9d1e12d6278ce5e503e8c6"
   var computerAddress = "19vi1SG78XRZfzrxRAKPMqPjsf5Rf2hmub"
   var step = 86400
   var itemsOnChart = 10
@@ -198,17 +198,16 @@
           beginTimestamp -= endTimestampModStep
           period = Math.ceil((endTimestamp - beginTimestamp) / localStep)
           for (let i = 0; i < period; i++) {
-            var requestUrl = "https://raw.githubusercontent.com/trendscharts/output/master/35e5888c2b2a39c05f0917bb75311b8263efb53e4c9d1e12d6278ce5e503e8c6/19vi1SG78XRZfzrxRAKPMqPjsf5Rf2hmub/" + (beginTimestamp + i * localStep) + "-" + localStep + "-all-0.json"
+            var requestUrl = "https://raw.githubusercontent.com/trendscharts/output/master/" + txHash + "/" + computerAddress + "/" + (beginTimestamp + i * localStep) + "-" + localStep + "-all-0.json"
             promises.push(getPromise(requestUrl));
           }
         } else {
           beginTimestamp = new Date(beginTimestamp * 1000).setUTCHours(0, 0, 0, 0) / 1000
           for (let i = 0; i < period; i++) {
-            var requestUrl = "https://raw.githubusercontent.com/trendscharts/output/master/35e5888c2b2a39c05f0917bb75311b8263efb53e4c9d1e12d6278ce5e503e8c6/19vi1SG78XRZfzrxRAKPMqPjsf5Rf2hmub/" + (beginTimestamp + i * step) + "-" + step + "-all-0.json"
+            var requestUrl = "https://raw.githubusercontent.com/trendscharts/output/master/" + txHash + "/" + computerAddress + "/" + (beginTimestamp + i * step) + "-" + step + "-all-0.json"
             promises.push(getPromise(requestUrl));
           }
         }
-
 
         promiseAllSkippingErrors(promises)
         .then((...data) => {

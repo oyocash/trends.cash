@@ -85,18 +85,12 @@
   document.getElementById("error").style.display = "none";
   document.getElementById("loaded").style.display = "none";
 
-  var computedProtocolId = "19LtLM6H2CMjYKq2mSZitAGUGgYXYh4m4Z"
-  var computedTxHash = "35e5888c2b2a39c05f0917bb75311b8263efb53e4c9d1e12d6278ce5e503e8c6"
-  var computerAddress = "19vi1SG78XRZfzrxRAKPMqPjsf5Rf2hmub"
-
   // populate search phrases
   var searchPhrases = []
   var searchText = atob(getUrlVars()["search"])
   searchPhrases = searchText.replace(/['"]+/g, '').split(/\s*,\s*/)
   // populate period
   var periodInput = parseInt(getUrlVars()["period"]) || window.searchPeriodDefault
-  // populate step
-  var step = parseInt(getUrlVars()["step"]) || 86400
   // populate date
   var dateTimestamp, dateForm
   var dateInput = getUrlVars()["date"] || 0
@@ -186,6 +180,117 @@
       maxDate: new Date()
   });
 
+
+  function promiseAllSkippingErrors(promises) {
+    return Promise.all(
+      promises.map(p => p.catch(error => null))
+    )
+  }
+  function getComputedResult (protocolAddress, txHash, computerAddress, beginTimestamp, endTimestamp, step) {
+    return new Promise(function(resolve, reject) {
+
+      let promises = [];
+      let period = Math.ceil((endTimestamp - beginTimestamp) / step)
+
+      var today = new Date().setUTCHours(0, 0, 0, 0) / 1000
+      var endTimestampDay = new Date(endTimestamp * 1000).setUTCHours(0, 0, 0, 0) / 1000
+
+      if(today === endTimestampDay && period === 1){
+        var localStep = 3600
+        var endTimestampModStep = (endTimestamp - new Date(1548979200 * 1000).setUTCHours(0, 0, 0, 0)) % localStep
+        endTimestamp -= endTimestampModStep
+        beginTimestamp -= endTimestampModStep
+        period = Math.ceil((endTimestamp - beginTimestamp) / localStep)
+        for (let i = 0; i < period; i++) {
+          var requestUrl = "https://raw.githubusercontent.com/trendscharts/output/master/35e5888c2b2a39c05f0917bb75311b8263efb53e4c9d1e12d6278ce5e503e8c6/19vi1SG78XRZfzrxRAKPMqPjsf5Rf2hmub/" + (beginTimestamp + i * localStep) + "-" + localStep + "-all.json"
+          promises.push(getPromise(requestUrl));
+        }
+      } else {
+        beginTimestamp = new Date(beginTimestamp * 1000).setUTCHours(0, 0, 0, 0) / 1000
+        for (let i = 0; i < period; i++) {
+          var requestUrl = "https://raw.githubusercontent.com/trendscharts/output/master/35e5888c2b2a39c05f0917bb75311b8263efb53e4c9d1e12d6278ce5e503e8c6/19vi1SG78XRZfzrxRAKPMqPjsf5Rf2hmub/" + (beginTimestamp + i * step) + "-" + step + "-all.json"
+          promises.push(getPromise(requestUrl));
+        }
+      }
+
+      promiseAllSkippingErrors(promises)
+      .then((...data) => {
+        for (let i = 0; i < data[0].length; i++) {
+          var rankingData
+          if (data[0][i]) {
+            if (data[0][i]['data'][3]) {
+              rankingData = JSON.parse(data[0][i]['data'][3])
+            }
+
+            for (let ii = 0; ii < rankingData.length; ii++) {
+              const base64Id = rankingData[ii][0]
+              const count = rankingData[ii][1]
+              const type = rankingData[ii][2]
+              let itemId = atob(base64Id)
+              let itemName = ''
+              if (protocols[base64Id] !== undefined) {
+                itemName = protocols[base64Id].name
+              } else if (base64Id.length <= 6) {
+                itemName = itemId + ' (' + base64Id + ')'
+              } else {
+                itemName = itemId
+              }
+              if (chartData[itemName] !== undefined) {
+                chartData[itemName]['count'] = chartData[itemName]['count'] + count
+                if (!(chartData[itemName]['base64'].includes(base64Id))) {
+                  chartData[itemName]['base64'].push(base64Id)
+                }
+                if (count > chartData[itemName]['count']) {
+                  chartData[itemName]['type'] = type
+                }
+              } else {
+                chartData[itemName] = {}
+                chartData[itemName]['count'] = count
+                chartData[itemName]['base64'] = []
+                chartData[itemName]['base64'].push(base64Id)
+                chartData[itemName]['itemId'] = itemId.replace(/[^0-9a-zA-Z\.@]/g,"")
+                chartData[itemName]['type'] = type
+              }
+              // B protocol names population
+              let prefix = itemId
+              if (!(bitcomPrefixes.includes(prefix)) && protocols[prefix] === undefined) {
+                try {
+                  bchaddr.isLegacyAddress(prefix)
+                  bitcomPrefixes.push(prefix)
+                } catch (e) {
+                }
+              }
+            }
+          }
+        }
+
+        for (var k in chartData){
+          if (chartData.hasOwnProperty(k)) {
+            chartDataUnordered.push([k, chartData[k]['count'], chartData[k]['base64'], chartData[k]['itemId'], chartData[k]['type']])
+          }
+        }
+        chartDataUnordered.sort((a, b) => parseFloat(b[1]) - parseFloat(a[1]))
+        var dummyChartObj = {}
+        dummyChartObj.chartData = JSON.parse(JSON.stringify(chartDataUnordered));
+        getBitcomProtocols().then(function() {
+          for (let key in bitcomProtocols) {
+            if (!bitcomProtocols.hasOwnProperty(key)) continue;
+            for (let ii = 0; ii < dummyChartObj.chartData.length; ii++) {
+              if (dummyChartObj.chartData[ii][0] === key) {
+                dummyChartObj.chartData[ii][0] = bitcomProtocols[key]['name']
+              }
+            }
+          }
+          chartDataUnordered = JSON.parse(JSON.stringify(dummyChartObj.chartData))
+          populateRankings()
+        })
+      })
+      .catch(error => {
+        console.log(error)
+      })
+    })
+  }
+
   document.addEventListener("DOMContentLoaded", function() {
     // on date change
     document.getElementById('startDateForm').addEventListener("change", function() {
@@ -216,112 +321,10 @@
 
     var populateChart = async function(searchStrings) {
       for (let pcIndex = 0; pcIndex < searchStrings.length; ++pcIndex) {
-        if (searchStrings[pcIndex].match(/prefix:\s*[0-9a-fA-F]+\b\s*/)) {  // transform prefix "h" to prefix "b"
-          let match = searchStrings[pcIndex].match(/(?:^|\s+)prefix:\s*([0-9a-fA-F]+)\s*/u)
-          if (match && match[1]) {
-            var bPrefix = hexToBase64(match[1])
-            getMatchCountComputed(searchStrings[pcIndex], pcIndex, match[1], "base")
-          }
-        } else if (searchStrings[pcIndex].match(/prefix:\s*\S+=\s*/)) {  // prefix "b"
-          let match = searchStrings[pcIndex].match(/(?:^|\s+)prefix:\s*(\S+=)\s*/u)
-          if (match && match[1]) {
-            getMatchCountComputed(searchStrings[pcIndex], pcIndex, match[1], "base")
-          }
-        } else if (searchStrings[pcIndex].match(/prefix:\s*\S+\s*/)) {  // prefix "s"
-          let match = searchStrings[pcIndex].match(/(?:^|\s+)prefix:\s*(\S+)\s*/u)
-          if (match && match[1]) {
-            getMatchCountComputed(searchStrings[pcIndex], pcIndex, btoa(match[1]), "base")
-          }
-        } else if (searchStrings[pcIndex].match(/app:\s*\S+\s*/)) {  // MAP app
-          let match = searchStrings[pcIndex].match(/(?:^|\s+)app:\s*(\S+)\s*/u)
-          if (match && match[1]) {
-            getMatchCountComputed(searchStrings[pcIndex], pcIndex, btoa(match[1]), "mapApp")
-          }
-        } else {
-          getMatchCountPlanaria(searchStrings[pcIndex], pcIndex)
-        }
+        getMatchCountArray(searchStrings[pcIndex], pcIndex)
       }
     }
-    var getMatchCountComputed = async function(realSearchPhrase, index, searchPhrase, type) {
-      let beginNotCorrectedTimestamp = new Date(parseInt(dateTimestamp - ((periodInput) * 24 * 60 * 60)) * 1000).toISOString()
-      let beginTimestamp = new Date(Date.UTC(beginNotCorrectedTimestamp.substring(0,4), parseInt(beginNotCorrectedTimestamp.substring(5,7)) - 1, beginNotCorrectedTimestamp.substring(8,10), 0, 0, 0, 0)).getTime() / 1000
-      let endTimestamp = parseInt(dateTimestamp)
-      var searchFilename = searchPhrase.replace(/\//g, '#')
-      var url = "https://raw.githubusercontent.com/trendscharts/output/master/" + computedTxHash + "/" + computerAddress + "/" + type + "/" + step + "/" + searchFilename + ".json"
-
-      fetch(url).then(function(r) {
-        return r.json()
-      }).then(response => {
-        if (response.length >= 0) {
-          let prevItemDate = null
-          let singleChartData = []
-          for (let index = 0; index < response.length; ++index) {
-            if (response[index]['_id'] < beginTimestamp) {
-              continue
-            }
-            let itemDate = new Date(response[index]['_id'] * 1000)
-            if (index === 0 || response[index]['_id'] - beginTimestamp < step) {
-              // fill with 0 if it's not the beginning
-              let timeDiff = Math.abs(itemDate.getTime() - (beginTimestamp * 1000))
-              let diffDays = Math.ceil(timeDiff / (1000 * step))
-              if (diffDays > 0) {
-                for (let j = diffDays; j > 0; --j) {
-                  let fillDate = new Date(itemDate)
-                  fillDate.setDate(itemDate.getDate() - j)
-                  singleChartData.push({"t": fillDate.getTime(), "y": 0})
-                }
-              }
-            } else {
-              let timeDiff = Math.abs(itemDate.getTime() - prevItemDate.getTime())
-              let diffDays = Math.floor(timeDiff / (1000 * 3600 * 24))
-              // fill empty dates with 0
-              if (diffDays > 1) {
-                for (let j = 1; j < diffDays; ++j) {
-                  let fillDate = new Date(prevItemDate)
-                  fillDate.setDate(prevItemDate.getDate() + j)
-                  singleChartData.push({"t": fillDate.getTime(), "y": 0})
-                }
-              }
-            }
-
-            // push real data
-            var chartItemDate = new Date(response[index]['_id'] * 1000).getTime()
-            singleChartData.push({"t": chartItemDate, "y": response[index]['count']})
-            prevItemDate = itemDate
-          }
-
-          // fill with 0 till the end
-          if (prevItemDate === null) {
-            prevItemDate = new Date(beginTimestamp * 1000)
-          }
-          let timeDiff = Math.abs(dateTimestamp * 1000 - prevItemDate.getTime())
-          let diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24))
-          if (diffDays > 1) {
-            for (let j = 1; j < diffDays; ++j) {
-              let fillDate = new Date(prevItemDate)
-              fillDate.setDate(prevItemDate.getDate() + j)
-              singleChartData.push({"t": fillDate.getTime(), "y": 0})
-            }
-          }
-          // push data to chart
-          var dataset = {"label": realSearchPhrase, "data": singleChartData, "backgroundColor": window.colors[0][index], "borderColor": window.colors[1][index], "pointRadius": 0, "fill": false, "lineTension": 0, "borderWidth": 2}
-          myChart.config.data.datasets.push(dataset)
-          myChart.update();
-          // show loaded
-          document.getElementById("loading").style.display = "none";
-          document.getElementById("error").style.display = "none";
-          document.getElementById("loaded").style.display = "block";
-        }
-      })
-      .catch(error => {
-        document.getElementById("loading").style.display = "none";
-        document.getElementById("error").style.display = "block";
-        document.getElementById("loaded").style.display = "none";
-        console.log(error)
-      })
-    }
-
-    var getMatchCountPlanaria = async function(searchPhrase, index) {
+    var getMatchCountArray = async function(searchPhrase, index) {
       let beginNotCorrectedTimestamp = new Date(parseInt(dateTimestamp - ((periodInput) * 24 * 60 * 60)) * 1000).toISOString()
       let beginTimestamp = new Date(Date.UTC(beginNotCorrectedTimestamp.substring(0,4), parseInt(beginNotCorrectedTimestamp.substring(5,7)) - 1, beginNotCorrectedTimestamp.substring(8,10), 0, 0, 0, 0)).getTime() / 1000
       let endTimestamp = parseInt(dateTimestamp)

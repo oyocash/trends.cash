@@ -263,6 +263,7 @@ div.main input[type="submit"]:focus {
   font-family: 'Roboto','Heebo',Arial,sans-serif;
   font-weight: 400;
   margin: 20px;
+  padding-bottom: 50px;
   max-width: 1152px;
   width:100%;
   grid-column: span 6;
