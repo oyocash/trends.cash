@@ -260,7 +260,8 @@
               continue
             }
             let itemDate = new Date(response[index]['_id'] * 1000)
-            if (index === 0 || response[index]['_id'] - beginTimestamp < step) {
+            if (index === 0 || prevItemDate === null) {
+              console.log(response[index]['_id'] - beginTimestamp)
               // fill with 0 if it's not the beginning
               let timeDiff = Math.abs(itemDate.getTime() - (beginTimestamp * 1000))
               let diffDays = Math.ceil(timeDiff / (1000 * step))
@@ -272,6 +273,7 @@
                 }
               }
             } else {
+              console.log(response[index]['_id'] - beginTimestamp)
               let timeDiff = Math.abs(itemDate.getTime() - prevItemDate.getTime())
               let diffDays = Math.floor(timeDiff / (1000 * 3600 * 24))
               // fill empty dates with 0
