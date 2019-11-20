@@ -88,6 +88,9 @@ var getTrendsLink = function(base64Ids, type) {
   if (type === 'mapApp') {
     query = 'app:' + base64Ids.join(', app:')
   }
+  if (type === 'run') {
+    query = 'app:' + base64Ids.join(', app:')
+  }
   let b64 = btoa(JSON.stringify(query).slice(1, JSON.stringify(query).length-1))
   return '/result/?search=' + b64 + '&period=' + window.searchPeriodDefault + '&date=0'
 }
