@@ -63,7 +63,9 @@
               To: <input type="text" name="endDateForm" id="endDateForm" title="Search date end" placeholder="YYYY-MM-DD"/>
             </div>
           </div>
-          <canvas id="myChart"></canvas>
+          <div style="height: 300px;">
+            <canvas id="myChart"></canvas>
+          </div>
         </div>
         <div class="s_results" id="error">
           <div class="n_results">
@@ -147,6 +149,7 @@
 	  },
 		options: {
       responsive: true,
+      maintainAspectRatio: false,
 			scales: {
 				xAxes: [{
 					type: 'time',

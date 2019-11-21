@@ -184,7 +184,6 @@
     }
     function getComputedResult (protocolAddress, txHash, computerAddress, beginTimestamp, endTimestamp, step) {
       return new Promise(function(resolve, reject) {
-
         let promises = [];
         let period = Math.ceil((endTimestamp - beginTimestamp) / step)
 
