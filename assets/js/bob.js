@@ -102,11 +102,11 @@ var getBitcomProtocols =  function() {
       }
       promises.push(getPromise(url, header));
     }
-
+    console.log(promises.length)
     Promise.all(promises)
-    .then((...args) => {
-      for (let i = 0; i < args.length; i++) {
-        var response = args[i][0]
+    .then(function(args) {
+      for (let ii = 0; ii < args.length; ii++) {
+        var response = args[ii]
         if (response !== undefined && (response.u !== undefined || response.c !== undefined)) {
           let bitcomEchoResults = []
           if (response.u !== undefined) {
