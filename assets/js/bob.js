@@ -10,6 +10,70 @@ var getPromise = function (url, header){
   })
 };
 
+var getBitcomProtocolEchos =  function(address) {
+  return new Promise(function(resolve, reject) {
+    let queryMatch = {}
+    queryMatch['$and'] = []
+    queryMatch['$and'].push({"out.tape.cell": {"$all": [{"$elemMatch": {"i": 0, "s": "$"}}, {"$elemMatch": {"i": 1, "s": "echo"}}, {"$elemMatch": {"i": 3, "s": {"$in": ["to", ">"]}}}, {"$elemMatch": {"i": 4, "s": {"$exists": true, "$ne": ""}}}]}})
+    queryMatch['$and'].push({'in.e.a': {'$in': [address]}})
+
+    let query = {
+      'v': 3,
+      'q': {
+        'find': queryMatch,
+        'skip': 0,
+        'limit': 100
+      }
+    }
+    let b64 = btoa(JSON.stringify(query))
+    let url = bobNode + b64
+    let header
+    if (window.bitdbApiKey) {
+      header = {
+        headers: { key: window.bitdbApiKey }
+      }
+    }
+
+    fetch(url, header).then(function(r) {
+      return r.json()
+    }).then(response => {
+      let bitcomEchoResults = []
+      let bitcomProtocolEchos = {}
+      if (response !== undefined && (response.u !== undefined || response.c !== undefined)) {
+        if (response.u !== undefined) {
+          bitcomEchoResults = bitcomEchoResults.concat(response.u.reverse())
+        }
+        if (response.c !== undefined) {
+          bitcomEchoResults = bitcomEchoResults.concat(response.c)
+        }
+
+        for (let i = 0; i < bitcomEchoResults.length; ++i) {
+          for (let j = 0; j < bitcomEchoResults[i]['out'].length; ++j) {
+            if (!bitcomEchoResults[i]['out'][j]) {
+              continue
+            }
+            for (let jj = 0; jj < bitcomEchoResults[i]['out'][j]['tape'].length; ++jj) {
+              if (bitcomEchoResults[i]['out'][j]['tape'][jj]['cell'][4] !== undefined) {
+                if (bitcomEchoResults[i]['out'][j]['tape'][jj]['cell'][0].s === "$" && bitcomEchoResults[i]['out'][j]['tape'][jj]['cell'][1].s === "echo" && (bitcomEchoResults[i]['out'][j]['tape'][jj]['cell'][3].s === "to" || bitcomEchoResults[i]['out'][j]['tape'][jj]['cell'][3].s === ">")) {
+                  let field = bitcomEchoResults[i]['out'][j]['tape'][jj]['cell'][4].s
+                  if (bitcomProtocolEchos[field] === undefined) {
+                    bitcomProtocolEchos[field] = bitcomEchoResults[i]['out'][j]['tape'][jj]['cell'][2].s
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      resolve(bitcomProtocolEchos)
+    })
+    .catch(error => {
+      reject(error)
+      console.log(error)
+    })
+  });
+}
+
 var getBitcomProtocols =  function() {
   return new Promise(function(resolve, reject) {
     var promises = []

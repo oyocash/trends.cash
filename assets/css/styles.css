@@ -257,7 +257,20 @@ div.main input[type="submit"]:focus {
 .chartNavRight { margin-left: auto;}
 /* end chart section */
 
+
 /* table */
+.resultTableLeft {
+  background-color: #fff;
+  font-family: 'Roboto','Heebo',Arial,sans-serif;
+  font-weight: 400;
+  margin: 20px;
+  padding-bottom: 50px;
+  max-width: 1152px;
+  width:100%;
+  grid-column: span 6;
+  position: relative;
+}
+
 .resultTable {
   background-color: #fff;
   font-family: 'Roboto','Heebo',Arial,sans-serif;
@@ -326,6 +339,17 @@ div.main input[type="submit"]:focus {
     overflow: hidden;
     text-overflow:ellipsis;
 }
+.resultTable-item .label-text2 {
+    left: 25px;
+    line-height: 16px;
+    position: absolute;
+    top: 24px;
+    text-align: left;
+    width: 25%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow:ellipsis;
+}
 .resultTable-item .label-value {
     color: #bdbdbd;
     font-size: 1.2rem;
@@ -336,6 +360,20 @@ div.main input[type="submit"]:focus {
     text-align: right;
     top: 24px;
     width: 132px;
+}
+.resultTable-item .label-value2 {
+    font-size: 1.2rem;
+    line-height: 16px;
+    padding-right: 15px;
+    position: absolute;
+    right: 23px;
+    text-align: right;
+    top: 24px;
+    width: 432px;
+}
+.resultTable-item .label-value2 a {
+  color: rgba(0,0,0,0.60);
+  text-decoration: none;
 }
 
 .search input[type="text"]{

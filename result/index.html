@@ -66,6 +66,28 @@
           <div style="height: 300px;">
             <canvas id="myChart"></canvas>
           </div>
+
+
+          <div class="grid chartGrid">
+            <div class="resultTable" id="protocolContentGrid">
+              <div class="resultTable-container resultTable-separator">
+                <div class="resultTable-title">
+                  Protocol
+                </div>
+              </div>
+              <div id="protocolContent"></div>
+            </div>
+            <div class="resultTable" id="protocolExplorersContentGrid">
+              <div class="resultTable-container resultTable-separator">
+                <div class="resultTable-title">
+                  Protocol explorers
+                </div>
+              </div>
+              <div id="protocolExplorersContent"></div>
+            </div>
+          </div>
+
+
         </div>
         <div class="s_results" id="error">
           <div class="n_results">
@@ -82,10 +104,254 @@
   </div>
 
 <script language='javascript'>
+  var populateChart = async function(searchStrings) {
+    return new Promise(function(resolve, reject) {
+      for (let pcIndex = 0; pcIndex < searchStrings.length; ++pcIndex) {
+        if (searchStrings[pcIndex].match(/prefix:\s*[0-9a-fA-F]+\b\s*/)) {  // transform prefix "h" to prefix "b"
+          let match = searchStrings[pcIndex].match(/(?:^|\s+)prefix:\s*([0-9a-fA-F]+)\s*/u)
+          if (match && match[1]) {
+            var bPrefix = hexToBase64(match[1])
+            getMatchCountComputed(searchStrings[pcIndex], pcIndex, match[1], "base").then(function(r) {
+              resolve(match[1])
+            })
+          }
+        } else if (searchStrings[pcIndex].match(/prefix:\s*\S+=\s*/)) {  // prefix "b"
+          let match = searchStrings[pcIndex].match(/(?:^|\s+)prefix:\s*(\S+=)\s*/u)
+          if (match && match[1]) {
+            getMatchCountComputed(searchStrings[pcIndex], pcIndex, match[1], "base").then(function(r) {
+              resolve(match[1])
+            })
+          }
+        } else if (searchStrings[pcIndex].match(/prefix:\s*\S+\s*/)) {  // prefix "s"
+          let match = searchStrings[pcIndex].match(/(?:^|\s+)prefix:\s*(\S+)\s*/u)
+          if (match && match[1]) {
+            getMatchCountComputed(searchStrings[pcIndex], pcIndex, btoa(match[1]), "base").then(function(r) {
+              resolve(match[1])
+            })
+          }
+        } else if (searchStrings[pcIndex].match(/app:\s*\S+\s*/)) {  // MAP app or run app
+          let match = searchStrings[pcIndex].match(/(?:^|\s+)app:\s*(\S+)\s*/u)
+          if (match && match[1]) {
+            getMatchCountComputed(searchStrings[pcIndex], pcIndex, btoa(match[1]), "mapApp").then(function(r) {
+              resolve()
+            })
+            .catch(error => {
+              getMatchCountComputed(searchStrings[pcIndex], pcIndex, btoa(match[1]), "run").then(function(r) {
+                resolve()
+              })
+            })
+          }
+        } else {
+          getMatchCountPlanaria(searchStrings[pcIndex], pcIndex).then(function(r) {
+            resolve()
+          })
+        }
+      }
+    })
+  }
+  var getMatchCountComputed = async function(realSearchPhrase, index, searchPhrase, type) {
+    return new Promise(function(resolve, reject) {
+      let beginNotCorrectedTimestamp = new Date(parseInt(dateTimestamp - ((periodInput) * 24 * 60 * 60)) * 1000).toISOString()
+      let beginTimestamp = new Date(Date.UTC(beginNotCorrectedTimestamp.substring(0,4), parseInt(beginNotCorrectedTimestamp.substring(5,7)) - 1, beginNotCorrectedTimestamp.substring(8,10), 0, 0, 0, 0)).getTime() / 1000
+      let endTimestamp = parseInt(dateTimestamp)
+      var searchFilename = searchPhrase.replace(/\//g, '#')
+      var url = "https://raw.githubusercontent.com/trendscharts/output/master/" + computedTxHash + "/" + computerAddress + "/" + type + "/" + step + "/" + searchFilename + ".json"
+
+      fetch(url).then(function(r) {
+        return r.json()
+      }).then(response => {
+        if (response.length >= 0) {
+          let prevItemDate = null
+          let singleChartData = []
+          for (let index = 0; index < response.length; ++index) {
+            if (response[index]['_id'] < beginTimestamp) {
+              continue
+            }
+            let itemDate = new Date(response[index]['_id'] * 1000)
+            if (index === 0 || prevItemDate === null) {
+              // fill with 0 if it's not the beginning
+              let timeDiff = Math.abs(itemDate.getTime() - (beginTimestamp * 1000))
+              let diffDays = Math.ceil(timeDiff / (1000 * step))
+              if (diffDays > 0) {
+                for (let j = diffDays; j > 0; --j) {
+                  let fillDate = new Date(itemDate)
+                  fillDate.setDate(itemDate.getDate() - j)
+                  singleChartData.push({"t": fillDate.getTime(), "y": 0})
+                }
+              }
+            } else {
+              let timeDiff = Math.abs(itemDate.getTime() - prevItemDate.getTime())
+              let diffDays = Math.floor(timeDiff / (1000 * 3600 * 24))
+              // fill empty dates with 0
+              if (diffDays > 1) {
+                for (let j = 1; j < diffDays; ++j) {
+                  let fillDate = new Date(prevItemDate)
+                  fillDate.setDate(prevItemDate.getDate() + j)
+                  singleChartData.push({"t": fillDate.getTime(), "y": 0})
+                }
+              }
+            }
+
+            // push real data
+            var chartItemDate = new Date(response[index]['_id'] * 1000).getTime()
+            singleChartData.push({"t": chartItemDate, "y": response[index]['count']})
+            prevItemDate = itemDate
+          }
+
+          // fill with 0 till the end
+          if (prevItemDate === null) {
+            prevItemDate = new Date(beginTimestamp * 1000)
+          }
+          let timeDiff = Math.abs(dateTimestamp * 1000 - prevItemDate.getTime())
+          let diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24))
+          if (diffDays > 1) {
+            for (let j = 1; j < diffDays; ++j) {
+              let fillDate = new Date(prevItemDate)
+              fillDate.setDate(prevItemDate.getDate() + j)
+              singleChartData.push({"t": fillDate.getTime(), "y": 0})
+            }
+          }
+          // push data to chart
+          var dataset = {"label": realSearchPhrase, "data": singleChartData, "backgroundColor": window.colors[0][index], "borderColor": window.colors[1][index], "pointRadius": 0, "fill": false, "lineTension": 0, "borderWidth": 2}
+          myChart.config.data.datasets.push(dataset)
+          myChart.update();
+          // show loaded
+          document.getElementById("loading").style.display = "none";
+          document.getElementById("error").style.display = "none";
+          document.getElementById("loaded").style.display = "block";
+          resolve(singleChartData.length)
+        }
+      })
+      .catch(error => {
+        document.getElementById("loading").style.display = "none";
+        document.getElementById("error").style.display = "block";
+        document.getElementById("loaded").style.display = "none";
+        console.log(error)
+        reject(error)
+      })
+    })
+  }
+
+  var getMatchCountPlanaria = async function(searchPhrase, index) {
+    let beginNotCorrectedTimestamp = new Date(parseInt(dateTimestamp - ((periodInput) * 24 * 60 * 60)) * 1000).toISOString()
+    let beginTimestamp = new Date(Date.UTC(beginNotCorrectedTimestamp.substring(0,4), parseInt(beginNotCorrectedTimestamp.substring(5,7)) - 1, beginNotCorrectedTimestamp.substring(8,10), 0, 0, 0, 0)).getTime() / 1000
+    let endTimestamp = parseInt(dateTimestamp)
+    let periodFormat = '%Y-%m-%d'
+
+    let queryMatch = searchQueryCreator(searchPhrase, beginTimestamp, endTimestamp)
+
+    let query = {
+      'v': 3,
+      'q': {
+        'aggregate': [{
+          '$match': queryMatch
+        }, {
+          '$group': {
+            '_id': {
+              '$dateToString': {
+                'format': periodFormat,
+                'date': {
+                  '$toDate': {
+                    '$multiply': [1000, '$blk.t']
+                  }
+                }
+              }
+            },
+            'count': {
+              '$sum': 1
+            }
+          }
+        }],
+        'limit': 10000,
+        'sort': {'_id': 1}
+      }
+    }
+
+    var b64 = btoa(JSON.stringify(query));
+    let url = window.bobNode + b64
+
+    let header
+    if (window.bitdbApiKey) {
+      header = {
+        headers: { key: window.bitdbApiKey }
+      }
+    }
+
+    fetch(url, header).then(function(r) {
+      return r.json()
+    }).then(response => {
+      if (response.c.length >= 0) {
+        let prevItemDate = null
+        let singleChartData = []
+        for (let index = 0; index < response.c.length; ++index) {
+            let itemDate = new Date(response.c[index]['_id'])
+            if (index === 0) {
+              // fill with 0 if it's not the beginning
+              let timeDiff = Math.abs(itemDate.getTime() - (beginTimestamp * 1000))
+              let diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24))
+              if (diffDays > 0) {
+                for (let j = diffDays; j > 0; --j) {
+                  let fillDate = new Date(itemDate)
+                  fillDate.setDate(itemDate.getDate() - j)
+                  singleChartData.push({"t": fillDate.getTime(), "y": 0})
+                }
+              }
+            } else {
+              let timeDiff = Math.abs(itemDate.getTime() - prevItemDate.getTime())
+              let diffDays = Math.floor(timeDiff / (1000 * 3600 * 24))
+              // fill empty dates with 0
+              if (diffDays > 1) {
+                for (let j = 1; j < diffDays; ++j) {
+                  let fillDate = new Date(prevItemDate)
+                  fillDate.setDate(prevItemDate.getDate() + j)
+                  singleChartData.push({"t": fillDate.getTime(), "y": 0})
+                }
+              }
+            }
+
+            // push real data
+            var chartItemDate = new Date(Date.UTC(response.c[index]['_id'].substring(0,4), parseInt(response.c[index]['_id'].substring(5,7)) - 1, response.c[index]['_id'].substring(8,10), 0, 0, 0, 0)).getTime()
+            singleChartData.push({"t": chartItemDate, "y": response.c[index]['count']})
+            prevItemDate = itemDate
+        }
+
+        // fill with 0 till the end
+        if (prevItemDate === null) {
+          prevItemDate = new Date(beginTimestamp * 1000)
+        }
+        let timeDiff = Math.abs(dateTimestamp * 1000 - prevItemDate.getTime())
+        let diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24))
+        if (diffDays > 1) {
+          for (let j = 1; j < diffDays; ++j) {
+            let fillDate = new Date(prevItemDate)
+            fillDate.setDate(prevItemDate.getDate() + j)
+            singleChartData.push({"t": fillDate.getTime(), "y": 0})
+          }
+        }
+        // push data to chart
+        var dataset = {"label": searchPhrase, "data": singleChartData, "backgroundColor": window.colors[0][index], "borderColor": window.colors[1][index], "pointRadius": 0, "fill": false, "lineTension": 0, "borderWidth": 2}
+        myChart.config.data.datasets.push(dataset)
+        myChart.update();
+        // show loaded
+        document.getElementById("loading").style.display = "none";
+        document.getElementById("error").style.display = "none";
+        document.getElementById("loaded").style.display = "block";
+      }
+    })
+    .catch(error => {
+      document.getElementById("loading").style.display = "none";
+      document.getElementById("error").style.display = "block";
+      document.getElementById("loaded").style.display = "none";
+      console.log(error)
+    })
+  }
+
   // initiate loading
   document.getElementById("loading").style.display = "block";
   document.getElementById("error").style.display = "none";
   document.getElementById("loaded").style.display = "none";
+  document.getElementById("protocolContentGrid").style.display = "none";
+  document.getElementById("protocolExplorersContentGrid").style.display = "none";
 
   var computedProtocolId = "19LtLM6H2CMjYKq2mSZitAGUGgYXYh4m4Z"
   var computedTxHash = "35e5888c2b2a39c05f0917bb75311b8263efb53e4c9d1e12d6278ce5e503e8c6"
@@ -217,240 +483,69 @@
     })
     loadFooter()
 
-    var populateChart = async function(searchStrings) {
-      for (let pcIndex = 0; pcIndex < searchStrings.length; ++pcIndex) {
-        if (searchStrings[pcIndex].match(/prefix:\s*[0-9a-fA-F]+\b\s*/)) {  // transform prefix "h" to prefix "b"
-          let match = searchStrings[pcIndex].match(/(?:^|\s+)prefix:\s*([0-9a-fA-F]+)\s*/u)
-          if (match && match[1]) {
-            var bPrefix = hexToBase64(match[1])
-            getMatchCountComputed(searchStrings[pcIndex], pcIndex, match[1], "base")
-          }
-        } else if (searchStrings[pcIndex].match(/prefix:\s*\S+=\s*/)) {  // prefix "b"
-          let match = searchStrings[pcIndex].match(/(?:^|\s+)prefix:\s*(\S+=)\s*/u)
-          if (match && match[1]) {
-            getMatchCountComputed(searchStrings[pcIndex], pcIndex, match[1], "base")
-          }
-        } else if (searchStrings[pcIndex].match(/prefix:\s*\S+\s*/)) {  // prefix "s"
-          let match = searchStrings[pcIndex].match(/(?:^|\s+)prefix:\s*(\S+)\s*/u)
-          if (match && match[1]) {
-            getMatchCountComputed(searchStrings[pcIndex], pcIndex, btoa(match[1]), "base")
-          }
-        } else if (searchStrings[pcIndex].match(/app:\s*\S+\s*/)) {  // MAP app or run app
-          let match = searchStrings[pcIndex].match(/(?:^|\s+)app:\s*(\S+)\s*/u)
-          if (match && match[1]) {
-            getMatchCountComputed(searchStrings[pcIndex], pcIndex, btoa(match[1]), "mapApp")
-            .then(function(r) {
-            })
-            .catch(error => {
-              getMatchCountComputed(searchStrings[pcIndex], pcIndex, btoa(match[1]), "run")
-            })
-          }
-        } else {
-          getMatchCountPlanaria(searchStrings[pcIndex], pcIndex)
-        }
-      }
-    }
-    var getMatchCountComputed = async function(realSearchPhrase, index, searchPhrase, type) {
-      return new Promise(function(resolve, reject) {
-        let beginNotCorrectedTimestamp = new Date(parseInt(dateTimestamp - ((periodInput) * 24 * 60 * 60)) * 1000).toISOString()
-        let beginTimestamp = new Date(Date.UTC(beginNotCorrectedTimestamp.substring(0,4), parseInt(beginNotCorrectedTimestamp.substring(5,7)) - 1, beginNotCorrectedTimestamp.substring(8,10), 0, 0, 0, 0)).getTime() / 1000
-        let endTimestamp = parseInt(dateTimestamp)
-        var searchFilename = searchPhrase.replace(/\//g, '#')
-        var url = "https://raw.githubusercontent.com/trendscharts/output/master/" + computedTxHash + "/" + computerAddress + "/" + type + "/" + step + "/" + searchFilename + ".json"
-
-        fetch(url).then(function(r) {
-          return r.json()
-        }).then(response => {
-          if (response.length >= 0) {
-            let prevItemDate = null
-            let singleChartData = []
-            for (let index = 0; index < response.length; ++index) {
-              if (response[index]['_id'] < beginTimestamp) {
-                continue
-              }
-              let itemDate = new Date(response[index]['_id'] * 1000)
-              if (index === 0 || prevItemDate === null) {
-                console.log(response[index]['_id'] - beginTimestamp)
-                // fill with 0 if it's not the beginning
-                let timeDiff = Math.abs(itemDate.getTime() - (beginTimestamp * 1000))
-                let diffDays = Math.ceil(timeDiff / (1000 * step))
-                if (diffDays > 0) {
-                  for (let j = diffDays; j > 0; --j) {
-                    let fillDate = new Date(itemDate)
-                    fillDate.setDate(itemDate.getDate() - j)
-                    singleChartData.push({"t": fillDate.getTime(), "y": 0})
-                  }
-                }
-              } else {
-                console.log(response[index]['_id'] - beginTimestamp)
-                let timeDiff = Math.abs(itemDate.getTime() - prevItemDate.getTime())
-                let diffDays = Math.floor(timeDiff / (1000 * 3600 * 24))
-                // fill empty dates with 0
-                if (diffDays > 1) {
-                  for (let j = 1; j < diffDays; ++j) {
-                    let fillDate = new Date(prevItemDate)
-                    fillDate.setDate(prevItemDate.getDate() + j)
-                    singleChartData.push({"t": fillDate.getTime(), "y": 0})
-                  }
-                }
-              }
-
-              // push real data
-              var chartItemDate = new Date(response[index]['_id'] * 1000).getTime()
-              singleChartData.push({"t": chartItemDate, "y": response[index]['count']})
-              prevItemDate = itemDate
-            }
-
-            // fill with 0 till the end
-            if (prevItemDate === null) {
-              prevItemDate = new Date(beginTimestamp * 1000)
-            }
-            let timeDiff = Math.abs(dateTimestamp * 1000 - prevItemDate.getTime())
-            let diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24))
-            if (diffDays > 1) {
-              for (let j = 1; j < diffDays; ++j) {
-                let fillDate = new Date(prevItemDate)
-                fillDate.setDate(prevItemDate.getDate() + j)
-                singleChartData.push({"t": fillDate.getTime(), "y": 0})
-              }
-            }
-            // push data to chart
-            var dataset = {"label": realSearchPhrase, "data": singleChartData, "backgroundColor": window.colors[0][index], "borderColor": window.colors[1][index], "pointRadius": 0, "fill": false, "lineTension": 0, "borderWidth": 2}
-            myChart.config.data.datasets.push(dataset)
-            myChart.update();
-            // show loaded
-            document.getElementById("loading").style.display = "none";
-            document.getElementById("error").style.display = "none";
-            document.getElementById("loaded").style.display = "block";
-            resolve(singleChartData.length)
-          }
-        })
-        .catch(error => {
-          document.getElementById("loading").style.display = "none";
-          document.getElementById("error").style.display = "block";
-          document.getElementById("loaded").style.display = "none";
-          console.log(error)
-          reject(error)
-        })
-      })
-    }
-
-    var getMatchCountPlanaria = async function(searchPhrase, index) {
-      let beginNotCorrectedTimestamp = new Date(parseInt(dateTimestamp - ((periodInput) * 24 * 60 * 60)) * 1000).toISOString()
-      let beginTimestamp = new Date(Date.UTC(beginNotCorrectedTimestamp.substring(0,4), parseInt(beginNotCorrectedTimestamp.substring(5,7)) - 1, beginNotCorrectedTimestamp.substring(8,10), 0, 0, 0, 0)).getTime() / 1000
-      let endTimestamp = parseInt(dateTimestamp)
-      let periodFormat = '%Y-%m-%d'
-
-      let queryMatch = searchQueryCreator(searchPhrase, beginTimestamp, endTimestamp)
-
-      let query = {
-        'v': 3,
-        'q': {
-          'aggregate': [{
-            '$match': queryMatch
-          }, {
-            '$group': {
-              '_id': {
-                '$dateToString': {
-                  'format': periodFormat,
-                  'date': {
-                    '$toDate': {
-                      '$multiply': [1000, '$blk.t']
-                    }
-                  }
-                }
-              },
-              'count': {
-                '$sum': 1
-              }
-            }
-          }],
-          'limit': 10000,
-          'sort': {'_id': 1}
-        }
-      }
-
-      var b64 = btoa(JSON.stringify(query));
-      let url = window.bobNode + b64
-
-      let header
-      if (window.bitdbApiKey) {
-        header = {
-          headers: { key: window.bitdbApiKey }
-        }
-      }
-
-      fetch(url, header).then(function(r) {
-        return r.json()
-      }).then(response => {
-        if (response.c.length >= 0) {
-          let prevItemDate = null
-          let singleChartData = []
-          for (let index = 0; index < response.c.length; ++index) {
-              let itemDate = new Date(response.c[index]['_id'])
-              if (index === 0) {
-                // fill with 0 if it's not the beginning
-                let timeDiff = Math.abs(itemDate.getTime() - (beginTimestamp * 1000))
-                let diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24))
-                if (diffDays > 0) {
-                  for (let j = diffDays; j > 0; --j) {
-                    let fillDate = new Date(itemDate)
-                    fillDate.setDate(itemDate.getDate() - j)
-                    singleChartData.push({"t": fillDate.getTime(), "y": 0})
-                  }
-                }
-              } else {
-                let timeDiff = Math.abs(itemDate.getTime() - prevItemDate.getTime())
-                let diffDays = Math.floor(timeDiff / (1000 * 3600 * 24))
-                // fill empty dates with 0
-                if (diffDays > 1) {
-                  for (let j = 1; j < diffDays; ++j) {
-                    let fillDate = new Date(prevItemDate)
-                    fillDate.setDate(prevItemDate.getDate() + j)
-                    singleChartData.push({"t": fillDate.getTime(), "y": 0})
-                  }
-                }
-              }
-
-              // push real data
-              var chartItemDate = new Date(Date.UTC(response.c[index]['_id'].substring(0,4), parseInt(response.c[index]['_id'].substring(5,7)) - 1, response.c[index]['_id'].substring(8,10), 0, 0, 0, 0)).getTime()
-              singleChartData.push({"t": chartItemDate, "y": response.c[index]['count']})
-              prevItemDate = itemDate
-          }
-
-          // fill with 0 till the end
-          if (prevItemDate === null) {
-            prevItemDate = new Date(beginTimestamp * 1000)
-          }
-          let timeDiff = Math.abs(dateTimestamp * 1000 - prevItemDate.getTime())
-          let diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24))
-          if (diffDays > 1) {
-            for (let j = 1; j < diffDays; ++j) {
-              let fillDate = new Date(prevItemDate)
-              fillDate.setDate(prevItemDate.getDate() + j)
-              singleChartData.push({"t": fillDate.getTime(), "y": 0})
-            }
-          }
-          // push data to chart
-          var dataset = {"label": searchPhrase, "data": singleChartData, "backgroundColor": window.colors[0][index], "borderColor": window.colors[1][index], "pointRadius": 0, "fill": false, "lineTension": 0, "borderWidth": 2}
-          myChart.config.data.datasets.push(dataset)
-          myChart.update();
-          // show loaded
-          document.getElementById("loading").style.display = "none";
-          document.getElementById("error").style.display = "none";
-          document.getElementById("loaded").style.display = "block";
-        }
-      })
-      .catch(error => {
-        document.getElementById("loading").style.display = "none";
-        document.getElementById("error").style.display = "block";
-        document.getElementById("loaded").style.display = "none";
-        console.log(error)
-      })
-    }
-
     // populate chart
-    populateChart(searchPhrases)
+    populateChart(searchPhrases).then(function(address) {
+      getBitcomProtocolEchos(address).then(function(r) {
+        if (r !== undefined && Object.keys(r).length !== 0) {
+          document.getElementById("protocolContentGrid").style.display = "grid";
+          var protocolContentText = ""
+
+          if (r['name'] !== undefined) {
+            var row = document.createElement("div");
+            row.className = "resultTable-item resultTable-container resultTable-separator";
+            var cell1 = document.createElement("div");
+            cell1.className = "label-text2"
+            var cell2 = document.createElement("div");
+            cell2.className = "label-value2"
+            var textNode1=document.createTextNode("name");
+            var textNode2=document.createTextNode(r['name']);
+            cell1.appendChild(textNode1);
+            cell2.appendChild(textNode2);
+            row.appendChild(cell1);
+            row.appendChild(cell2);
+            document.getElementById('protocolContent').appendChild(row)
+          }
+
+          if (r['url'] !== undefined) {
+            var row = document.createElement("div");
+            row.className = "resultTable-item resultTable-container resultTable-separator";
+            var cell1 = document.createElement("div");
+            cell1.className = "label-text2"
+            var cell2 = document.createElement("div");
+            cell2.className = "label-value2"
+            var textNode1=document.createTextNode("url");
+            var textNode2=document.createTextNode(r['url']);
+            var a = document.createElement("a");
+            a.setAttribute("href", r['url']);
+            cell1.appendChild(textNode1);
+            cell2.appendChild(a).appendChild(textNode2);
+            row.appendChild(cell1);
+            row.appendChild(cell2);
+            document.getElementById('protocolContent').appendChild(row)
+          }
+
+          for (const key in r) {
+            if (key === 'name' || key === 'url') {
+              continue
+            }
+            var row = document.createElement("div");
+            row.className = "resultTable-item resultTable-container resultTable-separator";
+            var cell1 = document.createElement("div");
+            cell1.className = "label-text2"
+            var cell2 = document.createElement("div");
+            cell2.className = "label-value2"
+            var textNode1=document.createTextNode(key);
+            var textNode2=document.createTextNode(r[key]);
+            cell1.appendChild(textNode1);
+            cell2.appendChild(textNode2);
+            row.appendChild(cell1);
+            row.appendChild(cell2);
+
+            document.getElementById('protocolContent').appendChild(row)
+          }
+        }
+      })
+    })
   })
 </script>
 </body>
