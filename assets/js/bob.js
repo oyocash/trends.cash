@@ -102,7 +102,6 @@ var getBitcomProtocols =  function() {
       }
       promises.push(getPromise(url, header));
     }
-    console.log(promises.length)
     Promise.all(promises)
     .then(function(args) {
       for (let ii = 0; ii < args.length; ii++) {

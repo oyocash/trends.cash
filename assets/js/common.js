@@ -39,9 +39,9 @@ var changeEndDate = function(path, periodInput, date) {
 var changeRoute = function(path, period, date) {
     window.open('/' + path + '/?period=' + period + '&date=' + date, "_self")
 }
-var changeSearchRoute = function(searchText, period, date) {
+var changeSearchRoute = function(searchText, period, date, step = 86400) {
   if (document.getElementById('navSearchText').value) {
-    window.open('/result/?search=' + btoa(searchText) + '&period=' + period + '&date=' + date, "_self")
+    window.open('/result/?search=' + btoa(searchText) + '&period=' + period + '&date=' + date + '&step=' + step, "_self")
   }
 }
 var rankingTable = function(parentElementId, items, colors) {
@@ -114,4 +114,29 @@ var hexToBase64 = function(str) {
   return btoa(String.fromCharCode.apply(null,
     str.replace(/\r|\n/g, "").replace(/([\da-fA-F]{2}) ?/g, "0x$1 ").replace(/ +$/, "").split(" "))
   );
+}
+
+function extractHostname(url) {
+  if (Array.isArray(url)) {
+    url = url[0]
+  }
+  if (!validURL(dummyTxUrl(url)))
+    return url;
+  var pathArray = url.split( '/' );
+  var protocol = pathArray[0];
+  var host = pathArray[2];
+  host = host.split( '?' )[0];
+  return protocol + '//' + host;
+}
+function validURL(str) {
+  var pattern = new RegExp('^(https?:\\/\\/)'+ // protocol
+    '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
+    '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
+    '(\\:\\d+)?(\\/[-a-z\\d%_.~\{\}+]*)*'+ // port and path
+    '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
+    '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
+  return !!pattern.test(str);
+}
+function dummyTxUrl(url) {
+  return url.replace("{tx_hash}", "000000000000000000000000000000000000000000000000000000000000")
 }

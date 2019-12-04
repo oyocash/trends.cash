@@ -280,6 +280,7 @@ div.main input[type="submit"]:focus {
   max-width: 1152px;
   width:100%;
   grid-column: span 6;
+  align-self: start;
   position: relative;
 }
 .resultTable-container {
@@ -350,6 +351,17 @@ div.main input[type="submit"]:focus {
     overflow: hidden;
     text-overflow:ellipsis;
 }
+.resultTable-item .label-text3 {
+    left: 25px;
+    line-height: 16px;
+    position: absolute;
+    top: 24px;
+    text-align: left;
+    width: 75%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow:ellipsis;
+}
 .resultTable-item .label-value {
     color: #bdbdbd;
     font-size: 1.2rem;
@@ -369,11 +381,21 @@ div.main input[type="submit"]:focus {
     right: 23px;
     text-align: right;
     top: 24px;
-    width: 432px;
+    width: 75%;
 }
-.resultTable-item .label-value2 a {
+.resultTable-item .label-value3 {
+    font-size: 1.2rem;
+    line-height: 16px;
+    padding-right: 15px;
+    position: absolute;
+    right: 23px;
+    text-align: right;
+    top: 24px;
+    width: 25%;
+}
+.resultTable-item .label-value2 a, .resultTable-item .label-value3 a, .resultTable-item .label-text2 a, .resultTable-item .label-text3 a {
   color: rgba(0,0,0,0.60);
-  text-decoration: none;
+  text-decoration: underline;
 }
 
 .search input[type="text"]{
@@ -459,6 +481,7 @@ button.active {
   }
   .resultTable {
     grid-column: span 12;
+    align-self: start;
     margin: 0 auto;
   }
 }

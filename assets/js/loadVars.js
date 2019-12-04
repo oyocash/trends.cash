@@ -1,6 +1,10 @@
 // default search period
 window.searchPeriodDefault = 7
 window.rankingPeriodDefault = 1
+// oyoExternalLinkProtocol values
+window.oyoRankingAddress = "149xadSKJcKdhgE4sMmcvx421nsGYwgkWo"
+window.oyoRankingPeriod = 30
+
 // bitdb babel node
 window.bobNodeDefault = 'https://bob.planaria.network/q/1GgmC7Cg782YtQ6R9QkM58voyWeQJmJJzG/'
 window.bobNode = window.bobNodeDefault
@@ -10,6 +14,17 @@ if (localStorage.getItem('bobNode')) {
     localStorage.removeItem('bobNode')
   } else {
     window.bobNode = localStorage.getItem('bobNode')
+  }
+}
+// neongenesis planaria node
+window.neongenesisNodeDefault = 'https://neongenesis.bitdb.network/q/1HcBPzWoKDL2FhCMbocQmLuFTYsiD73u1j/'
+window.neongenesisNode = window.neongenesisNodeDefault
+if (localStorage.getItem('neongenesisNode')) {
+  if (window.neongenesisNodeDefault === localStorage.getItem('neongenesisNode'))
+  {
+    localStorage.removeItem('neongenesisNode')
+  } else {
+    window.neongenesisNode = localStorage.getItem('neongenesisNode')
   }
 }
 // bitdb api key

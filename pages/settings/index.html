@@ -46,10 +46,14 @@
         <div class="form">
           <div class="field-block">
             <h4>Planaria (BOB) node</h4>
-        	   <input type="text" name="bobNode" id="bobNode" title="Planaria node" placeholder="Planaria node address"/>
+        	   <input type="text" name="bobNode" id="bobNode" title="BOB Planaria node" placeholder="BOB Planaria node address"/>
           </div>
           <div class="field-block">
-            <h4>Planaria (BOB) API key</h4>
+            <h4>Planaria (neonGenesis) node</h4>
+        	   <input type="text" name="neongenesisNode" id="neongenesisNode" title="neonGenesis Planaria node" placeholder="neonGenesis Planaria node address"/>
+          </div>
+          <div class="field-block">
+            <h4>Planaria API key</h4>
             <input type="text" name="bitdbApiKey" id="bitdbApiKey" title="Planaria API key" placeholder="Planaria API key"/>
           </div>
           <div class="form-buttons">
@@ -64,6 +68,7 @@
 
 <script language='javascript'>
   document.getElementById('bobNode').value =window.bobNode
+  document.getElementById('neongenesisNode').value =window.neongenesisNode
   document.getElementById('bitdbApiKey').value = window.bitdbApiKey
 
   document.addEventListener("DOMContentLoaded", function() {
@@ -75,6 +80,7 @@
 
     var setValues = function() {
       var bobNode = document.getElementById('bobNode').value
+      var neongenesisNode = document.getElementById('neongenesisNode').value
       var bitdbApiKey = document.getElementById('bitdbApiKey').value
       if (bobNode && bobNode !== window.bobNodeDefault) {
         localStorage.setItem('bobNode', bobNode)
@@ -82,6 +88,14 @@
       } else {
         localStorage.removeItem('bobNode')
         window.bobNode = window.bobNodeDefault
+      }
+
+      if (neongenesisNode && neongenesisNode !== window.neongenesisNodeDefault) {
+        localStorage.setItem('neongenesisNode', neongenesisNode)
+        window.neongenesisNode = neongenesisNode
+      } else {
+        localStorage.removeItem('neongenesisNode')
+        window.neongenesisNode = window.neongenesisNodeDefault
       }
 
       if (bitdbApiKey && bitdbApiKey !== window.bitdbApiKeyDefault) {

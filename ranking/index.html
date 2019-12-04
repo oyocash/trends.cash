@@ -76,7 +76,9 @@
               To: <input type="text" name="endDateForm" id="endDateForm" title="Search date end" placeholder="YYYY-MM-DD"/>
             </div>
           </div>
-          <canvas id="myChart"></canvas>
+          <div style="height: 500px;">
+            <canvas id="myChart"></canvas>
+          </div>
         </div>
 
         <div class="resultTable">
@@ -127,14 +129,15 @@
   // create chart
   var ctx = document.getElementById('myChart').getContext('2d');
   ctx.canvas.width = 400;
-  ctx.canvas.height = 300;
+  ctx.canvas.height = 500;
   var cfg = {
     type: 'pie',
     data: {
       datasets: []
     },
 		options: {
-			responsive: true
+			responsive: true,
+      maintainAspectRatio: false
 		}
   }
   var myChart = new Chart(ctx, cfg);

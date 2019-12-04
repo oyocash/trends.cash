@@ -34,9 +34,10 @@
   <meta name="bitcoin-address" content="1bGBx5H9NRmT3TbMHjXuUzo19CXmSfd6j">
 
   <script src="/assets/js/loader.js"></script>
-  <script src="/assets/js/loadVars.js"></script>
-  <script src="/assets/js/common.js?2011201901"></script>
-  <script src="/assets/js/bob.js?2311201901"></script>
+  <script src="/assets/js/loadVars.js?2611201901"></script>
+  <script src="/assets/js/common.js?2611201901"></script>
+  <script src="/assets/js/bob.js?2611201901"></script>
+  <script src="/assets/js/neongenesis.js?2611201901"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js" integrity="sha256-4iQZ6BVL4qNKlQ27TExEhBN1HFPvAvAMbFavKKosSWQ=" crossorigin="anonymous"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" integrity="sha256-Uv9BNBucvCPipKQ2NS9wYpJmi8DTOEfTA/nH2aoJALw=" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.8.0/pikaday.min.js" integrity="sha256-+B1vOR24Jpk4oWE/+SWu7AxoQqrqDT4SF+12bixBdjw=" crossorigin="anonymous"></script>
@@ -54,6 +55,8 @@
               <button class="periodButton" value="30">1m</button>
               <button class="periodButton" value="90">3m</button>
               <button class="periodButton" value="365">1y</button>
+              <button class="stepButton" value="3600" style="margin-left:20px;">Hourly</button>
+              <button class="stepButton" value="86400">Daily</button>
               <a id="oyoLink" style="margin-left:20px;">See on Oyo</a>
             </div>
             <div class="chartNavCenter">
@@ -66,7 +69,6 @@
           <div style="height: 300px;">
             <canvas id="myChart"></canvas>
           </div>
-
 
           <div class="grid chartGrid">
             <div class="resultTable" id="protocolContentGrid">
@@ -83,10 +85,10 @@
                   Protocol explorers
                 </div>
               </div>
+              <div id="protocolExplorersContentAddLink"></div>
               <div id="protocolExplorersContent"></div>
             </div>
           </div>
-
 
         </div>
         <div class="s_results" id="error">
@@ -104,6 +106,95 @@
   </div>
 
 <script language='javascript'>
+  var getRankings = function(address, type, appName, appUrl, beginTimestamp, endTimestamp) {
+    return new Promise(function(resolve, reject) {
+      if (type !== "default" && appName === "") {
+        return
+      }
+
+      var query = getOyoProAggregatedQueryListAll(address, type, appName, appUrl, 0, endTimestamp);
+      var b64 = btoa(JSON.stringify(query));
+
+      var url = window.neongenesisNode + b64;
+      var header = { headers: { key: window.bitdbApiKey } };
+      fetch(url, header).then(function(res) {
+        return res.json()
+      }).then(function(res) {
+          if (res.c !== undefined || res.u !== undefined) {
+            var items = []
+            if (res.c !== undefined) {
+              items = items.concat(res.c)
+            }
+            if (res.u !== undefined) {
+              for (let i = 0; i < res.u.length; ++i) {
+                let added = 0
+                for (let j = 0; j < items.length; ++j) {
+                  if (JSON.stringify(res.u[i]._id) === JSON.stringify(items[j]._id)) {
+                    added = 1
+                  }
+                }
+                if (added === 0) {
+                  items = items.concat(res.u[i])
+                  added = 1
+                }
+              }
+            }
+            for (let j = 0; j < items.length; ++j) {
+              items[j].satoshis = 0
+            }
+
+            var query = getOyoProAggregatedQuery(address, type, appName, appUrl, beginTimestamp, endTimestamp);
+            var b64 = btoa(JSON.stringify(query));
+
+            var url = window.neongenesisNode + b64;
+            var header = { headers: { key: window.bitdbApiKey } };
+            fetch(url, header).then(function(res) {
+              return res.json()
+            }).then(function(res) {
+                if (res.c !== undefined || res.u !== undefined) {
+                  if (res.c !== undefined) {
+                    for (let i = 0; i < res.c.length; ++i) {
+                      for (let j = 0; j < items.length; ++j) {
+                        if (JSON.stringify(res.c[i]._id) === JSON.stringify(items[j]._id)) {
+                          items[j].satoshis = res.c[i].satoshis
+                        }
+                      }
+                    }
+                  }
+                  if (res.u !== undefined) {
+                    for (let i = 0; i < res.u.length; ++i) {
+                      let added = 0
+                      for (let j = 0; j < items.length; ++j) {
+                        if (JSON.stringify(res.u[i]._id) === JSON.stringify(items[j]._id)) {
+                          items[j].satoshis += res.u[i].satoshis
+                          added = 1
+                        }
+                      }
+                      if (added === 0) {
+                        items = items.concat(res.u[i])
+                        added = 1
+                      }
+                    }
+                  }
+                }
+                items = items.sort(function(a, b) {
+                  return b.satoshis - a.satoshis;
+                });
+                resolve(items)
+            })
+            .catch(error => {
+              reject(error)
+              console.log(error)
+            })
+          }
+      })
+      .catch(error => {
+        reject(error)
+        console.log(error)
+      })
+    })
+  }
+
   var populateChart = async function(searchStrings) {
     return new Promise(function(resolve, reject) {
       for (let pcIndex = 0; pcIndex < searchStrings.length; ++pcIndex) {
@@ -112,32 +203,32 @@
           if (match && match[1]) {
             var bPrefix = hexToBase64(match[1])
             getMatchCountComputed(searchStrings[pcIndex], pcIndex, match[1], "base").then(function(r) {
-              resolve(match[1])
+              resolve(["baseProtocol", match[1]])
             })
           }
         } else if (searchStrings[pcIndex].match(/prefix:\s*\S+=\s*/)) {  // prefix "b"
           let match = searchStrings[pcIndex].match(/(?:^|\s+)prefix:\s*(\S+=)\s*/u)
           if (match && match[1]) {
             getMatchCountComputed(searchStrings[pcIndex], pcIndex, match[1], "base").then(function(r) {
-              resolve(match[1])
+              resolve(["baseProtocol", match[1]])
             })
           }
         } else if (searchStrings[pcIndex].match(/prefix:\s*\S+\s*/)) {  // prefix "s"
           let match = searchStrings[pcIndex].match(/(?:^|\s+)prefix:\s*(\S+)\s*/u)
           if (match && match[1]) {
             getMatchCountComputed(searchStrings[pcIndex], pcIndex, btoa(match[1]), "base").then(function(r) {
-              resolve(match[1])
+              resolve(["baseProtocol", match[1]])
             })
           }
         } else if (searchStrings[pcIndex].match(/app:\s*\S+\s*/)) {  // MAP app or run app
           let match = searchStrings[pcIndex].match(/(?:^|\s+)app:\s*(\S+)\s*/u)
           if (match && match[1]) {
             getMatchCountComputed(searchStrings[pcIndex], pcIndex, btoa(match[1]), "mapApp").then(function(r) {
-              resolve()
+              resolve(["mapApp", match[1]])
             })
             .catch(error => {
               getMatchCountComputed(searchStrings[pcIndex], pcIndex, btoa(match[1]), "run").then(function(r) {
-                resolve()
+                resolve(["run", match[1]])
               })
             })
           }
@@ -171,22 +262,20 @@
             if (index === 0 || prevItemDate === null) {
               // fill with 0 if it's not the beginning
               let timeDiff = Math.abs(itemDate.getTime() - (beginTimestamp * 1000))
-              let diffDays = Math.ceil(timeDiff / (1000 * step))
-              if (diffDays > 0) {
-                for (let j = diffDays; j > 0; --j) {
-                  let fillDate = new Date(itemDate)
-                  fillDate.setDate(itemDate.getDate() - j)
+              let diffSteps = Math.ceil(timeDiff / (1000 * step))
+              if (diffSteps > 0) {
+                for (let j = diffSteps; j > 0; --j) {
+                  let fillDate = new Date(itemDate.getTime() - 1000 * step * j)
                   singleChartData.push({"t": fillDate.getTime(), "y": 0})
                 }
               }
             } else {
               let timeDiff = Math.abs(itemDate.getTime() - prevItemDate.getTime())
-              let diffDays = Math.floor(timeDiff / (1000 * 3600 * 24))
+              let diffSteps = Math.floor(timeDiff / (1000 * step))
               // fill empty dates with 0
-              if (diffDays > 1) {
-                for (let j = 1; j < diffDays; ++j) {
-                  let fillDate = new Date(prevItemDate)
-                  fillDate.setDate(prevItemDate.getDate() + j)
+              if (diffSteps > 1) {
+                for (let j = 1; j < diffSteps; ++j) {
+                  let fillDate = new Date(prevItemDate.getTime() + 1000 * step * j)
                   singleChartData.push({"t": fillDate.getTime(), "y": 0})
                 }
               }
@@ -203,11 +292,10 @@
             prevItemDate = new Date(beginTimestamp * 1000)
           }
           let timeDiff = Math.abs(dateTimestamp * 1000 - prevItemDate.getTime())
-          let diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24))
-          if (diffDays > 1) {
-            for (let j = 1; j < diffDays; ++j) {
-              let fillDate = new Date(prevItemDate)
-              fillDate.setDate(prevItemDate.getDate() + j)
+          let diffSteps = Math.ceil(timeDiff / (1000 * step))
+          if (diffSteps > 1) {
+            for (let j = 1; j < diffSteps; ++j) {
+              let fillDate = new Date(prevItemDate.getTime() + 1000 * step * j)
               singleChartData.push({"t": fillDate.getTime(), "y": 0})
             }
           }
@@ -388,7 +476,7 @@
       return
     }
     dateInput = date.substring(0,4) + date.substring(5,7) + date.substring(8,10)
-    changeSearchRoute(searchText, periodInput, dateInput)
+    changeSearchRoute(searchText, periodInput, dateInput, step)
   }
   // oyo link
   var oyoSearchString = ""
@@ -408,6 +496,10 @@
   var ctx = document.getElementById('myChart').getContext('2d');
   ctx.canvas.width = 1000;
   ctx.canvas.height = 300;
+  let tooltipFormat = 'MMM D, YYYY'
+  if (step === 3600) {
+    tooltipFormat = 'MM/DD/YYYY HH:mm'
+  }
   var cfg = {
     type: 'line',
     data: {
@@ -424,7 +516,7 @@
               quarter: 'D MMM'
             },
             parser: 'MM/DD/YYYY HH:mm',
-            tooltipFormat: 'MMM D, YYYY',
+            tooltipFormat: tooltipFormat,
             unit: 'day'
           }
 				}],
@@ -472,7 +564,18 @@
       }
       periodButtons[i].addEventListener("click", function() {
         periodInput = periodButtons[i].value
-        changeSearchRoute(searchText, periodInput, dateInput)
+        changeSearchRoute(searchText, periodInput, dateInput, step)
+      })
+    }
+    // on step button click
+    let stepButtons = document.getElementsByClassName('stepButton');
+    for(let i=0; i<stepButtons.length; i++){
+      if (parseInt(step) === parseInt(stepButtons[i].value)) {
+        stepButtons[i].classList.add("active")
+      }
+      stepButtons[i].addEventListener("click", function() {
+        step = stepButtons[i].value
+        changeSearchRoute(searchText, periodInput, dateInput, step)
       })
     }
     // load partials
@@ -484,67 +587,119 @@
     loadFooter()
 
     // populate chart
-    populateChart(searchPhrases).then(function(address) {
-      getBitcomProtocolEchos(address).then(function(r) {
+    populateChart(searchPhrases).then(function([type, appName]) {
+      if (type === "baseProtocol" || type === "mapApp" || type === "run") {
+        var row = document.createElement("div");
+        row.className = "resultTable-item resultTable-container resultTable-separator";
+        var cell = document.createElement("div");
+        cell.className = "label-text3"
+        var textNode=document.createTextNode("Add transaction explorer");
+        var a = document.createElement("a");
+        var link = "https://pro.oyo.cash/add/?type=" + type + "&appName=" + appName
+        a.setAttribute("href", link);
+        cell.appendChild(a).appendChild(textNode);
+        row.appendChild(cell);
+        document.getElementById("protocolExplorersContentAddLink").appendChild(row)
+
+        document.getElementById("protocolExplorersContentGrid").style.display = "grid";
+      }
+      if (type === "baseProtocol") {
+        getBitcomProtocolEchos(appName).then(function(r) {
+          if (r !== undefined && Object.keys(r).length !== 0) {
+            document.getElementById("protocolContentGrid").style.display = "grid";
+            var protocolContentText = ""
+
+            if (r['name'] !== undefined) {
+              var row = document.createElement("div");
+              row.className = "resultTable-item resultTable-container resultTable-separator";
+              var cell1 = document.createElement("div");
+              cell1.className = "label-text2"
+              var cell2 = document.createElement("div");
+              cell2.className = "label-value2"
+              var textNode1=document.createTextNode("name");
+              var textNode2=document.createTextNode(r['name']);
+              cell1.appendChild(textNode1);
+              cell2.appendChild(textNode2);
+              row.appendChild(cell1);
+              row.appendChild(cell2);
+              document.getElementById('protocolContent').appendChild(row)
+            }
+
+            if (r['url'] !== undefined) {
+              var row = document.createElement("div");
+              row.className = "resultTable-item resultTable-container resultTable-separator";
+              var cell1 = document.createElement("div");
+              cell1.className = "label-text2"
+              var cell2 = document.createElement("div");
+              cell2.className = "label-value2"
+              var textNode1=document.createTextNode("url");
+              var textNode2=document.createTextNode(r['url']);
+              var a = document.createElement("a");
+              a.setAttribute("href", r['url']);
+              cell1.appendChild(textNode1);
+              cell2.appendChild(a).appendChild(textNode2);
+              row.appendChild(cell1);
+              row.appendChild(cell2);
+              document.getElementById('protocolContent').appendChild(row)
+            }
+
+            for (const key in r) {
+              if (key === 'name' || key === 'url') {
+                continue
+              }
+              var row = document.createElement("div");
+              row.className = "resultTable-item resultTable-container resultTable-separator";
+              var cell1 = document.createElement("div");
+              cell1.className = "label-text2"
+              var cell2 = document.createElement("div");
+              cell2.className = "label-value2"
+              var textNode1=document.createTextNode(key);
+              var textNode2=document.createTextNode(r[key]);
+              cell1.appendChild(textNode1);
+              if (validURL(r[key])) {
+                var a = document.createElement("a");
+                a.setAttribute("href", extractHostname(r[key]));
+                cell2.appendChild(a).appendChild(textNode2);
+              } else {
+                cell2.appendChild(textNode2);
+              }
+              row.appendChild(cell1);
+              row.appendChild(cell2);
+
+              document.getElementById('protocolContent').appendChild(row)
+            }
+          }
+        })
+      }
+
+      let appUrl
+      let endTimestamp = parseInt(new Date().getTime() / 1000)
+      let beginTimestamp = parseInt(endTimestamp - window.oyoRankingPeriod)
+      getRankings(window.oyoRankingAddress, type, appName, appUrl, beginTimestamp, endTimestamp).then(function(r) {
         if (r !== undefined && Object.keys(r).length !== 0) {
-          document.getElementById("protocolContentGrid").style.display = "grid";
           var protocolContentText = ""
 
-          if (r['name'] !== undefined) {
+          for (let i = 0; i < r.length; ++i) {
             var row = document.createElement("div");
             row.className = "resultTable-item resultTable-container resultTable-separator";
             var cell1 = document.createElement("div");
-            cell1.className = "label-text2"
+            cell1.className = "label-text3"
             var cell2 = document.createElement("div");
-            cell2.className = "label-value2"
-            var textNode1=document.createTextNode("name");
-            var textNode2=document.createTextNode(r['name']);
-            cell1.appendChild(textNode1);
-            cell2.appendChild(textNode2);
-            row.appendChild(cell1);
-            row.appendChild(cell2);
-            document.getElementById('protocolContent').appendChild(row)
-          }
-
-          if (r['url'] !== undefined) {
-            var row = document.createElement("div");
-            row.className = "resultTable-item resultTable-container resultTable-separator";
-            var cell1 = document.createElement("div");
-            cell1.className = "label-text2"
-            var cell2 = document.createElement("div");
-            cell2.className = "label-value2"
-            var textNode1=document.createTextNode("url");
-            var textNode2=document.createTextNode(r['url']);
+            cell2.className = "label-value3"
+            var textNode1 = document.createTextNode(extractHostname(r[i]["_id"]["url"]));
+            var textNode2 = document.createTextNode(r[i]["satoshis"]);
             var a = document.createElement("a");
-            a.setAttribute("href", r['url']);
-            cell1.appendChild(textNode1);
-            cell2.appendChild(a).appendChild(textNode2);
-            row.appendChild(cell1);
-            row.appendChild(cell2);
-            document.getElementById('protocolContent').appendChild(row)
-          }
-
-          for (const key in r) {
-            if (key === 'name' || key === 'url') {
-              continue
-            }
-            var row = document.createElement("div");
-            row.className = "resultTable-item resultTable-container resultTable-separator";
-            var cell1 = document.createElement("div");
-            cell1.className = "label-text2"
-            var cell2 = document.createElement("div");
-            cell2.className = "label-value2"
-            var textNode1=document.createTextNode(key);
-            var textNode2=document.createTextNode(r[key]);
-            cell1.appendChild(textNode1);
+            a.setAttribute("href", extractHostname(r[i]["_id"]["url"]));
+            cell1.appendChild(a).appendChild(textNode1);
             cell2.appendChild(textNode2);
             row.appendChild(cell1);
             row.appendChild(cell2);
 
-            document.getElementById('protocolContent').appendChild(row)
+            document.getElementById('protocolExplorersContent').appendChild(row)
           }
         }
       })
+
     })
   })
 </script>
