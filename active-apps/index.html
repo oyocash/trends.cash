@@ -85,6 +85,13 @@
   </div>
 
 <script language='javascript'>
+  var types = [
+    {"id": "all", "label": "All"},
+    {"id": "base", "label": "Base protocols"},
+    {"id": "mapApp", "label": "MAP apps"},
+    {"id": "run", "label": "run apps"}
+  ]
+
   var populateChart = async function() {
     return new Promise(function(resolve, reject) {
       getMatchCountComputed().then(function(r) {
@@ -97,77 +104,81 @@
       let beginNotCorrectedTimestamp = new Date(parseInt(dateTimestamp - ((periodInput) * 24 * 60 * 60)) * 1000).toISOString()
       let beginTimestamp = new Date(Date.UTC(beginNotCorrectedTimestamp.substring(0,4), parseInt(beginNotCorrectedTimestamp.substring(5,7)) - 1, beginNotCorrectedTimestamp.substring(8,10), 0, 0, 0, 0)).getTime() / 1000
       let endTimestamp = parseInt(dateTimestamp)
-      var url = "https://raw.githubusercontent.com/trendscharts/output/master/" + computedTxHash + "/" + computerAddress + "/dailyCount/" + "all" + "/" + step + ".json"
-console.log(url)
-      fetch(url).then(function(r) {
-        return r.json()
-      }).then(response => {
-        if (response.length >= 0) {
-          let prevItemDate = null
-          let singleChartData = []
-          for (let index = 0; index < response.length; ++index) {
-            if (response[index]['_id'] < beginTimestamp) {
-              continue
-            }
-            let itemDate = new Date(response[index]['_id'] * 1000)
-            if (index === 0 || prevItemDate === null) {
-              // fill with 0 if it's not the beginning
-              let timeDiff = Math.abs(itemDate.getTime() - (beginTimestamp * 1000))
-              let diffSteps = Math.ceil(timeDiff / (1000 * step))
-              if (diffSteps > 0) {
-                for (let j = diffSteps; j > 0; --j) {
-                  let fillDate = new Date(itemDate.getTime() - 1000 * step * j)
-                  singleChartData.push({"t": fillDate.getTime(), "y": 0})
+
+      for (let iii = 0; iii < types.length; ++iii) {
+        let type = types[iii]['id']
+        let label = types[iii]['label']
+        var url = "https://raw.githubusercontent.com/trendscharts/output/master/" + computedTxHash + "/" + computerAddress + "/dailyCount/" + type + "/" + step + ".json"
+        fetch(url).then(function(r) {
+          return r.json()
+        }).then(response => {
+          if (response.length >= 0) {
+            let prevItemDate = null
+            let singleChartData = []
+            for (let index = 0; index < response.length; ++index) {
+              if (response[index]['_id'] < beginTimestamp) {
+                continue
+              }
+              let itemDate = new Date(response[index]['_id'] * 1000)
+              if (index === 0 || prevItemDate === null) {
+                // fill with 0 if it's not the beginning
+                let timeDiff = Math.abs(itemDate.getTime() - (beginTimestamp * 1000))
+                let diffSteps = Math.ceil(timeDiff / (1000 * step))
+                if (diffSteps > 0) {
+                  for (let j = diffSteps; j > 0; --j) {
+                    let fillDate = new Date(itemDate.getTime() - 1000 * step * j)
+                    singleChartData.push({"t": fillDate.getTime(), "y": 0})
+                  }
+                }
+              } else {
+                let timeDiff = Math.abs(itemDate.getTime() - prevItemDate.getTime())
+                let diffSteps = Math.floor(timeDiff / (1000 * step))
+                // fill empty dates with 0
+                if (diffSteps > 1) {
+                  for (let j = 1; j < diffSteps; ++j) {
+                    let fillDate = new Date(prevItemDate.getTime() + 1000 * step * j)
+                    singleChartData.push({"t": fillDate.getTime(), "y": 0})
+                  }
                 }
               }
-            } else {
-              let timeDiff = Math.abs(itemDate.getTime() - prevItemDate.getTime())
-              let diffSteps = Math.floor(timeDiff / (1000 * step))
-              // fill empty dates with 0
-              if (diffSteps > 1) {
-                for (let j = 1; j < diffSteps; ++j) {
-                  let fillDate = new Date(prevItemDate.getTime() + 1000 * step * j)
-                  singleChartData.push({"t": fillDate.getTime(), "y": 0})
-                }
+
+              // push real data
+              var chartItemDate = new Date(response[index]['_id'] * 1000).getTime()
+              singleChartData.push({"t": chartItemDate, "y": response[index]['count']})
+              prevItemDate = itemDate
+            }
+
+            // fill with 0 till the end
+            if (prevItemDate === null) {
+              prevItemDate = new Date(beginTimestamp * 1000)
+            }
+            let timeDiff = Math.abs(dateTimestamp * 1000 - prevItemDate.getTime())
+            let diffSteps = Math.ceil(timeDiff / (1000 * step))
+            if (diffSteps > 1) {
+              for (let j = 1; j < diffSteps; ++j) {
+                let fillDate = new Date(prevItemDate.getTime() + 1000 * step * j)
+                singleChartData.push({"t": fillDate.getTime(), "y": 0})
               }
             }
-
-            // push real data
-            var chartItemDate = new Date(response[index]['_id'] * 1000).getTime()
-            singleChartData.push({"t": chartItemDate, "y": response[index]['count']})
-            prevItemDate = itemDate
+            // push data to chart
+            var dataset = {"label": label, "data": singleChartData, "backgroundColor": window.colors[0][iii], "borderColor": window.colors[1][iii], "pointRadius": 0, "fill": false, "lineTension": 0, "borderWidth": 2}
+            myChart.config.data.datasets.push(dataset)
+            myChart.update();
+            // show loaded
+            document.getElementById("loading").style.display = "none";
+            document.getElementById("error").style.display = "none";
+            document.getElementById("loaded").style.display = "block";
+            resolve(singleChartData.length)
           }
-
-          // fill with 0 till the end
-          if (prevItemDate === null) {
-            prevItemDate = new Date(beginTimestamp * 1000)
-          }
-          let timeDiff = Math.abs(dateTimestamp * 1000 - prevItemDate.getTime())
-          let diffSteps = Math.ceil(timeDiff / (1000 * step))
-          if (diffSteps > 1) {
-            for (let j = 1; j < diffSteps; ++j) {
-              let fillDate = new Date(prevItemDate.getTime() + 1000 * step * j)
-              singleChartData.push({"t": fillDate.getTime(), "y": 0})
-            }
-          }
-          // push data to chart
-          var dataset = {"label": "Active apps count", "data": singleChartData, "backgroundColor": window.colors[0][0], "borderColor": window.colors[1][0], "pointRadius": 0, "fill": false, "lineTension": 0, "borderWidth": 2}
-          myChart.config.data.datasets.push(dataset)
-          myChart.update();
-          // show loaded
+        })
+        .catch(error => {
           document.getElementById("loading").style.display = "none";
-          document.getElementById("error").style.display = "none";
-          document.getElementById("loaded").style.display = "block";
-          resolve(singleChartData.length)
-        }
-      })
-      .catch(error => {
-        document.getElementById("loading").style.display = "none";
-        document.getElementById("error").style.display = "block";
-        document.getElementById("loaded").style.display = "none";
-        console.log(error)
-        reject(error)
-      })
+          document.getElementById("error").style.display = "block";
+          document.getElementById("loaded").style.display = "none";
+          console.log(error)
+          reject(error)
+        })
+      }
     })
   }
 
