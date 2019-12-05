@@ -300,7 +300,6 @@ div.main input[type="submit"]:focus {
 .resultTable-title {
   overflow: hidden;
   text-overflow: ellipsis;
-  text-transform: capitalize;
   white-space: nowrap;
   font-size: 1.2rem;
   font-weight: bold;
