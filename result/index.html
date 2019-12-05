@@ -325,6 +325,9 @@
     let beginTimestamp = new Date(Date.UTC(beginNotCorrectedTimestamp.substring(0,4), parseInt(beginNotCorrectedTimestamp.substring(5,7)) - 1, beginNotCorrectedTimestamp.substring(8,10), 0, 0, 0, 0)).getTime() / 1000
     let endTimestamp = parseInt(dateTimestamp)
     let periodFormat = '%Y-%m-%d'
+    if (step === 3600) {
+      periodFormat = '%Y-%m-%d %H'
+    }
 
     let queryMatch = searchQueryCreator(searchPhrase, beginTimestamp, endTimestamp)
 
@@ -373,32 +376,37 @@
         let singleChartData = []
         for (let index = 0; index < response.c.length; ++index) {
             let itemDate = new Date(response.c[index]['_id'])
-            if (index === 0) {
+            if (step === 3600) {
+              itemDate = new Date(response.c[index]['_id'] + ":00")
+            }
+            if (index === 0 || prevItemDate === null) {
               // fill with 0 if it's not the beginning
               let timeDiff = Math.abs(itemDate.getTime() - (beginTimestamp * 1000))
-              let diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24))
-              if (diffDays > 0) {
-                for (let j = diffDays; j > 0; --j) {
-                  let fillDate = new Date(itemDate)
-                  fillDate.setDate(itemDate.getDate() - j)
+              let diffSteps = Math.ceil(timeDiff / (1000 * step))
+              if (diffSteps > 0) {
+                for (let j = diffSteps; j > 0; --j) {
+                  let fillDate = new Date(itemDate.getTime() - 1000 * step * j)
                   singleChartData.push({"t": fillDate.getTime(), "y": 0})
                 }
               }
             } else {
               let timeDiff = Math.abs(itemDate.getTime() - prevItemDate.getTime())
-              let diffDays = Math.floor(timeDiff / (1000 * 3600 * 24))
+              let diffSteps = Math.floor(timeDiff / (1000 * step))
               // fill empty dates with 0
-              if (diffDays > 1) {
-                for (let j = 1; j < diffDays; ++j) {
-                  let fillDate = new Date(prevItemDate)
-                  fillDate.setDate(prevItemDate.getDate() + j)
+              if (diffSteps > 1) {
+                for (let j = 1; j < diffSteps; ++j) {
+                  let fillDate = new Date(prevItemDate.getTime() + 1000 * step * j)
                   singleChartData.push({"t": fillDate.getTime(), "y": 0})
                 }
               }
             }
 
             // push real data
-            var chartItemDate = new Date(Date.UTC(response.c[index]['_id'].substring(0,4), parseInt(response.c[index]['_id'].substring(5,7)) - 1, response.c[index]['_id'].substring(8,10), 0, 0, 0, 0)).getTime()
+            var chartItemDate = new Date(response.c[index]['_id'].substring(0,4), parseInt(response.c[index]['_id'].substring(5,7)) - 1, response.c[index]['_id'].substring(8,10), 0, 0, 0, 0).getTime()
+            if (step === 3600) {
+              chartItemDate = new Date(response.c[index]['_id'].substring(0,4), parseInt(response.c[index]['_id'].substring(5,7)) - 1, response.c[index]['_id'].substring(8,10), response.c[index]['_id'].substring(11,13), 0, 0, 0).getTime()
+            }
+
             singleChartData.push({"t": chartItemDate, "y": response.c[index]['count']})
             prevItemDate = itemDate
         }
@@ -408,11 +416,10 @@
           prevItemDate = new Date(beginTimestamp * 1000)
         }
         let timeDiff = Math.abs(dateTimestamp * 1000 - prevItemDate.getTime())
-        let diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24))
-        if (diffDays > 1) {
-          for (let j = 1; j < diffDays; ++j) {
-            let fillDate = new Date(prevItemDate)
-            fillDate.setDate(prevItemDate.getDate() + j)
+        let diffSteps = Math.ceil(timeDiff / (1000 * step))
+        if (diffSteps > 1) {
+          for (let j = 1; j < diffSteps; ++j) {
+            let fillDate = new Date(prevItemDate.getTime() + 1000 * step * j)
             singleChartData.push({"t": fillDate.getTime(), "y": 0})
           }
         }
