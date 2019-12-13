@@ -33,8 +33,16 @@
   <meta name="theme-color" content="#ffffff">
   <meta name="bitcoin-address" content="1bGBx5H9NRmT3TbMHjXuUzo19CXmSfd6j">
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js" integrity="sha256-4iQZ6BVL4qNKlQ27TExEhBN1HFPvAvAMbFavKKosSWQ=" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" integrity="sha256-Uv9BNBucvCPipKQ2NS9wYpJmi8DTOEfTA/nH2aoJALw=" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/bchaddrjs@0.4.4/dist/bchaddrjs-0.4.4.min.js"></script>
+
+  <script src="/assets/js/chartjs-plugin-labels.min.js"></script>
+
   <script src="/assets/js/loader.js"></script>
   <script src="/assets/js/loadVars.js"></script>
+  <script src="/assets/js/common.js?1212201901"></script>
+  <script src="/assets/js/bob.js?1212201901"></script>
 </head>
 <body>
   <noscript>Trends.cash is charting tool for the Bitcoin SV blockchain. You can chart phrase mentions or protocol/app onchain usage.</noscript>
@@ -53,13 +61,39 @@
       		</div>
       	</div>
 
-      	<div class="promo">
-      		<a href="/ranking/" title="popular Bitcoin SV apps">Apps ranking by actions</a> |
-        	<a href="/ranking-turnover/" title="popular Bitcoin SV apps">Apps ranking by turnover</a>
-        </br></br>
-      		<a href="/active-apps/" title="active BSV apps count chart">Active apps chart</a> |
-      		<a href="https://oyo.cash/" title="search Bitcoin SV">Oyo.cash</a>
-      	</div>
+        <div class="grid gridHome">
+          <div class="gridColumnSpanSix card">
+            <a href="/ranking/">
+              <div class="card-container">
+                <h3>Apps ranking by actions</h3>
+                <div style="height: 350px;">
+                  <canvas id="actionsChart"></canvas>
+                </div>
+              </div>
+            </a>
+          </div>
+          <div class="gridColumnSpanSix card">
+            <a href="/ranking-turnover/">
+              <div class="card-container">
+                <h3>Apps ranking by turnover</h3>
+                <div style="height: 350px;">
+                  <canvas id="turnoverChart"></canvas>
+                </div>
+              </div>
+            </a>
+          </div>
+
+          <div class="gridColumnSpanSix card">
+            <a href="/active-apps/">
+              <div class="card-container">
+                <h3>Active apps count</h3>
+                <div style="height: 200px;">
+                  <canvas id="dailyCountChart"></canvas>
+                </div>
+              </div>
+            </a>
+          </div>
+        </div>
       </center>
 
       <div id="footer"></div>
@@ -67,6 +101,119 @@
   </div>
 
 <script language='javascript'>
+  var computedProtocolId = "19LtLM6H2CMjYKq2mSZitAGUGgYXYh4m4Z"
+  var computedTxHash = "35e5888c2b2a39c05f0917bb75311b8263efb53e4c9d1e12d6278ce5e503e8c6"
+  var computerAddress = "19vi1SG78XRZfzrxRAKPMqPjsf5Rf2hmub"
+  var itemsOnChart = 10
+  var endTimestamp = parseInt(new Date().getTime() / 1000)
+  var startTimestamp = endTimestamp - (1 * 24 * 60 * 60)
+
+  // create actions chart
+  var ctxActions = document.getElementById('actionsChart').getContext('2d');
+  ctxActions.canvas.width = 300;
+  ctxActions.canvas.height = 350;
+  var cfgActions = {
+    type: 'pie',
+    data: {
+      datasets: []
+    },
+    options: {
+     legend: {
+        display: false
+     },
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        labels: {
+          render: 'label',
+          overlap: false,
+          fontSize: 16,
+          fontColor: '#111',
+          fontFamily: "'Google Sans', 'sans-serif'"
+        }
+      }
+    }
+  }
+  var actionsChart = new Chart(ctxActions, cfgActions);
+
+  // create turnover chart
+  var ctxTurnover = document.getElementById('turnoverChart').getContext('2d');
+  ctxTurnover.canvas.width = 300;
+  ctxTurnover.canvas.height = 350;
+  var cfgTurnover = {
+    type: 'pie',
+    data: {
+      datasets: []
+    },
+    options: {
+     legend: {
+        display: false
+     },
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        labels: {
+          render: 'label',
+          overlap: false,
+          fontSize: 16,
+          fontColor: '#111',
+          fontFamily: "'Google Sans', 'sans-serif'"
+        }
+      }
+    }
+  }
+  var turnoverChart = new Chart(ctxTurnover, cfgTurnover);
+
+  // create
+
+    // create dailyCount chart
+    var ctxDailyCount = document.getElementById('dailyCountChart').getContext('2d');
+    ctxDailyCount.canvas.width = 350;
+    ctxDailyCount.canvas.height = 200;
+    let tooltipFormat = 'MM/DD/YYYY HH:mm'
+    var cfgDailyCount = {
+      type: 'line',
+      data: {
+        datasets: []
+  	  },
+  		options: {
+        legend: {
+          display: false
+        },
+        responsive: true,
+        maintainAspectRatio: false,
+  			scales: {
+  				xAxes: [{
+  					type: 'time',
+            time: {
+              displayFormats: {
+                quarter: 'D MMM HH:mm'
+              },
+              parser: 'MM/DD/YYYY HH:mm',
+              tooltipFormat: tooltipFormat,
+              unit: 'hour'
+            }
+  				}],
+  				yAxes: [{
+            ticks: {
+              beginAtZero: true,
+              callback: function(value) {if (value % 1 === 0) {return value;}}
+            }
+  				}]
+  			},
+        tooltips: {
+      		mode: 'index',
+      		intersect: false
+      	},
+      	hover: {
+      		mode: 'nearest',
+      		intersect: true
+      	}
+  		}
+    }
+    var dailyCountChart = new Chart(ctxDailyCount, cfgDailyCount);
+
+
   document.addEventListener("DOMContentLoaded", function() {
     loadHead()
     loadNav()
@@ -81,6 +228,203 @@
        document.getElementById("searchButton").click();
       }
     });
+
+    function getPromise (url, header){
+      return fetch(url, header).then(function(r) {
+        var url = r.url
+        return r.json()
+      }).then(function(response) {
+        return {"data": response, "url": url}
+      })
+    };
+    function promiseAllSkippingErrors(promises) {
+      return Promise.all(
+        promises.map(p => p.catch(error => null))
+      )
+    }
+    function populatePieChart(thisChart, subdir, label, protocolAddress, txHash, computerAddress, beginTimestamp, endTimestamp) {
+      return new Promise(function(resolve, reject) {
+        let promises = [];
+
+        var localStep = 3600
+        var endTimestampModStep = (endTimestamp - new Date(1548979200 * 1000).setUTCHours(0, 0, 0, 0)) % localStep
+        endTimestamp -= endTimestampModStep
+        beginTimestamp -= endTimestampModStep
+        let period = Math.ceil((endTimestamp - beginTimestamp) / localStep)
+        for (let i = 0; i < period; i++) {
+          var requestUrl = "https://raw.githubusercontent.com/trendscharts/output/master/" + txHash + "/" + computerAddress + "/" + subdir + (beginTimestamp + i * localStep) + "-" + localStep + "-all-0.json"
+          promises.push(getPromise(requestUrl));
+        }
+
+        promiseAllSkippingErrors(promises)
+        .then((data) => {
+          var chartDataUnordered = []
+          var chartDataFull = []
+          var chartDataSliced = []
+          var chartData = {}
+          for (let i = 0; i < data.length; i++) {
+            let rankingData
+            if (data[i] && data[i]['data'] && data[i]['data'][0]) {
+              if (data[i]['data'][3]) {
+                rankingData = JSON.parse(data[i]['data'][3])
+              }
+
+              for (let ii = 0; ii < rankingData.length; ii++) {
+                const base64Id = rankingData[ii][0]
+                const count = rankingData[ii][1]
+                const type = rankingData[ii][2]
+                let itemId = atob(base64Id)
+                let itemName = ''
+                if (protocols[base64Id] !== undefined) {
+                  itemName = protocols[base64Id].name
+                } else if (base64Id.length <= 6) {
+                  itemName = itemId + ' (' + base64Id + ')'
+                } else {
+                  itemName = itemId
+                }
+                if (chartData[itemName] !== undefined) {
+                  chartData[itemName]['count'] = chartData[itemName]['count'] + count
+                  if (!(chartData[itemName]['base64'].includes(base64Id))) {
+                    chartData[itemName]['base64'].push(base64Id)
+                  }
+                  if (count > chartData[itemName]['count']) {
+                    chartData[itemName]['type'] = type
+                  }
+                } else {
+                  chartData[itemName] = {}
+                  chartData[itemName]['count'] = count
+                  chartData[itemName]['base64'] = []
+                  chartData[itemName]['base64'].push(base64Id)
+                  chartData[itemName]['itemId'] = itemId.replace(/[^0-9a-zA-Z\.@]/g,"")
+                  chartData[itemName]['type'] = type
+                }
+                // B protocol names population
+                let prefix = itemId
+                if (!(bitcomPrefixes.includes(prefix)) && protocols[prefix] === undefined) {
+                  try {
+                    bchaddr.isLegacyAddress(prefix)
+                    bitcomPrefixes.push(prefix)
+                  } catch (e) {
+                  }
+                }
+              }
+            }
+          }
+
+          for (var k in chartData){
+            if (chartData.hasOwnProperty(k)) {
+              chartDataUnordered.push([k, chartData[k]['count'], chartData[k]['base64'], chartData[k]['itemId'], chartData[k]['type']])
+            }
+          }
+          chartDataUnordered.sort((a, b) => parseFloat(b[1]) - parseFloat(a[1]))
+          var dummyChartObj = {}
+          dummyChartObj.chartData = JSON.parse(JSON.stringify(chartDataUnordered));
+          getBitcomProtocols().then(function() {
+            for (let key in bitcomProtocols) {
+              if (!bitcomProtocols.hasOwnProperty(key)) continue;
+              for (let ii = 0; ii < dummyChartObj.chartData.length; ii++) {
+                if (dummyChartObj.chartData[ii][0] === key) {
+                  dummyChartObj.chartData[ii][0] = bitcomProtocols[key]['name']
+                }
+              }
+            }
+            chartDataUnordered = JSON.parse(JSON.stringify(dummyChartObj.chartData))
+
+            chartDataFull = chartDataUnordered
+            chartDataSliced = chartDataUnordered.slice(0, parseInt(itemsOnChart))
+            // draw chart
+            var chartDataset = []
+            var chartLabels = []
+            for (let i = 0; i < chartDataSliced.length; i++) {
+              chartDataset.push(chartDataSliced[i][1])
+              chartLabels.push(chartDataSliced[i][0])
+            }
+            var dataset = {"data": chartDataset, "backgroundColor": window.colors[1].slice(0, parseInt(itemsOnChart)), "label": label}
+            thisChart.config.data.datasets.push(dataset)
+            thisChart.config.data.labels = chartLabels
+            thisChart.update();
+          })
+        })
+        .catch(error => {
+          console.log(error)
+        })
+      })
+    }
+
+    function populateLineChart(thisChart, subdir, label, protocolAddress, txHash, computerAddress, beginTimestamp, endTimestamp) {
+      return new Promise(function(resolve, reject) {
+        let type = "all"
+        let step = 3600
+        var url = "https://raw.githubusercontent.com/trendscharts/output/master/" + computedTxHash + "/" + computerAddress + "/dailyCount/" + type + "/" + step + ".json"
+        fetch(url).then(function(r) {
+          return r.json()
+        }).then(response => {
+          if (response.length >= 0) {
+            let prevItemDate = null
+            let singleChartData = []
+            for (let index = 0; index < response.length; ++index) {
+              if (response[index]['_id'] < beginTimestamp) {
+                continue
+              }
+              let itemDate = new Date(response[index]['_id'] * 1000)
+              if (index === 0 || prevItemDate === null) {
+                // fill with 0 if it's not the beginning
+                let timeDiff = Math.abs(itemDate.getTime() - (beginTimestamp * 1000))
+                let diffSteps = Math.ceil(timeDiff / (1000 * step))
+                if (diffSteps > 0) {
+                  for (let j = diffSteps; j > 0; --j) {
+                    let fillDate = new Date(itemDate.getTime() - 1000 * step * j)
+                    singleChartData.push({"t": fillDate.getTime(), "y": 0})
+                  }
+                }
+              } else {
+                let timeDiff = Math.abs(itemDate.getTime() - prevItemDate.getTime())
+                let diffSteps = Math.floor(timeDiff / (1000 * step))
+                // fill empty dates with 0
+                if (diffSteps > 1) {
+                  for (let j = 1; j < diffSteps; ++j) {
+                    let fillDate = new Date(prevItemDate.getTime() + 1000 * step * j)
+                    singleChartData.push({"t": fillDate.getTime(), "y": 0})
+                  }
+                }
+              }
+
+              // push real data
+              var chartItemDate = new Date(response[index]['_id'] * 1000).getTime()
+              singleChartData.push({"t": chartItemDate, "y": response[index]['count']})
+              prevItemDate = itemDate
+            }
+
+            // fill with 0 till the end
+            if (prevItemDate === null) {
+              prevItemDate = new Date(beginTimestamp * 1000)
+            }
+            let timeDiff = Math.abs(endTimestamp * 1000 - prevItemDate.getTime())
+            let diffSteps = Math.ceil(timeDiff / (1000 * step))
+            if (diffSteps > 1) {
+              for (let j = 1; j < diffSteps; ++j) {
+                let fillDate = new Date(prevItemDate.getTime() + 1000 * step * j)
+                singleChartData.push({"t": fillDate.getTime(), "y": 0})
+              }
+            }
+            // push data to chart
+            var dataset = {"label": label, "data": singleChartData, "backgroundColor": window.colors[0][0], "borderColor": window.colors[1][0], "pointRadius": 0, "fill": false, "lineTension": 0, "borderWidth": 2}
+            thisChart.config.data.datasets.push(dataset)
+            thisChart.update();
+
+            resolve(singleChartData.length)
+          }
+        })
+        .catch(error => {
+          console.log(error)
+          reject(error)
+        })
+      })
+    }
+
+    populatePieChart(actionsChart, "", "Ranking by performed actions", computedProtocolId, computedTxHash, computerAddress, startTimestamp, endTimestamp)
+    populatePieChart(turnoverChart, "turnover/", "Ranking by turnover", computedProtocolId, computedTxHash, computerAddress, startTimestamp, endTimestamp)
+    populateLineChart(dailyCountChart, "", "Active apps count", computedProtocolId, computedTxHash, computerAddress, startTimestamp, endTimestamp)
   })
 </script>
 </body>

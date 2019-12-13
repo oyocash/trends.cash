@@ -204,7 +204,7 @@ div.main input[type="submit"]:focus {
     border: 1px solid #4d90fe;
 }
 .promo {
-  padding-bottom:80px;
+  padding-bottom:20px;
 }
 .promo a {
   padding-left:10px;
@@ -434,6 +434,12 @@ h3{
   font-family: arial, sans-serif;
   font-size: 1.5em;
   font-weight: normal;
+}
+h4{
+  color: #5f6368;
+  font-family: 'Google Sans',sans-serif;
+  font-size: 1.15em;
+  font-weight: 400;
 }
 input {
   font-size: 0.8em;
@@ -850,3 +856,48 @@ footer li.right{
   font-weight: 500;
 }
 /* end page */
+
+/* start home grid */
+.gridHome{
+  max-width: 980px;
+  min-height: 20%;
+}
+.gridHome a {
+  color:black;
+  text-decoration:none;
+}
+.gridColumnSpanTwelve {
+  width:100%;
+  grid-column: span 12;
+  position: relative;
+}
+
+.gridColumnSpanSix {
+  margin: 20px 30px;
+  margin-bottom: 60px;
+  width:95%;
+  grid-column: span 6;
+  position: relative;
+}
+
+@media screen and (max-width: 1024px) {
+  .gridColumnSpanSix {
+    grid-column: span 12;
+    align-self: start;
+    margin: 0 auto;
+    margin-bottom: 60px;
+    width: 98%;
+  }
+}
+/* end home grid */
+
+.card {
+  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+  transition: 0.3s;
+}
+.card:hover {
+  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+}
+.card-container {
+  padding: 10px 16px;
+}
