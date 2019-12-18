@@ -66,16 +66,21 @@
               To: <input type="text" name="endDateForm" id="endDateForm" title="Search date end" placeholder="YYYY-MM-DD"/>
             </div>
           </div>
-          <h4>Actions</h4>
-          <div style="height: 300px;">
-            <canvas id="actionsChart"></canvas>
-          </div>
-          <h4>Turnover</h4>
-          <div style="height: 300px;">
-            <canvas id="turnoverChart"></canvas>
-          </div>
 
           <div class="grid chartGrid">
+
+          <div class="resultTable">
+              <h4>Actions</h4>
+              <div style="height: 300px;">
+                <canvas id="actionsChart"></canvas>
+              </div>
+            </div>
+            <div class="resultTable">
+              <h4>Turnover</h4>
+              <div style="height: 300px;">
+                <canvas id="turnoverChart"></canvas>
+              </div>
+            </div>
             <div class="resultTable" id="protocolContentGrid">
               <div class="resultTable-container resultTable-separator">
                 <div class="resultTable-title">
@@ -527,8 +532,8 @@
         }
         // push data to chart
         var dataset = {"label": searchPhrase, "data": singleChartData, "backgroundColor": window.colors[0][index], "borderColor": window.colors[1][index], "pointRadius": 0, "fill": false, "lineTension": 0, "borderWidth": 2}
-        myChart.config.data.datasets.push(dataset)
-        myChart.update();
+        actionsChart.config.data.datasets.push(dataset)
+        actionsChart.update();
         // show loaded
         document.getElementById("loading").style.display = "none";
         document.getElementById("error").style.display = "none";
