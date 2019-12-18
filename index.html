@@ -355,6 +355,9 @@
       return new Promise(function(resolve, reject) {
         let type = "all"
         let step = 3600
+        var endTimestampModStep = (endTimestamp - new Date(1548979200 * 1000).setUTCHours(0, 0, 0, 0)) % step
+        endTimestamp -= endTimestampModStep
+        beginTimestamp -= endTimestampModStep
         var url = "https://raw.githubusercontent.com/trendscharts/output/master/" + computedTxHash + "/" + computerAddress + "/dailyCount/" + type + "/" + step + ".json"
         fetch(url).then(function(r) {
           return r.json()
@@ -363,7 +366,7 @@
             let prevItemDate = null
             let singleChartData = []
             for (let index = 0; index < response.length; ++index) {
-              if (response[index]['_id'] < beginTimestamp) {
+              if (parseInt(response[index]['_id']) < beginTimestamp) {
                 continue
               }
               let itemDate = new Date(response[index]['_id'] * 1000)

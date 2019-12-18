@@ -70,8 +70,8 @@
           <div style="height: 300px;">
             <canvas id="actionsChart"></canvas>
           </div>
-          <h4 style="display: none">Turnover</h4>
-          <div style="height: 300px; display: none">
+          <h4>Turnover</h4>
+          <div style="height: 300px;">
             <canvas id="turnoverChart"></canvas>
           </div>
 
@@ -206,6 +206,8 @@
           let match = searchStrings[pcIndex].match(/(?:^|\s+)prefix:\s*([0-9a-fA-F]+)\s*/u)
           if (match && match[1]) {
             var bPrefix = hexToBase64(match[1])
+            getTurnoverComputed(searchStrings[pcIndex], pcIndex, match[1], "base").then(function(r) {
+            })
             getMatchCountComputed(searchStrings[pcIndex], pcIndex, match[1], "base").then(function(r) {
               resolve(["baseProtocol", match[1]])
             })
@@ -213,6 +215,8 @@
         } else if (searchStrings[pcIndex].match(/prefix:\s*\S+=\s*/)) {  // prefix "b"
           let match = searchStrings[pcIndex].match(/(?:^|\s+)prefix:\s*(\S+=)\s*/u)
           if (match && match[1]) {
+            getTurnoverComputed(searchStrings[pcIndex], pcIndex, match[1], "base").then(function(r) {
+            })
             getMatchCountComputed(searchStrings[pcIndex], pcIndex, match[1], "base").then(function(r) {
               resolve(["baseProtocol", match[1]])
             })
@@ -220,6 +224,8 @@
         } else if (searchStrings[pcIndex].match(/prefix:\s*\S+\s*/)) {  // prefix "s"
           let match = searchStrings[pcIndex].match(/(?:^|\s+)prefix:\s*(\S+)\s*/u)
           if (match && match[1]) {
+            getTurnoverComputed(searchStrings[pcIndex], pcIndex, btoa(match[1]), "base").then(function(r) {
+            })
             getMatchCountComputed(searchStrings[pcIndex], pcIndex, btoa(match[1]), "base").then(function(r) {
               resolve(["baseProtocol", match[1]])
             })
@@ -227,10 +233,14 @@
         } else if (searchStrings[pcIndex].match(/app:\s*\S+\s*/)) {  // MAP app or run app
           let match = searchStrings[pcIndex].match(/(?:^|\s+)app:\s*(\S+)\s*/u)
           if (match && match[1]) {
+            getTurnoverComputed(searchStrings[pcIndex], pcIndex, btoa(match[1]), "mapApp").then(function(r) {
+            })
             getMatchCountComputed(searchStrings[pcIndex], pcIndex, btoa(match[1]), "mapApp").then(function(r) {
               resolve(["mapApp", match[1]])
             })
             .catch(error => {
+              getTurnoverComputed(searchStrings[pcIndex], pcIndex, btoa(match[1]), "run").then(function(r) {
+              })
               getMatchCountComputed(searchStrings[pcIndex], pcIndex, btoa(match[1]), "run").then(function(r) {
                 resolve(["run", match[1]])
               })
@@ -263,6 +273,9 @@
             if (response[index]['_id'] < beginTimestamp) {
               continue
             }
+            if (response[index]['_id'] > endTimestamp) {
+              break
+            }
             let itemDate = new Date(response[index]['_id'] * 1000)
             if (index === 0 || prevItemDate === null) {
               // fill with 0 if it's not the beginning
@@ -288,7 +301,7 @@
 
             // push real data
             var chartItemDate = new Date(response[index]['_id'] * 1000).getTime()
-            singleChartData.push({"t": chartItemDate, "y": response[index]['count']})
+            singleChartData.push({"t": chartItemDate, "y": response[index]['turnover']})
             prevItemDate = itemDate
           }
 
@@ -308,6 +321,7 @@
           var dataset = {"label": realSearchPhrase, "data": singleChartData, "backgroundColor": window.colors[0][index], "borderColor": window.colors[1][index], "pointRadius": 0, "fill": false, "lineTension": 0, "borderWidth": 2}
           turnoverChart.config.data.datasets.push(dataset)
           turnoverChart.update();
+
           // show loaded
           document.getElementById("loading").style.display = "none";
           document.getElementById("error").style.display = "none";
@@ -342,6 +356,9 @@
           for (let index = 0; index < response.length; ++index) {
             if (response[index]['_id'] < beginTimestamp) {
               continue
+            }
+            if (response[index]['_id'] > endTimestamp) {
+              break
             }
             let itemDate = new Date(response[index]['_id'] * 1000)
             if (index === 0 || prevItemDate === null) {
@@ -589,10 +606,10 @@
     tooltipFormat = 'MM/DD/YYYY HH:mm'
   }
   // create actions chart
-  var ctx = document.getElementById('actionsChart').getContext('2d');
-  ctx.canvas.width = 1000;
-  ctx.canvas.height = 300;
-  var cfg = {
+  var actionsCtx = document.getElementById('actionsChart').getContext('2d');
+  actionsCtx.canvas.width = 1000;
+  actionsCtx.canvas.height = 300;
+  var actionsCfg = {
     type: 'line',
     data: {
       datasets: []
@@ -629,14 +646,14 @@
     	}
 		}
   }
-  var actionsChart = new Chart(ctx, cfg);
+  var actionsChart = new Chart(actionsCtx, actionsCfg);
   // end create actions chart
 
   // create turnover chart
-  var ctx = document.getElementById('turnoverChart').getContext('2d');
-  ctx.canvas.width = 1000;
-  ctx.canvas.height = 300;
-  var cfg = {
+  var turnoverCtx = document.getElementById('turnoverChart').getContext('2d');
+  turnoverCtx.canvas.width = 1000;
+  turnoverCtx.canvas.height = 300;
+  var turnoverCfg = {
     type: 'line',
     data: {
       datasets: []
@@ -673,7 +690,7 @@
     	}
 		}
   }
-  var turnoverChart = new Chart(ctx, cfg);
+  var turnoverChart = new Chart(turnoverCtx, turnoverCfg);
   // end create turnover chart
 
   var picker = new Pikaday(
