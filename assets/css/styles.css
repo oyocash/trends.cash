@@ -283,6 +283,9 @@ div.main input[type="submit"]:focus {
   align-self: start;
   position: relative;
 }
+.resultTableFull {
+  grid-column: span 12;
+}
 .resultTable-container {
     display: flex;
     align-items: center;
