@@ -257,6 +257,10 @@ div.main input[type="submit"]:focus {
 .chartNavRight { margin-left: auto;}
 /* end chart section */
 
+.rankingChartWrapper {
+  height: 500px;
+  margin-top: 20px;
+}
 
 /* table */
 .resultTableLeft {

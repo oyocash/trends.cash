@@ -13,7 +13,7 @@
   <meta property="og:description" content="Ranking of popular Bitcoins SV apps sorted by turnover" />
   <meta property="og:image" content="https://trends.cash/assets/images/logo-large.png" />
 
-  <link rel="stylesheet" href="/assets/css/styles.css">
+  <link rel="stylesheet" href="/assets/css/styles.css?2012201901">
   <link rel="apple-touch-icon" sizes="57x57" href="/assets/icons/apple-icon-57x57.png">
   <link rel="apple-touch-icon" sizes="60x60" href="/assets/icons/apple-icon-60x60.png">
   <link rel="apple-touch-icon" sizes="72x72" href="/assets/icons/apple-icon-72x72.png">
@@ -38,9 +38,9 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.8.0/pikaday.min.js" integrity="sha256-+B1vOR24Jpk4oWE/+SWu7AxoQqrqDT4SF+12bixBdjw=" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/bchaddrjs@0.4.4/dist/bchaddrjs-0.4.4.min.js"></script>
   <script src="/assets/js/loader.js"></script>
-  <script src="/assets/js/loadVars.js"></script>
-  <script src="/assets/js/common.js?2011201901"></script>
-  <script src="/assets/js/bob.js?0811201901"></script>
+  <script src="/assets/js/loadVars.js?2012201901"></script>
+  <script src="/assets/js/common.js?2012201901"></script>
+  <script src="/assets/js/bob.js?2012201901"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.8.0/css/pikaday.min.css" integrity="sha256-+RIb33VoW3hHdfmp0+G4FrGAxzlKBXiwo6thzduwZdU=" crossorigin="anonymous" />
 </head>
 <body>
@@ -76,8 +76,11 @@
               To: <input type="text" name="endDateForm" id="endDateForm" title="Search date end" placeholder="YYYY-MM-DD"/>
             </div>
           </div>
-          <div style="height: 500px;">
-            <canvas id="myChart"></canvas>
+          <div class="rankingChartWrapper">
+            <canvas id="pieChart"></canvas>
+          </div>
+          <div class="rankingChartWrapper">
+            <canvas id="areaChart"></canvas>
           </div>
         </div>
 
@@ -103,11 +106,13 @@
   var computedTxHash = "35e5888c2b2a39c05f0917bb75311b8263efb53e4c9d1e12d6278ce5e503e8c6"
   var computerAddress = "19vi1SG78XRZfzrxRAKPMqPjsf5Rf2hmub"
   var step = 86400
+  var localStep = step
   var itemsOnChart = 10
-  var chartDataUnordered = []
-  var chartDataFull = []
-  var chartDataSliced = []
-  let chartData = {}
+  var pieChartDataUnordered = []
+  var pieChartDataFull = []
+  var pieChartDataSliced = []
+  let pieChartData = {}
+  let areaChartData = {}
 
   // populate period
   var periodInput = parseInt(getUrlVars()["period"]) || window.rankingPeriodDefault
@@ -127,10 +132,10 @@
   var startDateForm = new Date(startDateTimestamp * 1000).toISOString().substring(0, 10)
   document.getElementById('startDateForm').value = startDateForm
   // create chart
-  var ctx = document.getElementById('myChart').getContext('2d');
-  ctx.canvas.width = 400;
-  ctx.canvas.height = 500;
-  var cfg = {
+  var pieCtx = document.getElementById('pieChart').getContext('2d');
+  pieCtx.canvas.width = 400;
+  pieCtx.canvas.height = 500;
+  var pieCfg = {
     type: 'pie',
     data: {
       datasets: []
@@ -140,7 +145,76 @@
       maintainAspectRatio: false
 		}
   }
-  var myChart = new Chart(ctx, cfg);
+  var pieChart = new Chart(pieCtx, pieCfg);
+  let tooltipFormat = 'MMM D, YYYY'
+  if (step === 3600) {
+    tooltipFormat = 'MM/DD/YYYY HH:mm'
+  }
+  if (dateInput === undefined || parseInt(dateInput) === 0) {
+    tooltipFormat = 'MM/DD/YYYY HH:mm'
+  }
+  // create area chart
+  var areaCtx = document.getElementById('areaChart').getContext('2d');
+  areaCtx.canvas.width = 400;
+  areaCtx.canvas.height = 500;
+  var areaCfg = {
+    type: 'line',
+    data: {
+      datasets: []
+	  },
+		options: {
+     legend: {
+        display: false
+     },
+      responsive: true,
+      maintainAspectRatio: false,
+			scales: {
+				xAxes: [{
+					type: 'time',
+          time: {
+            displayFormats: {
+              quarter: 'D MMM'
+            },
+            parser: 'MM/DD/YYYY HH:mm',
+            tooltipFormat: tooltipFormat,
+            unit: 'day'
+          }
+				}],
+				yAxes: [{
+					type: 'logarithmic',
+          ticks: {
+            min: 0,
+            max: 1000000000000,
+            callback: function (value, index, values) {
+              if (value === 1000000000000) return "10K BSV";
+              if (value === 100000000000) return "1K BSV";
+              if (value === 10000000000) return "100 BSV";
+              if (value === 1000000000) return "10 BSV";
+              if (value === 100000000) return "1 BSV";
+              if (value === 10000000) return "10M sat";
+              if (value === 1000000) return "1M sat";
+              if (value === 100000) return "100K sat";
+              if (value === 10000) return "10K sat";
+              if (value === 1000) return "1K sat";
+              if (value === 100) return "100 sat";
+              if (value === 10) return "10 sat";
+              if (value === 0) return "0";
+              return null;
+            }
+          }
+				}]
+			},
+      tooltips: {
+    		mode: 'index',
+    		intersect: false
+    	},
+    	hover: {
+    		mode: 'nearest',
+    		intersect: true
+    	}
+		}
+  }
+  var areaChart = new Chart(areaCtx, areaCfg);
   var picker = new Pikaday(
   {
       field: document.getElementById('endDateForm'),
@@ -194,7 +268,7 @@
         var endTimestampDay = new Date(endTimestamp * 1000).setUTCHours(0, 0, 0, 0) / 1000
 
         if(today === endTimestampDay && period === 1){
-          var localStep = 3600
+          localStep = 3600
           var endTimestampModStep = (endTimestamp - new Date(1548979200 * 1000).setUTCHours(0, 0, 0, 0)) % localStep
           endTimestamp -= endTimestampModStep
           beginTimestamp -= endTimestampModStep
@@ -233,22 +307,28 @@
                 } else {
                   itemName = itemId
                 }
-                if (chartData[itemName] !== undefined) {
-                  chartData[itemName]['turnoverAmount'] = chartData[itemName]['turnoverAmount'] + turnoverAmount
-                  if (!(chartData[itemName]['base64'].includes(base64Id))) {
-                    chartData[itemName]['base64'].push(base64Id)
+                if (pieChartData[itemName] !== undefined) {
+                  pieChartData[itemName]['turnoverAmount'] = pieChartData[itemName]['turnoverAmount'] + turnoverAmount
+                  if (!(pieChartData[itemName]['base64'].includes(base64Id))) {
+                    pieChartData[itemName]['base64'].push(base64Id)
                   }
-                  if (turnoverAmount > chartData[itemName]['turnoverAmount']) {
-                    chartData[itemName]['type'] = type
+                  if (turnoverAmount > pieChartData[itemName]['turnoverAmount']) {
+                    pieChartData[itemName]['type'] = type
                   }
                 } else {
-                  chartData[itemName] = {}
-                  chartData[itemName]['turnoverAmount'] = turnoverAmount
-                  chartData[itemName]['base64'] = []
-                  chartData[itemName]['base64'].push(base64Id)
-                  chartData[itemName]['itemId'] = itemId.replace(/[^0-9a-zA-Z\.@]/g,"")
-                  chartData[itemName]['type'] = type
+                  pieChartData[itemName] = {}
+                  pieChartData[itemName]['turnoverAmount'] = turnoverAmount
+                  pieChartData[itemName]['base64'] = []
+                  pieChartData[itemName]['base64'].push(base64Id)
+                  pieChartData[itemName]['itemId'] = itemId.replace(/[^0-9a-zA-Z\.@]/g,"")
+                  pieChartData[itemName]['type'] = type
                 }
+                //area chart generation
+                if (areaChartData[itemName] === undefined) {
+                  areaChartData[itemName] = []
+                }
+                areaChartData[itemName].push({"t": data[0][i]['data'][4] * 1000, "y": turnoverAmount})
+
                 // B protocol names population
                 let prefix = itemId
                 if (!(bitcomPrefixes.includes(prefix)) && protocols[prefix] === undefined) {
@@ -262,24 +342,26 @@
             }
           }
 
-          for (var k in chartData){
-            if (chartData.hasOwnProperty(k)) {
-              chartDataUnordered.push([k, chartData[k]['turnoverAmount'], chartData[k]['base64'], chartData[k]['itemId'], chartData[k]['type']])
+          for (var k in pieChartData){
+            if (pieChartData.hasOwnProperty(k)) {
+              pieChartDataUnordered.push([k, pieChartData[k]['turnoverAmount'], pieChartData[k]['base64'], pieChartData[k]['itemId'], pieChartData[k]['type']])
             }
           }
-          chartDataUnordered.sort((a, b) => parseFloat(b[1]) - parseFloat(a[1]))
+          pieChartDataUnordered.sort((a, b) => parseFloat(b[1]) - parseFloat(a[1]))
           var dummyChartObj = {}
-          dummyChartObj.chartData = JSON.parse(JSON.stringify(chartDataUnordered));
+          dummyChartObj.chartData = JSON.parse(JSON.stringify(pieChartDataUnordered));
           getBitcomProtocols().then(function() {
             for (let key in bitcomProtocols) {
               if (!bitcomProtocols.hasOwnProperty(key)) continue;
               for (let ii = 0; ii < dummyChartObj.chartData.length; ii++) {
                 if (dummyChartObj.chartData[ii][0] === key) {
                   dummyChartObj.chartData[ii][0] = bitcomProtocols[key]['name']
+                  areaChartData[bitcomProtocols[key]['name']] = areaChartData[key];
+                  delete areaChartData[key];
                 }
               }
             }
-            chartDataUnordered = JSON.parse(JSON.stringify(dummyChartObj.chartData))
+            pieChartDataUnordered = JSON.parse(JSON.stringify(dummyChartObj.chartData))
             populateRankings()
           })
         })
@@ -289,21 +371,73 @@
       })
     }
     var populateRankings = function () {
-      chartDataFull = chartDataUnordered
-      chartDataSliced = chartDataUnordered.slice(0, parseInt(itemsOnChart))
+      pieChartDataFull = pieChartDataUnordered
+      pieChartDataSliced = pieChartDataUnordered.slice(0, parseInt(itemsOnChart))
       // draw chart
-      var chartDataset = []
-      var chartLabels = []
-      for (let i = 0; i < chartDataSliced.length; i++) {
-        chartDataset.push(chartDataSliced[i][1])
-        chartLabels.push(chartDataSliced[i][0])
+      var pieChartDataset = []
+      var pieChartLabels = []
+      for (let i = 0; i < pieChartDataSliced.length; i++) {
+        pieChartDataset.push(pieChartDataSliced[i][1])
+        pieChartLabels.push(pieChartDataSliced[i][0])
       }
-      var dataset = {"data": chartDataset, "backgroundColor": window.colors[1].slice(0, parseInt(itemsOnChart)), "label": "Ranking by performed actions"}
-      myChart.config.data.datasets.push(dataset)
-      myChart.config.data.labels = chartLabels
-      myChart.update();
+      var dataset = {"data": pieChartDataset, "backgroundColor": window.colors[1].slice(0, parseInt(itemsOnChart)), "label": "Ranking by performed actions"}
+      pieChart.config.data.datasets.push(dataset)
+      pieChart.config.data.labels = pieChartLabels
+      pieChart.update();
+
+      for (var iiiii = 0; iiiii < pieChartLabels.length && iiiii < 3; ++iiiii) {
+        var areaDatasetOrg = areaChartData[pieChartLabels[iiiii]]
+        let prevItemDate = null
+        let areaDataset = []
+        for (var iiiij = 0; iiiij < areaDatasetOrg.length; ++iiiij) {
+          var itemDate = new Date(areaDatasetOrg[iiiij]['t'])
+          if (iiiij === 0 || prevItemDate === null) {
+            // fill with 0 if it's not the beginning
+            let timeDiff = Math.abs(itemDate.getTime() - (beginTimestamp * 1000))
+            let diffSteps = Math.ceil(timeDiff / (1000 * localStep))
+            if (diffSteps > 0) {
+              for (let j = diffSteps; j > 0; --j) {
+                let fillDate = new Date(itemDate.getTime() - 1000 * localStep * j)
+                areaDataset.push({"t": fillDate.getTime(), "y": 0})
+              }
+            }
+          } else {
+            let timeDiff = Math.abs(itemDate.getTime() - prevItemDate.getTime())
+            let diffSteps = Math.floor(timeDiff / (1000 * localStep))
+            // fill empty dates with 0
+            if (diffSteps > 1) {
+              for (let j = 1; j < diffSteps; ++j) {
+                let fillDate = new Date(prevItemDate.getTime() + 1000 * localStep * j)
+                areaDataset.push({"t": fillDate.getTime(), "y": 0})
+              }
+            }
+          }
+
+          // push real data
+          areaDataset.push(areaDatasetOrg[iiiij])
+          prevItemDate = itemDate
+        }
+
+        // fill with 0 till the end
+        if (prevItemDate === null) {
+          prevItemDate = new Date(beginTimestamp * 1000)
+        }
+        let timeDiff = Math.abs(dateTimestamp * 1000 - prevItemDate.getTime())
+        let diffSteps = Math.ceil(timeDiff / (1000 * localStep))
+        if (diffSteps > 1) {
+          for (let j = 1; j < diffSteps; ++j) {
+            let fillDate = new Date(prevItemDate.getTime() + 1000 * localStep * j)
+            areaDataset.push({"t": fillDate.getTime(), "y": 0})
+          }
+        }
+
+        var dataset = {"label": pieChartLabels[iiiii], "data": areaDataset, "backgroundColor": window.colors[0][iiiii], "borderColor": window.colors[1][iiiii], "pointRadius": 0, "fill": true, "lineTension": 0, "borderWidth": 2}
+        areaChart.config.data.datasets.push(dataset)
+        areaChart.update();
+      }
+
       //populate table
-      rankingTable("tableContent", chartDataFull, window.colors[1])
+      rankingTable("tableContent", pieChartDataFull, window.colors[1])
       // show loaded
       document.getElementById("loading").style.display = "none";
       document.getElementById("error").style.display = "none";

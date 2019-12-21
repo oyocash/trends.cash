@@ -404,6 +404,7 @@
           }
           let timeDiff = Math.abs(dateTimestamp * 1000 - prevItemDate.getTime())
           let diffSteps = Math.ceil(timeDiff / (1000 * step))
+
           if (diffSteps > 1) {
             for (let j = 1; j < diffSteps; ++j) {
               let fillDate = new Date(prevItemDate.getTime() + 1000 * step * j)
