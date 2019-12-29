@@ -124,7 +124,13 @@
     dateTimestamp = parseInt(dateReal.getTime() / 1000) + 1
     dateForm = dateReal.toISOString().substring(0, 10)
   } else {
-    dateTimestamp = parseInt(new Date().getTime() / 1000)
+    if (periodInput > 1) {
+        var d = new Date()
+        let dateReal = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate(), 23, 59, 59, 0))
+        dateTimestamp = parseInt(dateReal.getTime() / 1000) + 1
+    } else {
+      dateTimestamp = parseInt(new Date().getTime() / 1000)
+    }
     dateForm = new Date().toISOString().substring(0, 10)
   }
   document.getElementById('endDateForm').value = dateForm
@@ -151,7 +157,7 @@
   if (step === 3600) {
     tooltipFormat = 'MM/DD/YYYY HH:mm'
   }
-  if (dateInput === undefined || parseInt(dateInput) === 0) {
+  if ((dateInput === undefined || parseInt(dateInput) === 0) && periodInput === 1) {
     tooltipFormat = 'MM/DD/YYYY HH:mm'
   }
   // create area chart
@@ -164,9 +170,6 @@
       datasets: []
 	  },
 		options: {
-     legend: {
-        display: false
-     },
       responsive: true,
       maintainAspectRatio: false,
 			scales: {
@@ -182,11 +185,11 @@
           }
 				}],
 				yAxes: [{
-					type: 'logarithmic',
           ticks: {
             min: 0,
-            max: 1000000,
             callback: function (value, index, values) {
+              if (value === 100000000) return "100M";
+              if (value === 10000000) return "10M";
               if (value === 1000000) return "1M";
               if (value === 100000) return "100K";
               if (value === 10000) return "10K";
@@ -262,7 +265,7 @@
         var today = new Date().setUTCHours(0, 0, 0, 0) / 1000
         var endTimestampDay = new Date(endTimestamp * 1000).setUTCHours(0, 0, 0, 0) / 1000
 
-        if(today === endTimestampDay && period === 1){
+        if(today === endTimestampDay && period === 1) {
           localStep = 3600
           var endTimestampModStep = (endTimestamp - new Date(1548979200 * 1000).setUTCHours(0, 0, 0, 0)) % localStep
           endTimestamp -= endTimestampModStep
@@ -352,8 +355,22 @@
               for (let ii = 0; ii < dummyChartObj.chartData.length; ii++) {
                 if (dummyChartObj.chartData[ii][0] === key) {
                   dummyChartObj.chartData[ii][0] = bitcomProtocols[key]['name']
-                  areaChartData[bitcomProtocols[key]['name']] = areaChartData[key];
-                  delete areaChartData[key];
+                  var localOldCount = 0
+                  var localCount = 0
+                  if (areaChartData[bitcomProtocols[key]['name']] !== undefined) {
+                    for (let iij = 0; iij < areaChartData[bitcomProtocols[key]['name']].length; ++iij) {
+                      localOldCount += areaChartData[bitcomProtocols[key]['name']][iij]['y']
+                    }
+                  }
+                  if (areaChartData[key] !== undefined) {
+                    for (let iij = 0; iij < areaChartData[key].length; ++iij) {
+                      localCount += areaChartData[key][iij]['y']
+                    }
+                  }
+                  if (localCount > localOldCount) {
+                    areaChartData[bitcomProtocols[key]['name']] = areaChartData[key];
+                    delete areaChartData[key];
+                  }
                 }
               }
             }
@@ -381,11 +398,12 @@
       pieChart.config.data.labels = pieChartLabels
       pieChart.update();
 
-      for (var iiiii = 0; iiiii < pieChartLabels.length && iiiii < 3; ++iiiii) {
+      for (let iiiii = 0; iiiii < pieChartLabels.length; ++iiiii) {
         var areaDatasetOrg = areaChartData[pieChartLabels[iiiii]]
         let prevItemDate = null
         let areaDataset = []
-        for (var iiiij = 0; iiiij < areaDatasetOrg.length; ++iiiij) {
+        var localCount = 0
+        for (let iiiij = 0; iiiij < areaDatasetOrg.length; ++iiiij) {
           var itemDate = new Date(areaDatasetOrg[iiiij]['t'])
           if (iiiij === 0 || prevItemDate === null) {
             // fill with 0 if it's not the beginning
@@ -394,7 +412,7 @@
             if (diffSteps > 0) {
               for (let j = diffSteps; j > 0; --j) {
                 let fillDate = new Date(itemDate.getTime() - 1000 * localStep * j)
-                areaDataset.push({"t": fillDate.getTime(), "y": 0})
+                areaDataset.push({"t": fillDate.getTime(), "y": localCount})
               }
             }
           } else {
@@ -404,10 +422,12 @@
             if (diffSteps > 1) {
               for (let j = 1; j < diffSteps; ++j) {
                 let fillDate = new Date(prevItemDate.getTime() + 1000 * localStep * j)
-                areaDataset.push({"t": fillDate.getTime(), "y": 0})
+                areaDataset.push({"t": fillDate.getTime(), "y": localCount})
               }
             }
           }
+          localCount = areaDatasetOrg[iiiij]['y'] + localCount
+          areaDatasetOrg[iiiij]['y'] = localCount
 
           // push real data
           areaDataset.push(areaDatasetOrg[iiiij])
@@ -423,11 +443,11 @@
         if (diffSteps > 1) {
           for (let j = 1; j < diffSteps; ++j) {
             let fillDate = new Date(prevItemDate.getTime() + 1000 * localStep * j)
-            areaDataset.push({"t": fillDate.getTime(), "y": 0})
+            areaDataset.push({"t": fillDate.getTime(), "y": localCount})
           }
         }
 
-        var dataset = {"label": pieChartLabels[iiiii], "data": areaDataset, "backgroundColor": window.colors[0][iiiii], "borderColor": window.colors[1][iiiii], "pointRadius": 0, "fill": true, "lineTension": 0, "borderWidth": 2}
+        var dataset = {"label": pieChartLabels[iiiii], "data": areaDataset, "backgroundColor": window.colors[0][iiiii], "borderColor": window.colors[1][iiiii], "pointRadius": 0, "fill": false, "lineTension": 0, "borderWidth": 2}
         areaChart.config.data.datasets.push(dataset)
         areaChart.update();
       }
