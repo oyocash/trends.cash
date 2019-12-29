@@ -687,7 +687,50 @@
 				yAxes: [{
           ticks: {
             beginAtZero: true,
-            callback: function(value) {if (value % 1 === 0) {return value;}}
+            callback: function (value, index, values) {
+              if (value === 100000000000000) return "1M BSV";
+              if (value === 50000000000000) return "500K BSV";
+              if (value === 20000000000000) return "200K BSV";
+              if (value === 10000000000000) return "100K BSV";
+              if (value === 5000000000000) return "50K BSV";
+              if (value === 2000000000000) return "20K BSV";
+              if (value === 1000000000000) return "10K BSV";
+              if (value === 500000000000) return "5K BSV";
+              if (value === 200000000000) return "2K BSV";
+              if (value === 100000000000) return "1K BSV";
+              if (value === 50000000000) return "500 BSV";
+              if (value === 20000000000) return "200 BSV";
+              if (value === 10000000000) return "100 BSV";
+              if (value === 5000000000) return "50 BSV";
+              if (value === 2000000000) return "20 BSV";
+              if (value === 1000000000) return "10 BSV";
+              if (value === 500000000) return "5 BSV";
+              if (value === 200000000) return "2 BSV";
+              if (value === 100000000) return "1 BSV";
+              if (value === 50000000) return "50M sat";
+              if (value === 20000000) return "20M sat";
+              if (value === 10000000) return "10M sat";
+              if (value === 5000000) return "5M sat";
+              if (value === 2000000) return "2M sat";
+              if (value === 1000000) return "1M sat";
+              if (value === 500000) return "500K sat";
+              if (value === 200000) return "200K sat";
+              if (value === 100000) return "100K sat";
+              if (value === 50000) return "50K sat";
+              if (value === 20000) return "20K sat";
+              if (value === 10000) return "10K sat";
+              if (value === 5000) return "5K sat";
+              if (value === 2000) return "2K sat";
+              if (value === 1000) return "1K sat";
+              if (value === 500) return "500 sat";
+              if (value === 200) return "200 sat";
+              if (value === 100) return "100 sat";
+              if (value === 50) return "50 sat";
+              if (value === 20) return "20 sat";
+              if (value === 10) return "10 sat";
+              if (value === 0) return "0";
+              return null;
+            }
           }
 				}]
 			},
