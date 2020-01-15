@@ -68,8 +68,7 @@
           </div>
 
           <div class="grid chartGrid">
-
-          <div class="resultTable" id="actionsChartGrid">
+            <div class="resultTable" id="actionsChartGrid">
               <h4>Actions</h4>
               <div style="height: 300px;">
                 <canvas id="actionsChart"></canvas>
@@ -619,6 +618,7 @@
   // create actions chart
   var actionsCtx = document.getElementById('actionsChart').getContext('2d');
   actionsCtx.canvas.width = 1000;
+//  actionsCtx.canvas.width = window.innerWidth
   actionsCtx.canvas.height = 300;
   var actionsCfg = {
     type: 'line',
@@ -663,6 +663,7 @@
   // create turnover chart
   var turnoverCtx = document.getElementById('turnoverChart').getContext('2d');
   turnoverCtx.canvas.width = 1000;
+//  turnoverCtx.canvas.width = window.innerWidth
   turnoverCtx.canvas.height = 300;
   var turnoverCfg = {
     type: 'line',

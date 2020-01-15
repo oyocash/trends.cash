@@ -222,7 +222,7 @@ div.main input[type="submit"]:focus {
       width: 403px;
   }
   div.main div.sbox{
-      width: 428px;
+      width: 95%;
   }
 }
 @media screen and (max-width: 800px) {
@@ -248,7 +248,7 @@ div.main input[type="submit"]:focus {
   font-weight: 400;
   margin: 20px;
   max-width: 1152px;
-  width:100%;
+  width:calc(100% - 40px);
   grid-column: span 6;
   position: relative;
 }
@@ -282,7 +282,7 @@ div.main input[type="submit"]:focus {
   margin: 20px;
   padding-bottom: 50px;
   max-width: 1152px;
-  width:100%;
+  width:calc(100% - 40px);
   grid-column: span 6;
   align-self: start;
   position: relative;
@@ -882,7 +882,7 @@ footer li.right{
 .gridColumnSpanSix {
   margin: 20px 30px;
   margin-bottom: 60px;
-  width:95%;
+  width:calc(100% - 60px);
   grid-column: span 6;
   position: relative;
 }
@@ -893,7 +893,7 @@ footer li.right{
     align-self: start;
     margin: 0 auto;
     margin-bottom: 60px;
-    width: 98%;
+    width:calc(100% - 60px);
   }
 }
 /* end home grid */
