@@ -13,7 +13,7 @@
   <meta property="og:description" content="Search result for apps and mentions on the Bitcoin blockchain" />
   <meta property="og:image" content="https://trends.cash/assets/images/logo-large.png" />
 
-  <link rel="stylesheet" href="/assets/css/styles.css">
+  <link rel="stylesheet" href="/assets/css/styles.css?170101">
   <link rel="apple-touch-icon" sizes="57x57" href="/assets/icons/apple-icon-57x57.png">
   <link rel="apple-touch-icon" sizes="60x60" href="/assets/icons/apple-icon-60x60.png">
   <link rel="apple-touch-icon" sizes="72x72" href="/assets/icons/apple-icon-72x72.png">
@@ -606,7 +606,6 @@
       oyoSearchString += "\"" + searchPhrases[i] + "\" "
     }
   }
-//  var oyoSearchString = searchPhrases.map(searchPhrases => `"${searchPhrases}"`).join(' ');
   var oyoLink = document.getElementById('oyoLink')
   oyoLink.setAttribute("href", "https://oyo.cash/result/?search=" + btoa(oyoSearchString) + "&offset=0");
   oyoLink.setAttribute("title", "Search Bitcoin for " + oyoSearchString);
@@ -618,7 +617,6 @@
   // create actions chart
   var actionsCtx = document.getElementById('actionsChart').getContext('2d');
   actionsCtx.canvas.width = 1000;
-//  actionsCtx.canvas.width = window.innerWidth
   actionsCtx.canvas.height = 300;
   var actionsCfg = {
     type: 'line',
@@ -663,7 +661,6 @@
   // create turnover chart
   var turnoverCtx = document.getElementById('turnoverChart').getContext('2d');
   turnoverCtx.canvas.width = 1000;
-//  turnoverCtx.canvas.width = window.innerWidth
   turnoverCtx.canvas.height = 300;
   var turnoverCfg = {
     type: 'line',

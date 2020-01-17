@@ -341,7 +341,7 @@ div.main input[type="submit"]:focus {
     position: absolute;
     top: 0;
     text-align: left;
-    width: 75%;
+    width: 60%;
     white-space: nowrap;
     overflow: hidden;
     text-overflow:ellipsis;
