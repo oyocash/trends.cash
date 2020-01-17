@@ -494,7 +494,8 @@ button.active {
   .resultTable {
     grid-column: span 12;
     align-self: start;
-    margin: 0 auto;
+    margin: 0 10px;
+    width:calc(100% - 20px);
   }
 }
 /* nav */
