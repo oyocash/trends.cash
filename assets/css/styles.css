@@ -467,7 +467,7 @@ button.active {
   .search input[type="text"]{
     box-sizing:border-box;
     height:46px;
-    width: 350px;
+    width: 90%;
     font-family: sans-serif;
     padding: 0 60px 0 20px;
     border: 0.5px solid #d9d9d9;
@@ -483,7 +483,8 @@ button.active {
   }
   .chartSection {
     grid-column: span 12;
-    margin: 0 auto;
+    margin: 0 10px;
+    width:calc(100% - 20px);
   }
   .chartNav {
     display: block;
