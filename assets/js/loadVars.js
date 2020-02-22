@@ -3,7 +3,7 @@ window.searchPeriodDefault = 7
 window.rankingPeriodDefault = 1
 // oyoExternalLinkProtocol values
 window.oyoRankingAddress = "149xadSKJcKdhgE4sMmcvx421nsGYwgkWo"
-window.oyoRankingPeriod = 30
+window.oyoRankingPeriod = 30 * 24 * 60 * 60
 
 // bitdb babel node
 window.bobNodeDefault = 'https://bob.planaria.network/q/1GgmC7Cg782YtQ6R9QkM58voyWeQJmJJzG/'
