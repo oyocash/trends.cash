@@ -332,6 +332,12 @@
 
             chartDataFull = chartDataUnordered
             chartDataSliced = chartDataUnordered.slice(0, parseInt(itemsOnChart))
+
+            // shorten names
+            for (let i = 0; i < chartDataSliced.length; i++) {
+              chartDataSliced[i][0] = chartDataSliced[i][0].substring(0, 10);
+            }
+
             // draw chart
             var chartDataset = []
             var chartLabels = []
