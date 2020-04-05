@@ -335,7 +335,9 @@
 
             // shorten names
             for (let i = 0; i < chartDataSliced.length; i++) {
-              chartDataSliced[i][0] = chartDataSliced[i][0].substring(0, 10);
+              if (chartDataSliced[i][0].length > 10) {
+                chartDataSliced[i][0] = chartDataSliced[i][0].substring(0, 7) + "...";
+              }
             }
 
             // draw chart

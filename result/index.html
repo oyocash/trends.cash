@@ -108,7 +108,7 @@
   var populateChart = async function(searchStrings) {
     return new Promise(function(resolve, reject) {
       for (let pcIndex = 0; pcIndex < searchStrings.length; ++pcIndex) {
-        if (searchStrings[pcIndex].match(/prefix:\s*[0-9a-fA-F]+\b\s*/)) {  // transform prefix "h" to prefix "b"
+        if (searchStrings[pcIndex].match(/^prefix:\s*[0-9a-fA-F]+\b\s*$/)) {  // transform prefix "h" to prefix "b"
           let match = searchStrings[pcIndex].match(/(?:^|\s+)prefix:\s*([0-9a-fA-F]+)\s*/u)
           if (match && match[1]) {
             var bPrefix = hexToBase64(match[1])
@@ -118,7 +118,7 @@
               resolve(["baseProtocol", match[1]])
             })
           }
-        } else if (searchStrings[pcIndex].match(/prefix:\s*\S+=\s*/)) {  // prefix "b"
+        } else if (searchStrings[pcIndex].match(/^prefix:\s*\S+=\s*$/)) {  // prefix "b"
           let match = searchStrings[pcIndex].match(/(?:^|\s+)prefix:\s*(\S+=)\s*/u)
           if (match && match[1]) {
             getTurnoverComputed(searchStrings[pcIndex], pcIndex, match[1], "base").then(function(r) {
@@ -127,7 +127,7 @@
               resolve(["baseProtocol", match[1]])
             })
           }
-        } else if (searchStrings[pcIndex].match(/prefix:\s*\S+\s*/)) {  // prefix "s"
+        } else if (searchStrings[pcIndex].match(/^prefix:\s*\S+\s*$/)) {  // prefix "s"
           let match = searchStrings[pcIndex].match(/(?:^|\s+)prefix:\s*(\S+)\s*/u)
           if (match && match[1]) {
             getTurnoverComputed(searchStrings[pcIndex], pcIndex, btoa(match[1]), "base").then(function(r) {
@@ -136,7 +136,7 @@
               resolve(["baseProtocol", match[1]])
             })
           }
-        } else if (searchStrings[pcIndex].match(/app:\s*\S+\s*/)) {  // MAP app or run app
+        } else if (searchStrings[pcIndex].match(/^app:\s*\S+\s*$/)) {  // MAP app or run app
           let match = searchStrings[pcIndex].match(/(?:^|\s+)app:\s*(\S+)\s*/u)
           if (match && match[1]) {
             getTurnoverComputed(searchStrings[pcIndex], pcIndex, btoa(match[1]), "mapApp").then(function(r) {
