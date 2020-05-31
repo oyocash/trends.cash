@@ -5,15 +5,37 @@ window.rankingPeriodDefault = 1
 window.oyoRankingAddress = "149xadSKJcKdhgE4sMmcvx421nsGYwgkWo"
 window.oyoRankingPeriod = 30 * 24 * 60 * 60
 
-// bitdb babel node
-window.bobNodeDefault = 'https://bob.planaria.network/q/1GgmC7Cg782YtQ6R9QkM58voyWeQJmJJzG/'
-window.bobNode = window.bobNodeDefault
-if (localStorage.getItem('bobNode')) {
-  if (window.bobNodeDefault === localStorage.getItem('bobNode'))
+// bob bitbus node
+window.bobBitbusNodeDefault = 'https://bob.bitbus.network/block/'
+window.bobBitbusNode = window.bobBitbusNodeDefault
+if (localStorage.getItem('bobBitbusNode')) {
+  if (window.bobBitbusNodeDefault === localStorage.getItem('bobBitbusNode'))
   {
-    localStorage.removeItem('bobNode')
+    localStorage.removeItem('bobBitbusNode')
   } else {
-    window.bobNode = localStorage.getItem('bobNode')
+    window.bobBitbusNode = localStorage.getItem('bobBitbusNode')
+  }
+}
+// planaria token
+window.planariaTokenDefault = 'eyJhbGciOiJFUzI1NksiLCJ0eXAiOiJKV1QifQ.eyJzdWIiOiIxR2hyVVYyd1luNWlkaEFhbTd4cXpDOTl1ZXNSdEs4aEV2IiwiaXNzdWVyIjoiZ2VuZXJpYy1iaXRhdXRoIn0.SUEyYVRzbEZ4UG9TYXdTNjd0bnU0ZnhnSDV4VjlCeHNHTHRPZlpLdWU1Z0xQMTJNRGY1M1ovdnQvTDNKTGZBbHRYak5VUFg2cWEyVXhvRjZFTHdyUm5jPQ'
+window.planariaToken = window.planariaTokenDefault
+if (localStorage.getItem('planariaToken')) {
+  if (window.planariaTokenDefault === localStorage.getItem('planariaToken'))
+  {
+    localStorage.removeItem('planariaToken')
+  } else {
+    window.planariaToken = localStorage.getItem('planariaToken')
+  }
+}
+// old bob node
+window.bobPlanariaNodeDefault = 'https://bob.planaria.network/q/1GgmC7Cg782YtQ6R9QkM58voyWeQJmJJzG/'
+window.bobPlanariaNode = window.bobPlanariaNodeDefault
+if (localStorage.getItem('bobPlanariaNode')) {
+  if (window.bobPlanariaNodeDefault === localStorage.getItem('bobPlanariaNode'))
+  {
+    localStorage.removeItem('bobPlanariaNode')
+  } else {
+    window.bobPlanariaNode = localStorage.getItem('bobPlanariaNode')
   }
 }
 // neongenesis planaria node

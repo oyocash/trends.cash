@@ -21,44 +21,43 @@ var getBitcomProtocolEchos =  function(address) {
       'v': 3,
       'q': {
         'find': queryMatch,
+        "project": {
+          "in.e.a": 1,
+          "out.tape.cell.s": 1
+        },
         'skip': 0,
         'limit': 100
       }
     }
-    let b64 = btoa(JSON.stringify(query))
-    let url = bobNode + b64
-    let header
-    if (window.bitdbApiKey) {
-      header = {
-        headers: { key: window.bitdbApiKey }
-      }
+    let url = window.bobBitbusNode
+
+    let fetchParams = {
+      method: "post",
+      headers: {
+        'Content-type': 'application/json; charset=utf-8',
+        'token': window.planariaToken,
+        "format": "json"
+      },
+      body: JSON.stringify(query)
     }
 
-    fetch(url, header).then(function(r) {
+    fetch(url, fetchParams).then(function(r) {
       return r.json()
     }).then(response => {
-      let bitcomEchoResults = []
+      let bitcomEchoResults = response
       let bitcomProtocolEchos = {}
-      if (response !== undefined && (response.u !== undefined || response.c !== undefined)) {
-        if (response.u !== undefined) {
-          bitcomEchoResults = bitcomEchoResults.concat(response.u.reverse())
-        }
-        if (response.c !== undefined) {
-          bitcomEchoResults = bitcomEchoResults.concat(response.c)
-        }
 
-        for (let i = 0; i < bitcomEchoResults.length; ++i) {
-          for (let j = 0; j < bitcomEchoResults[i]['out'].length; ++j) {
-            if (!bitcomEchoResults[i]['out'][j]) {
-              continue
-            }
-            for (let jj = 0; jj < bitcomEchoResults[i]['out'][j]['tape'].length; ++jj) {
-              if (bitcomEchoResults[i]['out'][j]['tape'][jj]['cell'][4] !== undefined) {
-                if (bitcomEchoResults[i]['out'][j]['tape'][jj]['cell'][0].s === "$" && bitcomEchoResults[i]['out'][j]['tape'][jj]['cell'][1].s === "echo" && (bitcomEchoResults[i]['out'][j]['tape'][jj]['cell'][3].s === "to" || bitcomEchoResults[i]['out'][j]['tape'][jj]['cell'][3].s === ">")) {
-                  let field = bitcomEchoResults[i]['out'][j]['tape'][jj]['cell'][4].s
-                  if (bitcomProtocolEchos[field] === undefined) {
-                    bitcomProtocolEchos[field] = bitcomEchoResults[i]['out'][j]['tape'][jj]['cell'][2].s
-                  }
+      for (let i = 0; i < bitcomEchoResults.length; ++i) {
+        for (let j = 0; j < bitcomEchoResults[i]['out'].length; ++j) {
+          if (!bitcomEchoResults[i]['out'][j]) {
+            continue
+          }
+          for (let jj = 0; jj < bitcomEchoResults[i]['out'][j]['tape'].length; ++jj) {
+            if (bitcomEchoResults[i]['out'][j]['tape'][jj]['cell'][4] !== undefined) {
+              if (bitcomEchoResults[i]['out'][j]['tape'][jj]['cell'][0].s === "$" && bitcomEchoResults[i]['out'][j]['tape'][jj]['cell'][1].s === "echo" && (bitcomEchoResults[i]['out'][j]['tape'][jj]['cell'][3].s === "to" || bitcomEchoResults[i]['out'][j]['tape'][jj]['cell'][3].s === ">")) {
+                let field = bitcomEchoResults[i]['out'][j]['tape'][jj]['cell'][4].s
+                if (bitcomProtocolEchos[field] === undefined) {
+                  bitcomProtocolEchos[field] = bitcomEchoResults[i]['out'][j]['tape'][jj]['cell'][2].s
                 }
               }
             }
@@ -88,48 +87,46 @@ var getBitcomProtocols =  function() {
         'v': 3,
         'q': {
           'find': queryMatch,
+          "project": {
+            "in.e.a": 1,
+            "out.tape.cell.s": 1
+          },
           'skip': 0,
           'limit': 500
         }
       }
-      let b64 = btoa(JSON.stringify(query))
-      let url = bobNode + b64
-      let header
-      if (window.bitdbApiKey) {
-        header = {
-          headers: { key: window.bitdbApiKey }
-        }
+      let url = window.bobBitbusNode
+
+      let fetchParams = {
+        method: "post",
+        headers: {
+          'Content-type': 'application/json; charset=utf-8',
+          'token': window.planariaToken,
+          "format": "json"
+        },
+        body: JSON.stringify(query)
       }
-      promises.push(getPromise(url, header));
+
+      promises.push(getPromise(url, fetchParams));
     }
     Promise.all(promises)
     .then(function(args) {
       for (let ii = 0; ii < args.length; ii++) {
-        var response = args[ii]
-        if (response !== undefined && (response.u !== undefined || response.c !== undefined)) {
-          let bitcomEchoResults = []
-          if (response.u !== undefined) {
-            bitcomEchoResults = bitcomEchoResults.concat(response.u.reverse())
-          }
-          if (response.c !== undefined) {
-            bitcomEchoResults = bitcomEchoResults.concat(response.c)
-          }
-
-          for (let i = 0; i < bitcomEchoResults.length; ++i) {
-            for (let j = 0; j < bitcomEchoResults[i]['out'].length; ++j) {
-              if (!bitcomEchoResults[i]['out'][j]) {
-                continue
+        var bitcomEchoResults = args[ii]
+        for (let i = 0; i < bitcomEchoResults.length; ++i) {
+          for (let j = 0; j < bitcomEchoResults[i]['out'].length; ++j) {
+            if (!bitcomEchoResults[i]['out'][j]) {
+              continue
+            }
+            for (let jj = 0; jj < bitcomEchoResults[i]['out'][j]['tape'].length; ++jj) {
+              if (bitcomProtocols[bitcomEchoResults[i]['in'][0].e.a] === undefined) {
+                bitcomProtocols[bitcomEchoResults[i]['in'][0].e.a] = {}
               }
-              for (let jj = 0; jj < bitcomEchoResults[i]['out'][j]['tape'].length; ++jj) {
-                if (bitcomProtocols[bitcomEchoResults[i]['in'][0].e.a] === undefined) {
-                  bitcomProtocols[bitcomEchoResults[i]['in'][0].e.a] = {}
-                }
-                if (bitcomEchoResults[i]['out'][j]['tape'][jj]['cell'][4] !== undefined) {
-                  if (bitcomEchoResults[i]['out'][j]['tape'][jj]['cell'][0].s === "$" && bitcomEchoResults[i]['out'][j]['tape'][jj]['cell'][1].s === "echo" && (bitcomEchoResults[i]['out'][j]['tape'][jj]['cell'][3].s === "to" || bitcomEchoResults[i]['out'][j]['tape'][jj]['cell'][3].s === ">") && bitcomEchoResults[i]['out'][j]['tape'][jj]['cell'][4].s === "name") {
-                    let field = bitcomEchoResults[i]['out'][j]['tape'][jj]['cell'][4].s
-                    if (bitcomProtocols[bitcomEchoResults[i]['in'][0].e.a][field] === undefined) {
-                      bitcomProtocols[bitcomEchoResults[i]['in'][0].e.a][field] = bitcomEchoResults[i]['out'][j]['tape'][jj]['cell'][2].s
-                    }
+              if (bitcomEchoResults[i]['out'][j]['tape'][jj]['cell'][4] !== undefined) {
+                if (bitcomEchoResults[i]['out'][j]['tape'][jj]['cell'][0].s === "$" && bitcomEchoResults[i]['out'][j]['tape'][jj]['cell'][1].s === "echo" && (bitcomEchoResults[i]['out'][j]['tape'][jj]['cell'][3].s === "to" || bitcomEchoResults[i]['out'][j]['tape'][jj]['cell'][3].s === ">") && bitcomEchoResults[i]['out'][j]['tape'][jj]['cell'][4].s === "name") {
+                  let field = bitcomEchoResults[i]['out'][j]['tape'][jj]['cell'][4].s
+                  if (bitcomProtocols[bitcomEchoResults[i]['in'][0].e.a][field] === undefined) {
+                    bitcomProtocols[bitcomEchoResults[i]['in'][0].e.a][field] = bitcomEchoResults[i]['out'][j]['tape'][jj]['cell'][2].s
                   }
                 }
               }

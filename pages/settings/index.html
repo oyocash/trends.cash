@@ -34,8 +34,8 @@
   <meta name="bitcoin-address" content="1bGBx5H9NRmT3TbMHjXuUzo19CXmSfd6j">
 
   <script src="/assets/js/loader.js"></script>
-  <script src="/assets/js/loadVars.js"></script>
-  <script src="/assets/js/common.js"></script>
+  <script src="/assets/js/loadVars.js?300501"></script>
+  <script src="/assets/js/common.js?300501"></script>
 </head>
 <body>
   <div id="app" class="container">
@@ -45,12 +45,20 @@
         <h2>Settings</h2>
         <div class="form">
           <div class="field-block">
+            <h4>BOB Bitbus node</h4>
+        	   <input type="text" name="bobBitbusNode" id="bobBitbusNode" title="BOB Bitbus node" placeholder="BOB Bitbus node"/>
+          </div>
+          <div class="field-block">
+            <h4>Planaria token</h4>
+            <input type="text" name="planariaToken" id="planariaToken" title="Planaria token" placeholder="Planaria token"/>
+          </div>
+          <div class="field-block">
             <h4>Planaria (BOB) node</h4>
-        	   <input type="text" name="bobNode" id="bobNode" title="BOB Planaria node" placeholder="BOB Planaria node address"/>
+        	   <input type="text" name="bobPlanariaNode" id="bobPlanariaNode" title="BOB Planaria node" placeholder="BOB Planaria node"/>
           </div>
           <div class="field-block">
             <h4>Planaria (neonGenesis) node</h4>
-        	   <input type="text" name="neongenesisNode" id="neongenesisNode" title="neonGenesis Planaria node" placeholder="neonGenesis Planaria node address"/>
+        	   <input type="text" name="neongenesisNode" id="neongenesisNode" title="neonGenesis Planaria node" placeholder="neonGenesis Planaria node"/>
           </div>
           <div class="field-block">
             <h4>Planaria API key</h4>
@@ -79,15 +87,33 @@
     loadFooter()
 
     var setValues = function() {
-      var bobNode = document.getElementById('bobNode').value
+      var bobBitbusNode = document.getElementById('bobBitbusNode').value
+      var planariaToken = document.getElementById('planariaToken').value
+      var bobPlanariaNode = document.getElementById('bobPlanariaNode').value
       var neongenesisNode = document.getElementById('neongenesisNode').value
       var bitdbApiKey = document.getElementById('bitdbApiKey').value
-      if (bobNode && bobNode !== window.bobNodeDefault) {
-        localStorage.setItem('bobNode', bobNode)
-        window.bobNode = bobNode
+      if (bobBitbusNode && bobBitbusNode !== window.bobBitbusNodeDefault) {
+        localStorage.setItem('bobBitbusNode', bobBitbusNode)
+        window.bobBitbusNode = bobBitbusNode
       } else {
-        localStorage.removeItem('bobNode')
-        window.bobNode = window.bobNodeDefault
+        localStorage.removeItem('bobBitbusNode')
+        window.bobBitbusNode = window.bobBitbusNodeDefault
+      }
+
+      if (planariaToken && planariaToken !== window.planariaTokenDefault) {
+        localStorage.setItem('planariaToken', planariaToken)
+        window.bobPlanariaNode = planariaToken
+      } else {
+        localStorage.removeItem('planariaToken')
+        window.planariaToken = window.planariaTokenDefault
+      }
+
+      if (bobPlanariaNode && bobPlanariaNode !== window.bobPlanariaNodeDefault) {
+        localStorage.setItem('bobPlanariaNode', bobPlanariaNode)
+        window.bobPlanariaNode = bobPlanariaNode
+      } else {
+        localStorage.removeItem('bobPlanariaNode')
+        window.bobPlanariaNode = window.bobPlanariaNodeDefault
       }
 
       if (neongenesisNode && neongenesisNode !== window.neongenesisNodeDefault) {
