@@ -35,7 +35,7 @@
 
   <script src="/assets/js/loader.js"></script>
   <script src="/assets/js/loadVars.js?310502"></script>
-  <script src="/assets/js/common.js?310502"></script>
+  <script src="/assets/js/common.js?310701"></script>
   <script src="/assets/js/bob.js?310506"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js" integrity="sha256-4iQZ6BVL4qNKlQ27TExEhBN1HFPvAvAMbFavKKosSWQ=" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.8.0/pikaday.min.js" integrity="sha256-+B1vOR24Jpk4oWE/+SWu7AxoQqrqDT4SF+12bixBdjw=" crossorigin="anonymous"></script>
@@ -104,58 +104,6 @@
   </div>
 
 <script language='javascript'>
-  var lineChartConfig = {
-      chart: {
-        type: 'line'
-      },
-      subtitle: {
-        text: "trends.cash"
-      },
-      xAxis: {
-          type: 'datetime'
-      },
-      yAxis: {
-          title: false
-      },
-      tooltip: {
-          pointFormat: '{series.name}: <b>{point.y}</b>'
-      },
-      legend: {
-        itemStyle: {
-           fontSize: '10px',
-           fontWeight: 'normal',
-           color: '#666666'
-        },
-      },
-      plotOptions: {
-          series: {
-            states: {
-              inactive: {
-                opacity: 1
-              },
-              hover: {
-                enabled: false
-              }
-            }
-          },
-          line: {
-              marker: {
-                  radius: 0
-              },
-              lineWidth: 2,
-              states: {
-                  hover: {
-                      lineWidth: 2
-                  }
-              },
-              threshold: null
-          }
-      },
-      credits: {
-        enabled: false
-      },
-      series: []
-  };
   var actionsChart = JSON.parse(JSON.stringify(lineChartConfig));
   var turnoverChart = JSON.parse(JSON.stringify(lineChartConfig));
 

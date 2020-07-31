@@ -142,3 +142,108 @@ function validURL(str) {
 function dummyTxUrl(url) {
   return url.replace("{tx_hash}", "000000000000000000000000000000000000000000000000000000000000")
 }
+
+var lineChartConfig = {
+    chart: {
+      type: 'line'
+    },
+    subtitle: {
+      text: "trends.cash"
+    },
+    xAxis: {
+        type: 'datetime'
+    },
+    yAxis: {
+        title: false
+    },
+    tooltip: {
+        pointFormat: '{series.name}: <b>{point.y}</b>'
+    },
+    legend: {
+      itemStyle: {
+         fontSize: '10px',
+         fontWeight: 'normal',
+         color: '#666666'
+      },
+    },
+    plotOptions: {
+        series: {
+          states: {
+            inactive: {
+              opacity: 1
+            },
+            hover: {
+              enabled: false
+            }
+          }
+        },
+        line: {
+            marker: {
+                radius: 0
+            },
+            lineWidth: 2,
+            states: {
+                hover: {
+                    lineWidth: 2
+                }
+            },
+            threshold: null
+        }
+    },
+    credits: {
+      enabled: false
+    },
+    series: []
+};
+
+var pieChartConfig = {
+    chart: {
+        plotBackgroundColor: null,
+        plotBorderWidth: null,
+        plotShadow: false,
+        type: 'pie'
+    },
+    subtitle: {
+      text: "trends.cash"
+    },
+    tooltip: {
+        pointFormat: '{series.name}: <b>{point.y}</b>'
+    },
+    accessibility: {
+        point: {
+            valueSuffix: '%'
+        }
+    },
+    legend: {
+      itemStyle: {
+         fontSize: '10px',
+         fontWeight: 'normal',
+         color: '#666666'
+      },
+    },
+    plotOptions: {
+        series: {
+          states: {
+            inactive: {
+              opacity: 1
+            },
+            hover: {
+              enabled: false
+            }
+          }
+        },
+        pie: {
+            allowPointSelect: true,
+            cursor: 'pointer',
+            dataLabels: {
+                enabled: true,
+                format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+            },
+            showInLegend: true,
+            size: "90%"
+        }
+    },
+    credits: {
+      enabled: false
+    }
+}

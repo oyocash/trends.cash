@@ -39,7 +39,7 @@
   <script src="https://code.highcharts.com/highcharts.js"></script>
   <script src="/assets/js/loader.js"></script>
   <script src="/assets/js/loadVars.js?310502"></script>
-  <script src="/assets/js/common.js?310502"></script>
+  <script src="/assets/js/common.js?310701"></script>
   <script src="/assets/js/bob.js?310506"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.8.0/css/pikaday.min.css" integrity="sha256-+RIb33VoW3hHdfmp0+G4FrGAxzlKBXiwo6thzduwZdU=" crossorigin="anonymous" />
 </head>
@@ -113,109 +113,6 @@
   var pieChartDataSliced = []
   let pieChartData = {}
   let areaChartData = {}
-
-  var pieChartConfig = {
-      chart: {
-          plotBackgroundColor: null,
-          plotBorderWidth: null,
-          plotShadow: false,
-          type: 'pie'
-      },
-      subtitle: {
-        text: "trends.cash"
-      },
-      tooltip: {
-          pointFormat: '{series.name}: <b>{point.y}</b>'
-      },
-      accessibility: {
-          point: {
-              valueSuffix: '%'
-          }
-      },
-      legend: {
-        itemStyle: {
-           fontSize: '10px',
-           fontWeight: 'normal',
-           color: '#666666'
-        },
-      },
-      plotOptions: {
-          series: {
-            states: {
-              inactive: {
-                opacity: 1
-              },
-              hover: {
-                enabled: false
-              }
-            }
-          },
-          pie: {
-              allowPointSelect: true,
-              cursor: 'pointer',
-              dataLabels: {
-                  enabled: true,
-                  format: '<b>{point.name}</b>: {point.percentage:.1f} %'
-              },
-              showInLegend: true,
-              size: "90%"
-          }
-      },
-      credits: {
-        enabled: false
-      }
-  }
-  var lineChartConfig = {
-      chart: {
-        type: 'line'
-      },
-      subtitle: {
-        text: "trends.cash"
-      },
-      xAxis: {
-          type: 'datetime'
-      },
-      yAxis: {
-          title: false
-      },
-      tooltip: {
-          pointFormat: '{series.name}: <b>{point.y}</b>'
-      },
-      legend: {
-        itemStyle: {
-           fontSize: '10px',
-           fontWeight: 'normal',
-           color: '#666666'
-        },
-      },
-      plotOptions: {
-          series: {
-            states: {
-              inactive: {
-                opacity: 1
-              },
-              hover: {
-                enabled: false
-              }
-            }
-          },
-          line: {
-              marker: {
-                  radius: 0
-              },
-              lineWidth: 2,
-              states: {
-                  hover: {
-                      lineWidth: 2
-                  }
-              },
-              threshold: null
-          }
-      },
-      credits: {
-        enabled: false
-      }
-  };
 
   // populate period
   var periodInput = parseInt(getUrlVars()["period"]) || window.rankingPeriodDefault
