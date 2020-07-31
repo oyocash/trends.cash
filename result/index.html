@@ -38,8 +38,8 @@
   <script src="/assets/js/common.js?310502"></script>
   <script src="/assets/js/bob.js?310506"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js" integrity="sha256-4iQZ6BVL4qNKlQ27TExEhBN1HFPvAvAMbFavKKosSWQ=" crossorigin="anonymous"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" integrity="sha256-Uv9BNBucvCPipKQ2NS9wYpJmi8DTOEfTA/nH2aoJALw=" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.8.0/pikaday.min.js" integrity="sha256-+B1vOR24Jpk4oWE/+SWu7AxoQqrqDT4SF+12bixBdjw=" crossorigin="anonymous"></script>
+  <script src="https://code.highcharts.com/highcharts.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.8.0/css/pikaday.min.css" integrity="sha256-+RIb33VoW3hHdfmp0+G4FrGAxzlKBXiwo6thzduwZdU=" crossorigin="anonymous" />
 </head>
 <body>
@@ -70,13 +70,13 @@
             <div class="resultTable" id="actionsChartGrid">
               <h4>Actions</h4>
               <div style="height: 300px;">
-                <canvas id="actionsChart"></canvas>
+                <div id="actionsChart" style="height: 300px;"></div>
               </div>
             </div>
             <div class="resultTable" id="turnoverChartGrid">
               <h4>Turnover</h4>
               <div style="height: 300px;">
-                <canvas id="turnoverChart"></canvas>
+                <div id="turnoverChart" style="height: 300px;"></div>
               </div>
             </div>
             <div class="resultTable" id="protocolContentGrid">
@@ -104,6 +104,61 @@
   </div>
 
 <script language='javascript'>
+  var lineChartConfig = {
+      chart: {
+        type: 'line'
+      },
+      subtitle: {
+        text: "trends.cash"
+      },
+      xAxis: {
+          type: 'datetime'
+      },
+      yAxis: {
+          title: false
+      },
+      tooltip: {
+          pointFormat: '{series.name}: <b>{point.y}</b>'
+      },
+      legend: {
+        itemStyle: {
+           fontSize: '10px',
+           fontWeight: 'normal',
+           color: '#666666'
+        },
+      },
+      plotOptions: {
+          series: {
+            states: {
+              inactive: {
+                opacity: 1
+              },
+              hover: {
+                enabled: false
+              }
+            }
+          },
+          line: {
+              marker: {
+                  radius: 0
+              },
+              lineWidth: 2,
+              states: {
+                  hover: {
+                      lineWidth: 2
+                  }
+              },
+              threshold: null
+          }
+      },
+      credits: {
+        enabled: false
+      },
+      series: []
+  };
+  var actionsChart = JSON.parse(JSON.stringify(lineChartConfig));
+  var turnoverChart = JSON.parse(JSON.stringify(lineChartConfig));
+
   var populateChart = async function(searchStrings) {
     return new Promise(function(resolve, reject) {
       for (let pcIndex = 0; pcIndex < searchStrings.length; ++pcIndex) {
@@ -175,7 +230,6 @@
       fetch(url).then(function(r) {
         return r.json()
       }).then(response => {
-      console.log(JSON.stringify(response))
         if (response.length >= 0) {
           let prevItemDate = null
           let singleChartData = []
@@ -194,7 +248,7 @@
               if (diffSteps > 0) {
                 for (let j = diffSteps; j > 0; --j) {
                   let fillDate = new Date(itemDate.getTime() - 1000 * step * j)
-                  singleChartData.push({"t": fillDate.getTime(), "y": 0})
+                  singleChartData.push([fillDate.getTime(), 0])
                 }
               }
             } else {
@@ -204,14 +258,14 @@
               if (diffSteps > 1) {
                 for (let j = 1; j < diffSteps; ++j) {
                   let fillDate = new Date(prevItemDate.getTime() + 1000 * step * j)
-                  singleChartData.push({"t": fillDate.getTime(), "y": 0})
+                  singleChartData.push([ fillDate.getTime(), 0])
                 }
               }
             }
 
             // push real data
             var chartItemDate = new Date(response[index]['_id'] * 1000).getTime()
-            singleChartData.push({"t": chartItemDate, "y": response[index]['turnover']})
+            singleChartData.push([ chartItemDate, response[index]['turnover']])
             prevItemDate = itemDate
           }
 
@@ -224,14 +278,13 @@
           if (diffSteps > 1) {
             for (let j = 1; j < diffSteps; ++j) {
               let fillDate = new Date(prevItemDate.getTime() + 1000 * step * j)
-              singleChartData.push({"t": fillDate.getTime(), "y": 0})
+              singleChartData.push([ fillDate.getTime(),  0])
             }
           }
           // push data to chart
-          console.log(JSON.stringify(singleChartData))
-          var dataset = {"label": realSearchPhrase, "data": singleChartData, "backgroundColor": window.colors[0][index], "borderColor": window.colors[1][index], "pointRadius": 0, "fill": false, "lineTension": 0, "borderWidth": 2}
-          turnoverChart.config.data.datasets.push(dataset)
-          turnoverChart.update();
+          turnoverChart.title = { text: `Amount spent` }
+          turnoverChart.series.push({name: realSearchPhrase, data: singleChartData, color: window.colors[index]})
+          var turnoverChartObj = Highcharts.chart("turnoverChart", turnoverChart)
 
           // show loaded
           document.getElementById("loading").style.display = "none";
@@ -279,7 +332,7 @@
               if (diffSteps > 0) {
                 for (let j = diffSteps; j > 0; --j) {
                   let fillDate = new Date(itemDate.getTime() - 1000 * step * j)
-                  singleChartData.push({"t": fillDate.getTime(), "y": 0})
+                  singleChartData.push([ fillDate.getTime(), 0])
                 }
               }
             } else {
@@ -289,14 +342,14 @@
               if (diffSteps > 1) {
                 for (let j = 1; j < diffSteps; ++j) {
                   let fillDate = new Date(prevItemDate.getTime() + 1000 * step * j)
-                  singleChartData.push({"t": fillDate.getTime(), "y": 0})
+                  singleChartData.push([ fillDate.getTime(), 0])
                 }
               }
             }
 
             // push real data
             var chartItemDate = new Date(response[index]['_id'] * 1000).getTime()
-            singleChartData.push({"t": chartItemDate, "y": response[index]['count']})
+            singleChartData.push([ chartItemDate, response[index]['count']])
             prevItemDate = itemDate
           }
 
@@ -310,13 +363,14 @@
           if (diffSteps > 1) {
             for (let j = 1; j < diffSteps; ++j) {
               let fillDate = new Date(prevItemDate.getTime() + 1000 * step * j)
-              singleChartData.push({"t": fillDate.getTime(), "y": 0})
+              singleChartData.push([ fillDate.getTime(), 0 ])
             }
           }
           // push data to chart
-          var dataset = {"label": realSearchPhrase, "data": singleChartData, "backgroundColor": window.colors[0][index], "borderColor": window.colors[1][index], "pointRadius": 0, "fill": false, "lineTension": 0, "borderWidth": 2}
-          actionsChart.config.data.datasets.push(dataset)
-          actionsChart.update();
+          actionsChart.title = { text: `Performed actions` }
+          actionsChart.series.push({name: realSearchPhrase, data: singleChartData, color: window.colors[index]})
+          var actionsChartObj = Highcharts.chart("actionsChart", actionsChart)
+
           // show loaded
           document.getElementById("loading").style.display = "none";
           document.getElementById("error").style.display = "none";
@@ -406,7 +460,7 @@
               if (diffSteps > 0) {
                 for (let j = diffSteps; j > 0; --j) {
                   let fillDate = new Date(itemDate.getTime() - 1000 * step * j)
-                  singleChartData.push({"t": fillDate.getTime(), "y": 0})
+                  singleChartData.push([ fillDate.getTime(),  0 ])
                 }
               }
             } else {
@@ -416,7 +470,7 @@
               if (diffSteps > 1) {
                 for (let j = 1; j < diffSteps; ++j) {
                   let fillDate = new Date(prevItemDate.getTime() + 1000 * step * j)
-                  singleChartData.push({"t": fillDate.getTime(), "y": 0})
+                  singleChartData.push([ fillDate.getTime(), 0 ])
                 }
               }
             }
@@ -427,7 +481,7 @@
               chartItemDate = new Date(response.c[index]['_id'].substring(0,4), parseInt(response.c[index]['_id'].substring(5,7)) - 1, response.c[index]['_id'].substring(8,10), response.c[index]['_id'].substring(11,13), 0, 0, 0).getTime()
             }
 
-            singleChartData.push({"t": chartItemDate, "y": response.c[index]['count']})
+            singleChartData.push([ chartItemDate, response.c[index]['count'] ])
             prevItemDate = itemDate
         }
 
@@ -440,13 +494,13 @@
         if (diffSteps > 1) {
           for (let j = 1; j < diffSteps; ++j) {
             let fillDate = new Date(prevItemDate.getTime() + 1000 * step * j)
-            singleChartData.push({"t": fillDate.getTime(), "y": 0})
+            singleChartData.push([ fillDate.getTime(), 0 ])
           }
         }
         // push data to chart
-        var dataset = {"label": searchPhrase, "data": singleChartData, "backgroundColor": window.colors[0][index], "borderColor": window.colors[1][index], "pointRadius": 0, "fill": false, "lineTension": 0, "borderWidth": 2}
-        actionsChart.config.data.datasets.push(dataset)
-        actionsChart.update();
+        actionsChart.title = { text: `Search count` }
+        actionsChart.series.push({name: realSearchPhrase, data: singleChartData, color: window.colors[index]})
+        var actionsChartObj = Highcharts.chart("actionsChart", actionsChart)
         // show loaded
         document.getElementById("loading").style.display = "none";
         document.getElementById("error").style.display = "none";
@@ -517,141 +571,6 @@
   var oyoLink = document.getElementById('oyoLink')
   oyoLink.setAttribute("href", "https://oyo.cash/result/?search=" + btoa(oyoSearchString) + "&offset=0");
   oyoLink.setAttribute("title", "Search Bitcoin for " + oyoSearchString);
-
-  let tooltipFormat = 'MMM D, YYYY'
-  if (step === 3600) {
-    tooltipFormat = 'MM/DD/YYYY HH:mm'
-  }
-  // create actions chart
-  var actionsCtx = document.getElementById('actionsChart').getContext('2d');
-  actionsCtx.canvas.width = 1000;
-  actionsCtx.canvas.height = 300;
-  var actionsCfg = {
-    type: 'line',
-    data: {
-      datasets: []
-	  },
-		options: {
-      responsive: true,
-      maintainAspectRatio: false,
-			scales: {
-				xAxes: [{
-					type: 'time',
-          time: {
-            displayFormats: {
-              quarter: 'D MMM'
-            },
-            parser: 'MM/DD/YYYY HH:mm',
-            tooltipFormat: tooltipFormat,
-            unit: 'day'
-          }
-				}],
-				yAxes: [{
-          ticks: {
-            beginAtZero: true,
-            callback: function(value) {if (value % 1 === 0) {return value;}}
-          }
-				}]
-			},
-      tooltips: {
-    		mode: 'index',
-    		intersect: false
-    	},
-    	hover: {
-    		mode: 'nearest',
-    		intersect: true
-    	}
-		}
-  }
-  var actionsChart = new Chart(actionsCtx, actionsCfg);
-  // end create actions chart
-
-  // create turnover chart
-  var turnoverCtx = document.getElementById('turnoverChart').getContext('2d');
-  turnoverCtx.canvas.width = 1000;
-  turnoverCtx.canvas.height = 300;
-  var turnoverCfg = {
-    type: 'line',
-    data: {
-      datasets: []
-	  },
-		options: {
-      responsive: true,
-      maintainAspectRatio: false,
-			scales: {
-				xAxes: [{
-					type: 'time',
-          time: {
-            displayFormats: {
-              quarter: 'D MMM'
-            },
-            parser: 'MM/DD/YYYY HH:mm',
-            tooltipFormat: tooltipFormat,
-            unit: 'day'
-          }
-				}],
-				yAxes: [{
-          ticks: {
-            beginAtZero: true,
-            callback: function (value, index, values) {
-              if (value === 100000000000000) return "1M BSV";
-              if (value === 50000000000000) return "500K BSV";
-              if (value === 20000000000000) return "200K BSV";
-              if (value === 10000000000000) return "100K BSV";
-              if (value === 5000000000000) return "50K BSV";
-              if (value === 2000000000000) return "20K BSV";
-              if (value === 1000000000000) return "10K BSV";
-              if (value === 500000000000) return "5K BSV";
-              if (value === 200000000000) return "2K BSV";
-              if (value === 100000000000) return "1K BSV";
-              if (value === 50000000000) return "500 BSV";
-              if (value === 20000000000) return "200 BSV";
-              if (value === 10000000000) return "100 BSV";
-              if (value === 5000000000) return "50 BSV";
-              if (value === 2000000000) return "20 BSV";
-              if (value === 1000000000) return "10 BSV";
-              if (value === 500000000) return "5 BSV";
-              if (value === 200000000) return "2 BSV";
-              if (value === 100000000) return "1 BSV";
-              if (value === 50000000) return "50M sat";
-              if (value === 20000000) return "20M sat";
-              if (value === 10000000) return "10M sat";
-              if (value === 5000000) return "5M sat";
-              if (value === 2000000) return "2M sat";
-              if (value === 1000000) return "1M sat";
-              if (value === 500000) return "500K sat";
-              if (value === 200000) return "200K sat";
-              if (value === 100000) return "100K sat";
-              if (value === 50000) return "50K sat";
-              if (value === 20000) return "20K sat";
-              if (value === 10000) return "10K sat";
-              if (value === 5000) return "5K sat";
-              if (value === 2000) return "2K sat";
-              if (value === 1000) return "1K sat";
-              if (value === 500) return "500 sat";
-              if (value === 200) return "200 sat";
-              if (value === 100) return "100 sat";
-              if (value === 50) return "50 sat";
-              if (value === 20) return "20 sat";
-              if (value === 10) return "10 sat";
-              if (value === 0) return "0";
-              return null;
-            }
-          }
-				}]
-			},
-      tooltips: {
-    		mode: 'index',
-    		intersect: false
-    	},
-    	hover: {
-    		mode: 'nearest',
-    		intersect: true
-    	}
-		}
-  }
-  var turnoverChart = new Chart(turnoverCtx, turnoverCfg);
-  // end create turnover chart
 
   var picker = new Pikaday(
   {

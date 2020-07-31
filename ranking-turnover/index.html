@@ -1,16 +1,16 @@
 <html>
 <head>
-  <title>Trends.cash - Popular Bitcoin SV apps (by amount spent)</title>
+  <title>Trends.cash - Popular Bitcoin SV apps (by money spent)</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:creator" content="@pmitchev" />
-  <meta name="twitter:title" content="Trends.cash - Popular Bitcoin SV (BSV) apps (sorted by turnover)" />
-  <meta name="twitter:description" content="Ranking of popular Bitcoins SV (BSV) apps sorted by turnover" />
+  <meta name="twitter:title" content="Trends.cash - Popular Bitcoin SV (BSV) apps (sorted by money spent)" />
+  <meta name="twitter:description" content="Ranking of popular Bitcoins SV (BSV) apps sorted by money spent" />
   <meta name="twitter:image" content="https://trends.cash/assets/images/logo-large.png" />
   <meta property="og:url" content="https://trends.cash/ranking-turnover/" />
   <meta property="og:type"   content="website" />
-  <meta property="og:title" content="Trends.cash - Popular Bitcoin SV apps (sorted by turnover)" />
-  <meta property="og:description" content="Ranking of popular Bitcoins SV apps sorted by turnover" />
+  <meta property="og:title" content="Trends.cash - Popular Bitcoin SV apps (sorted by money spent)" />
+  <meta property="og:description" content="Ranking of popular Bitcoins SV apps sorted by money spent" />
   <meta property="og:image" content="https://trends.cash/assets/images/logo-large.png" />
 
   <link rel="stylesheet" href="/assets/css/styles.css?240101">
@@ -34,9 +34,9 @@
   <meta name="bitcoin-address" content="1bGBx5H9NRmT3TbMHjXuUzo19CXmSfd6j">
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js" integrity="sha256-4iQZ6BVL4qNKlQ27TExEhBN1HFPvAvAMbFavKKosSWQ=" crossorigin="anonymous"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" integrity="sha256-Uv9BNBucvCPipKQ2NS9wYpJmi8DTOEfTA/nH2aoJALw=" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.8.0/pikaday.min.js" integrity="sha256-+B1vOR24Jpk4oWE/+SWu7AxoQqrqDT4SF+12bixBdjw=" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/bchaddrjs@0.4.4/dist/bchaddrjs-0.4.4.min.js"></script>
+  <script src="https://code.highcharts.com/highcharts.js"></script>
   <script src="/assets/js/loader.js"></script>
   <script src="/assets/js/loadVars.js?310502"></script>
   <script src="/assets/js/common.js?310502"></script>
@@ -44,7 +44,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.8.0/css/pikaday.min.css" integrity="sha256-+RIb33VoW3hHdfmp0+G4FrGAxzlKBXiwo6thzduwZdU=" crossorigin="anonymous" />
 </head>
 <body>
-  <noscript>Ranking of popular Bitcoins SV apps sorted by amount spent</noscript>
+  <noscript>Ranking of popular Bitcoins SV apps sorted by money spent</noscript>
   <div id="app" class="container">
     <div id="nav"></div>
       <div class="grid" id="loading">
@@ -77,17 +77,17 @@
             </div>
           </div>
           <div class="rankingChartWrapper">
-            <canvas id="pieChart"></canvas>
+            <div id="pieChart" style="height:500px;"></div>
           </div>
           <div class="rankingChartWrapper">
-            <canvas id="areaChart"></canvas>
+            <div id="areaChart" style="height:500px;"></div>
           </div>
         </div>
 
         <div class="resultTable">
           <div class="resultTable-container resultTable-separator">
             <div class="resultTable-title">
-              Popular BSV apps (sorted by amount spent)
+              Popular BSV apps (sorted by money spent)
             </div>
           </div>
           <div id="tableContent"></div>
@@ -114,6 +114,109 @@
   let pieChartData = {}
   let areaChartData = {}
 
+  var pieChartConfig = {
+      chart: {
+          plotBackgroundColor: null,
+          plotBorderWidth: null,
+          plotShadow: false,
+          type: 'pie'
+      },
+      subtitle: {
+        text: "trends.cash"
+      },
+      tooltip: {
+          pointFormat: '{series.name}: <b>{point.y}</b>'
+      },
+      accessibility: {
+          point: {
+              valueSuffix: '%'
+          }
+      },
+      legend: {
+        itemStyle: {
+           fontSize: '10px',
+           fontWeight: 'normal',
+           color: '#666666'
+        },
+      },
+      plotOptions: {
+          series: {
+            states: {
+              inactive: {
+                opacity: 1
+              },
+              hover: {
+                enabled: false
+              }
+            }
+          },
+          pie: {
+              allowPointSelect: true,
+              cursor: 'pointer',
+              dataLabels: {
+                  enabled: true,
+                  format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+              },
+              showInLegend: true,
+              size: "90%"
+          }
+      },
+      credits: {
+        enabled: false
+      }
+  }
+  var lineChartConfig = {
+      chart: {
+        type: 'line'
+      },
+      subtitle: {
+        text: "trends.cash"
+      },
+      xAxis: {
+          type: 'datetime'
+      },
+      yAxis: {
+          title: false
+      },
+      tooltip: {
+          pointFormat: '{series.name}: <b>{point.y}</b>'
+      },
+      legend: {
+        itemStyle: {
+           fontSize: '10px',
+           fontWeight: 'normal',
+           color: '#666666'
+        },
+      },
+      plotOptions: {
+          series: {
+            states: {
+              inactive: {
+                opacity: 1
+              },
+              hover: {
+                enabled: false
+              }
+            }
+          },
+          line: {
+              marker: {
+                  radius: 0
+              },
+              lineWidth: 2,
+              states: {
+                  hover: {
+                      lineWidth: 2
+                  }
+              },
+              threshold: null
+          }
+      },
+      credits: {
+        enabled: false
+      }
+  };
+
   // populate period
   var periodInput = parseInt(getUrlVars()["period"]) || window.rankingPeriodDefault
   // populate date
@@ -137,113 +240,7 @@
   var startDateTimestamp = dateTimestamp - (periodInput * 24 * 60 * 60)
   var startDateForm = new Date(startDateTimestamp * 1000).toISOString().substring(0, 10)
   document.getElementById('startDateForm').value = startDateForm
-  // create chart
-  var pieCtx = document.getElementById('pieChart').getContext('2d');
-  pieCtx.canvas.width = 400;
-  pieCtx.canvas.height = 500;
-  var pieCfg = {
-    type: 'pie',
-    data: {
-      datasets: []
-    },
-		options: {
-			responsive: true,
-      maintainAspectRatio: false
-		}
-  }
-  var pieChart = new Chart(pieCtx, pieCfg);
-  let tooltipFormat = 'MMM D, YYYY'
-  if (step === 3600) {
-    tooltipFormat = 'MM/DD/YYYY HH:mm'
-  }
-  if ((dateInput === undefined || parseInt(dateInput) === 0) && periodInput === 1) {
-    tooltipFormat = 'MM/DD/YYYY HH:mm'
-  }
-  // create area chart
-  var areaCtx = document.getElementById('areaChart').getContext('2d');
-  areaCtx.canvas.width = 400;
-  areaCtx.canvas.height = 500;
-  var areaCfg = {
-    type: 'line',
-    data: {
-      datasets: []
-	  },
-		options: {
-      responsive: true,
-      maintainAspectRatio: false,
-			scales: {
-				xAxes: [{
-					type: 'time',
-          time: {
-            displayFormats: {
-              quarter: 'D MMM'
-            },
-            parser: 'MM/DD/YYYY HH:mm',
-            tooltipFormat: tooltipFormat,
-            unit: 'day'
-          }
-				}],
-				yAxes: [{
-          ticks: {
-            min: 0,
-            callback: function (value, index, values) {
-              if (value === 100000000000000) return "1M BSV";
-              if (value === 50000000000000) return "500K BSV";
-              if (value === 20000000000000) return "200K BSV";
-              if (value === 10000000000000) return "100K BSV";
-              if (value === 5000000000000) return "50K BSV";
-              if (value === 2000000000000) return "20K BSV";
-              if (value === 1000000000000) return "10K BSV";
-              if (value === 500000000000) return "5K BSV";
-              if (value === 200000000000) return "2K BSV";
-              if (value === 100000000000) return "1K BSV";
-              if (value === 50000000000) return "500 BSV";
-              if (value === 20000000000) return "200 BSV";
-              if (value === 10000000000) return "100 BSV";
-              if (value === 5000000000) return "50 BSV";
-              if (value === 2000000000) return "20 BSV";
-              if (value === 1000000000) return "10 BSV";
-              if (value === 500000000) return "5 BSV";
-              if (value === 200000000) return "2 BSV";
-              if (value === 100000000) return "1 BSV";
-              if (value === 50000000) return "50M sat";
-              if (value === 20000000) return "20M sat";
-              if (value === 10000000) return "10M sat";
-              if (value === 5000000) return "5M sat";
-              if (value === 2000000) return "2M sat";
-              if (value === 1000000) return "1M sat";
-              if (value === 500000) return "500K sat";
-              if (value === 200000) return "200K sat";
-              if (value === 100000) return "100K sat";
-              if (value === 50000) return "50K sat";
-              if (value === 20000) return "20K sat";
-              if (value === 10000) return "10K sat";
-              if (value === 5000) return "5K sat";
-              if (value === 2000) return "2K sat";
-              if (value === 1000) return "1K sat";
-              if (value === 500) return "500 sat";
-              if (value === 200) return "200 sat";
-              if (value === 100) return "100 sat";
-              if (value === 50) return "50 sat";
-              if (value === 20) return "20 sat";
-              if (value === 10) return "10 sat";
-              if (value === 0) return "0";
-              return null;
-            }
-          }
-				}]
-			},
-      tooltips: {
-    		mode: 'index',
-    		intersect: false
-    	},
-    	hover: {
-    		mode: 'nearest',
-    		intersect: true
-    	}
-		}
-  }
-  var areaChart = new Chart(areaCtx, areaCfg);
+
   var picker = new Pikaday(
   {
       field: document.getElementById('endDateForm'),
@@ -420,14 +417,34 @@
       var pieChartDataset = []
       var pieChartLabels = []
       for (let i = 0; i < pieChartDataSliced.length; i++) {
-        pieChartDataset.push(pieChartDataSliced[i][1])
+        var itemLabel = pieChartDataSliced[i][0]
+        if (pieChartDataSliced[i][0].length > 10) {
+          itemLabel = pieChartDataSliced[i][0].substring(0, 7) + "...";
+        }
         pieChartLabels.push(pieChartDataSliced[i][0])
+        var item = { "name": itemLabel, "y": pieChartDataSliced[i][1]}
+        pieChartDataset.push(item)
       }
-      var dataset = {"data": pieChartDataset, "backgroundColor": window.colors[1].slice(0, parseInt(itemsOnChart)), "label": "Ranking by performed actions"}
-      pieChart.config.data.datasets.push(dataset)
-      pieChart.config.data.labels = pieChartLabels
-      pieChart.update();
+      var pieChartTitle = "Distribution of money spent within app"
+      var pieChart = JSON.parse(JSON.stringify(pieChartConfig));
+      pieChart.title = { text: pieChartTitle }
+      pieChart.series = [{
+          name: "Money spent",
+          colors: window.colors,
+          colorByPoint: true,
+          dataLabels: {
+              distance: 3,
+              style: {
+                  color: "#888",
+                  fontSize: 9
+              }
+          },
+          data: pieChartDataset
+      }]
 
+      var pieChartObj = Highcharts.chart("pieChart", pieChart);
+
+      var areaDatasets = []
       for (let iiiii = 0; iiiii < pieChartLabels.length; ++iiiii) {
         var areaDatasetOrg = areaChartData[pieChartLabels[iiiii]]
         let prevItemDate = null
@@ -442,7 +459,7 @@
             if (diffSteps > 0) {
               for (let j = diffSteps; j > 0; --j) {
                 let fillDate = new Date(itemDate.getTime() - 1000 * localStep * j)
-                areaDataset.push({"t": fillDate.getTime(), "y": localCount})
+                areaDataset.push([ fillDate.getTime(), localCount])
               }
             }
           } else {
@@ -452,7 +469,7 @@
             if (diffSteps > 1) {
               for (let j = 1; j < diffSteps; ++j) {
                 let fillDate = new Date(prevItemDate.getTime() + 1000 * localStep * j)
-                areaDataset.push({"t": fillDate.getTime(), "y": localCount})
+                areaDataset.push([fillDate.getTime(), localCount])
               }
             }
           }
@@ -460,7 +477,7 @@
           areaDatasetOrg[iiiij]['y'] = localCount
 
           // push real data
-          areaDataset.push(areaDatasetOrg[iiiij])
+          areaDataset.push([areaDatasetOrg[iiiij].t, areaDatasetOrg[iiiij].y])
           prevItemDate = itemDate
         }
 
@@ -473,21 +490,31 @@
         if (diffSteps > 1) {
           for (let j = 1; j < diffSteps; ++j) {
             let fillDate = new Date(prevItemDate.getTime() + 1000 * localStep * j)
-            areaDataset.push({"t": fillDate.getTime(), "y": localCount})
+            areaDataset.push([fillDate.getTime(), localCount])
           }
         }
 
-        var dataset = {"label": pieChartLabels[iiiii], "data": areaDataset, "backgroundColor": window.colors[0][iiiii], "borderColor": window.colors[1][iiiii], "pointRadius": 0, "fill": false, "lineTension": 0, "borderWidth": 2}
-        areaChart.config.data.datasets.push(dataset)
-        areaChart.update();
+        var itemLabel = pieChartLabels[iiiii]
+        if (pieChartLabels[iiiii].length > 10) {
+          itemLabel = pieChartLabels[iiiii].substring(0, 7) + "...";
+        }
+        areaDatasets.push({name: itemLabel, data: areaDataset, color: window.colors[iiiii]})
       }
+      var lineChartLabel = "Timeline of money spent within app"
+      var lineChart = JSON.parse(JSON.stringify(lineChartConfig));
+      lineChart.title = { text: lineChartLabel }
+      lineChart.series = areaDatasets
+      var lineChartObj = Highcharts.chart("areaChart", lineChart);
 
       //populate table
-      rankingTable("tableContent", pieChartDataFull, window.colors[1])
+      rankingTable("tableContent", pieChartDataFull, window.colors)
       // show loaded
       document.getElementById("loading").style.display = "none";
       document.getElementById("error").style.display = "none";
       document.getElementById("loaded").style.display = "grid";
+
+      pieChartObj.reflow()
+      lineChartObj.reflow()
     }
 
     // get actions chart data

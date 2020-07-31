@@ -37,10 +37,9 @@
   <script src="/assets/js/loadVars.js?0412201901"></script>
   <script src="/assets/js/common.js?0412201901"></script>
   <script src="/assets/js/bob.js?0412201901"></script>
-  <script src="/assets/js/neongenesis.js?0412201901"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js" integrity="sha256-4iQZ6BVL4qNKlQ27TExEhBN1HFPvAvAMbFavKKosSWQ=" crossorigin="anonymous"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" integrity="sha256-Uv9BNBucvCPipKQ2NS9wYpJmi8DTOEfTA/nH2aoJALw=" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.8.0/pikaday.min.js" integrity="sha256-+B1vOR24Jpk4oWE/+SWu7AxoQqrqDT4SF+12bixBdjw=" crossorigin="anonymous"></script>
+  <script src="https://code.highcharts.com/highcharts.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.8.0/css/pikaday.min.css" integrity="sha256-+RIb33VoW3hHdfmp0+G4FrGAxzlKBXiwo6thzduwZdU=" crossorigin="anonymous" />
 </head>
 <body>
@@ -67,7 +66,7 @@
             </div>
           </div>
           <div style="height: 300px;">
-            <canvas id="myChart"></canvas>
+            <div id="lineChart"></div>
           </div>
 
         </div>
@@ -93,6 +92,58 @@
     {"id": "run", "label": "run apps"}
   ]
 
+  var lineChartConfig = {
+      chart: {
+        type: 'line'
+      },
+      subtitle: {
+        text: "trends.cash"
+      },
+      xAxis: {
+          type: 'datetime'
+      },
+      yAxis: {
+          title: false
+      },
+      tooltip: {
+          pointFormat: '{series.name}: <b>{point.y}</b>'
+      },
+      legend: {
+        itemStyle: {
+           fontSize: '10px',
+           fontWeight: 'normal',
+           color: '#666666'
+        },
+      },
+      plotOptions: {
+          series: {
+            states: {
+              inactive: {
+                opacity: 1
+              },
+              hover: {
+                enabled: false
+              }
+            }
+          },
+          line: {
+              marker: {
+                  radius: 0
+              },
+              lineWidth: 2,
+              states: {
+                  hover: {
+                      lineWidth: 2
+                  }
+              },
+              threshold: null
+          }
+      },
+      credits: {
+        enabled: false
+      }
+  };
+
   var populateChart = async function() {
     return new Promise(function(resolve, reject) {
       getMatchCountComputed().then(function(r) {
@@ -106,6 +157,7 @@
       let beginTimestamp = new Date(Date.UTC(beginNotCorrectedTimestamp.substring(0,4), parseInt(beginNotCorrectedTimestamp.substring(5,7)) - 1, beginNotCorrectedTimestamp.substring(8,10), 0, 0, 0, 0)).getTime() / 1000
       let endTimestamp = parseInt(dateTimestamp)
 
+      var chartData = []
       for (let iii = 0; iii < types.length; ++iii) {
         let type = types[iii]['id']
         let label = types[iii]['label']
@@ -128,7 +180,7 @@
                 if (diffSteps > 0) {
                   for (let j = diffSteps; j > 0; --j) {
                     let fillDate = new Date(itemDate.getTime() - 1000 * step * j)
-                    singleChartData.push({"t": fillDate.getTime(), "y": 0})
+                    singleChartData.push([ fillDate.getTime(),  0 ])
                   }
                 }
               } else {
@@ -138,14 +190,14 @@
                 if (diffSteps > 1) {
                   for (let j = 1; j < diffSteps; ++j) {
                     let fillDate = new Date(prevItemDate.getTime() + 1000 * step * j)
-                    singleChartData.push({"t": fillDate.getTime(), "y": 0})
+                    singleChartData.push([ fillDate.getTime(), 0])
                   }
                 }
               }
 
               // push real data
               var chartItemDate = new Date(response[index]['_id'] * 1000).getTime()
-              singleChartData.push({"t": chartItemDate, "y": response[index]['count']})
+              singleChartData.push([ chartItemDate, response[index]['count'] ])
               prevItemDate = itemDate
             }
 
@@ -158,18 +210,25 @@
             if (diffSteps > 1) {
               for (let j = 1; j < diffSteps; ++j) {
                 let fillDate = new Date(prevItemDate.getTime() + 1000 * step * j)
-                singleChartData.push({"t": fillDate.getTime(), "y": 0})
+                singleChartData.push([ fillDate.getTime(), 0 ])
               }
             }
-            // push data to chart
-            var dataset = {"label": label, "data": singleChartData, "backgroundColor": window.colors[0][iii], "borderColor": window.colors[1][iii], "pointRadius": 0, "fill": false, "lineTension": 0, "borderWidth": 2}
-            myChart.config.data.datasets.push(dataset)
-            myChart.update();
-            // show loaded
-            document.getElementById("loading").style.display = "none";
-            document.getElementById("error").style.display = "none";
-            document.getElementById("loaded").style.display = "block";
-            resolve(singleChartData.length)
+
+            chartData.push({name: label, data: singleChartData, color: window.colors[iii]})
+
+            if (iii === types.length - 1) {
+              var lineChartLabel = "Active apps count"
+              var lineChart = JSON.parse(JSON.stringify(lineChartConfig));
+              lineChart.title = { text: lineChartLabel }
+              lineChart.series = chartData
+              var lineChartObj = Highcharts.chart("lineChart", lineChart);
+
+              // show loaded
+              document.getElementById("loading").style.display = "none";
+              document.getElementById("error").style.display = "none";
+              document.getElementById("loaded").style.display = "block";
+              resolve(singleChartData.length)
+            }
           }
         })
         .catch(error => {
@@ -224,53 +283,6 @@
   var changeLocalRoute = function(period, date, step = 86400) {
     window.open('/active-apps/?period=' + period + '&date=' + date + '&step=' + step, "_self")
   }
-
-  // create chart
-  var ctx = document.getElementById('myChart').getContext('2d');
-  ctx.canvas.width = 1000;
-  ctx.canvas.height = 300;
-  let tooltipFormat = 'MMM D, YYYY'
-  if (step === 3600) {
-    tooltipFormat = 'MM/DD/YYYY HH:mm'
-  }
-  var cfg = {
-    type: 'line',
-    data: {
-      datasets: []
-	  },
-		options: {
-      responsive: true,
-      maintainAspectRatio: false,
-			scales: {
-				xAxes: [{
-					type: 'time',
-          time: {
-            displayFormats: {
-              quarter: 'D MMM'
-            },
-            parser: 'MM/DD/YYYY HH:mm',
-            tooltipFormat: tooltipFormat,
-            unit: 'day'
-          }
-				}],
-				yAxes: [{
-          ticks: {
-            beginAtZero: true,
-            callback: function(value) {if (value % 1 === 0) {return value;}}
-          }
-				}]
-			},
-      tooltips: {
-    		mode: 'index',
-    		intersect: false
-    	},
-    	hover: {
-    		mode: 'nearest',
-    		intersect: true
-    	}
-		}
-  }
-  var myChart = new Chart(ctx, cfg);
 
   var picker = new Pikaday(
   {
