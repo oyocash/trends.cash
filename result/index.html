@@ -35,11 +35,11 @@
 
   <script src="/assets/js/loader.js"></script>
   <script src="/assets/js/loadVars.js?310502"></script>
-  <script src="/assets/js/common.js?310701"></script>
+  <script src="/assets/js/common.js?310502"></script>
   <script src="/assets/js/bob.js?310506"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js" integrity="sha256-4iQZ6BVL4qNKlQ27TExEhBN1HFPvAvAMbFavKKosSWQ=" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" integrity="sha256-Uv9BNBucvCPipKQ2NS9wYpJmi8DTOEfTA/nH2aoJALw=" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.8.0/pikaday.min.js" integrity="sha256-+B1vOR24Jpk4oWE/+SWu7AxoQqrqDT4SF+12bixBdjw=" crossorigin="anonymous"></script>
-  <script src="https://code.highcharts.com/highcharts.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.8.0/css/pikaday.min.css" integrity="sha256-+RIb33VoW3hHdfmp0+G4FrGAxzlKBXiwo6thzduwZdU=" crossorigin="anonymous" />
 </head>
 <body>
@@ -70,13 +70,13 @@
             <div class="resultTable" id="actionsChartGrid">
               <h4>Actions</h4>
               <div style="height: 300px;">
-                <div id="actionsChart" style="height: 300px;"></div>
+                <canvas id="actionsChart"></canvas>
               </div>
             </div>
             <div class="resultTable" id="turnoverChartGrid">
               <h4>Turnover</h4>
               <div style="height: 300px;">
-                <div id="turnoverChart" style="height: 300px;"></div>
+                <canдижvas id="turnoverChart"></canvas>
               </div>
             </div>
             <div class="resultTable" id="protocolContentGrid">
@@ -104,8 +104,57 @@
   </div>
 
 <script language='javascript'>
-  var actionsChart = JSON.parse(JSON.stringify(lineChartConfig));
-  var turnoverChart = JSON.parse(JSON.stringify(lineChartConfig));
+  var lineChartConfig = {
+      chart: {
+        type: 'line'
+      },
+      subtitle: {
+        text: "trends.cash"
+      },
+      xAxis: {
+          type: 'datetime'
+      },
+      yAxis: {
+          title: false
+      },
+      tooltip: {
+          pointFormat: '{series.name}: <b>{point.y}</b>'
+      },
+      legend: {
+        itemStyle: {
+           fontSize: '10px',
+           fontWeight: 'normal',
+           color: '#666666'
+        },
+      },
+      plotOptions: {
+          series: {
+            states: {
+              inactive: {
+                opacity: 1
+              },
+              hover: {
+                enabled: false
+              }
+            }
+          },
+          line: {
+              marker: {
+                  radius: 0
+              },
+              lineWidth: 2,
+              states: {
+                  hover: {
+                      lineWidth: 2
+                  }
+              },
+              threshold: null
+          }
+      },
+      credits: {
+        enabled: false
+      }
+  };
 
   var populateChart = async function(searchStrings) {
     return new Promise(function(resolve, reject) {
@@ -178,6 +227,7 @@
       fetch(url).then(function(r) {
         return r.json()
       }).then(response => {
+      console.log(JSON.stringify(response))
         if (response.length >= 0) {
           let prevItemDate = null
           let singleChartData = []
@@ -230,9 +280,9 @@
             }
           }
           // push data to chart
-          turnoverChart.title = { text: `Amount spent` }
-          turnoverChart.series.push({name: realSearchPhrase, data: singleChartData, color: window.colors[index]})
-          var turnoverChartObj = Highcharts.chart("turnoverChart", turnoverChart)
+          var dataset = {"label": realSearchPhrase, "data": singleChartData, "backgroundColor": window.colors[0][index], "borderColor": window.colors[1][index], "pointRadius": 0, "fill": false, "lineTension": 0, "borderWidth": 2}
+          turnoverChart.config.data.datasets.push(dataset)
+          turnoverChart.update();
 
           // show loaded
           document.getElementById("loading").style.display = "none";
@@ -280,7 +330,7 @@
               if (diffSteps > 0) {
                 for (let j = diffSteps; j > 0; --j) {
                   let fillDate = new Date(itemDate.getTime() - 1000 * step * j)
-                  singleChartData.push([ fillDate.getTime(), 0])
+                  singleChartData.push({"t": fillDate.getTime(), "y": 0})
                 }
               }
             } else {
@@ -290,14 +340,14 @@
               if (diffSteps > 1) {
                 for (let j = 1; j < diffSteps; ++j) {
                   let fillDate = new Date(prevItemDate.getTime() + 1000 * step * j)
-                  singleChartData.push([ fillDate.getTime(), 0])
+                  singleChartData.push({"t": fillDate.getTime(), "y": 0})
                 }
               }
             }
 
             // push real data
             var chartItemDate = new Date(response[index]['_id'] * 1000).getTime()
-            singleChartData.push([ chartItemDate, response[index]['count']])
+            singleChartData.push({"t": chartItemDate, "y": response[index]['count']})
             prevItemDate = itemDate
           }
 
@@ -311,14 +361,13 @@
           if (diffSteps > 1) {
             for (let j = 1; j < diffSteps; ++j) {
               let fillDate = new Date(prevItemDate.getTime() + 1000 * step * j)
-              singleChartData.push([ fillDate.getTime(), 0 ])
+              singleChartData.push({"t": fillDate.getTime(), "y": 0})
             }
           }
           // push data to chart
-          actionsChart.title = { text: `Performed actions` }
-          actionsChart.series.push({name: realSearchPhrase, data: singleChartData, color: window.colors[index]})
-          var actionsChartObj = Highcharts.chart("actionsChart", actionsChart)
-
+          var dataset = {"label": realSearchPhrase, "data": singleChartData, "backgroundColor": window.colors[0][index], "borderColor": window.colors[1][index], "pointRadius": 0, "fill": false, "lineTension": 0, "borderWidth": 2}
+          actionsChart.config.data.datasets.push(dataset)
+          actionsChart.update();
           // show loaded
           document.getElementById("loading").style.display = "none";
           document.getElementById("error").style.display = "none";
@@ -446,9 +495,9 @@
           }
         }
         // push data to chart
-        actionsChart.title = { text: `Search count` }
-        actionsChart.series.push({name: realSearchPhrase, data: singleChartData, color: window.colors[index]})
-        var actionsChartObj = Highcharts.chart("actionsChart", actionsChart)
+        var dataset = {"label": searchPhrase, "data": singleChartData, "backgroundColor": window.colors[0][index], "borderColor": window.colors[1][index], "pointRadius": 0, "fill": false, "lineTension": 0, "borderWidth": 2}
+        actionsChart.config.data.datasets.push(dataset)
+        actionsChart.update();
         // show loaded
         document.getElementById("loading").style.display = "none";
         document.getElementById("error").style.display = "none";

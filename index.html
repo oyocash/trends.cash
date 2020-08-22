@@ -36,10 +36,7 @@
   <script src="https://unpkg.com/bchaddrjs@0.4.4/dist/bchaddrjs-0.4.4.min.js"></script>
   <script src="https://code.highcharts.com/highcharts.js"></script>
 
-  <script src="/assets/js/loader.js"></script>
-  <script src="/assets/js/loadVars.js?310508"></script>
-  <script src="/assets/js/common.js?310701"></script>
-  <script src="/assets/js/bob.js?310506"></script>
+  <script src="/assets/js/scripts.js"></script>
 </head>
 <body>
   <noscript>Trends.cash is charting tool for the Bitcoin SV blockchain. You can chart phrase mentions or protocol/app onchain usage.</noscript>
@@ -113,90 +110,6 @@
   var endTimestamp = parseInt(new Date().getTime() / 1000)
   var startTimestamp = endTimestamp - (1 * 24 * 60 * 60)
 
-  var pieChartHomeConfig = {
-      chart: {
-          plotBackgroundColor: null,
-          plotBorderWidth: null,
-          plotShadow: false,
-          type: 'pie'
-      },
-      subtitle: {
-        text: "trends.cash"
-      },
-      tooltip: { enabled: false },
-      accessibility: {
-          point: {
-              valueSuffix: '%'
-          }
-      },
-      plotOptions: {
-          series: {
-            states: {
-              inactive: {
-                opacity: 1
-              },
-              hover: {
-                enabled: false
-              }
-            }
-          },
-          pie: {
-              allowPointSelect: true,
-              cursor: 'pointer',
-              dataLabels: {
-                  enabled: true,
-                  format: '<b>{point.name}</b>: {point.percentage:.1f} %'
-              },
-              size: "80%"
-          }
-      },
-      credits: {
-        enabled: false
-      }
-  }
-  var lineChartHomeConfig = {
-      chart: {
-        type: 'line'
-      },
-      subtitle: {
-        text: "trends.cash"
-      },
-      xAxis: {
-          type: 'datetime'
-      },
-      yAxis: {
-          title: false
-      },
-      tooltip: { enabled: false },
-      legend: { enabled: false },
-      plotOptions: {
-          series: {
-            states: {
-              inactive: {
-                opacity: 1
-              },
-              hover: {
-                enabled: false
-              }
-            }
-          },
-          line: {
-              marker: {
-                  radius: 0
-              },
-              lineWidth: 2,
-              states: {
-                  hover: {
-                      lineWidth: 2
-                  }
-              },
-              threshold: null
-          }
-      },
-      credits: {
-        enabled: false
-      }
-  };
 
   document.addEventListener("DOMContentLoaded", function() {
     loadHead()
@@ -257,6 +170,9 @@
                 const base64Id = rankingData[ii][0]
                 const count = rankingData[ii][1]
                 const type = rankingData[ii][2]
+                if (base64Id === undefined || base64Id === "undefined") {
+                  continue
+                }
                 let itemId = atob(base64Id)
                 let itemName = ''
                 if (protocols[base64Id] !== undefined) {
