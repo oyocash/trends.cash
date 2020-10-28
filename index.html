@@ -146,7 +146,7 @@
         beginTimestamp -= endTimestampModStep
         let period = Math.ceil((endTimestamp - beginTimestamp) / localStep)
         for (let i = 0; i < period; i++) {
-          var requestUrl = "https://raw.githubusercontent.com/trendscharts/output/master/actions/" + subdir + (beginTimestamp + i * localStep) + "-" + localStep + "-all-0.json"
+          var requestUrl = "https://raw.githubusercontent.com/trendscharts/output/master/" + subdir + (beginTimestamp + i * localStep) + "-" + localStep + "-all-0.json"
           promises.push(getPromise(requestUrl));
         }
 
@@ -276,7 +276,7 @@
         var endTimestampModStep = (endTimestamp - new Date(1548979200 * 1000).setUTCHours(0, 0, 0, 0)) % step
         endTimestamp -= endTimestampModStep
         beginTimestamp -= endTimestampModStep
-        var url = "https://raw.githubusercontent.com/trendscharts/output/master/" + "/dailyCount/" + type + "/" + step + ".json"
+        var url = "https://raw.githubusercontent.com/trendscharts/output/master/" + "actions/dailyCount/" + type + "/" + step + ".json"
         fetch(url).then(function(r) {
           return r.json()
         }).then(response => {
@@ -346,7 +346,7 @@
         })
       })
     }
-    populatePieChart("actionsChart", "", "Apps ranking by performed actions", startTimestamp, endTimestamp)
+    populatePieChart("actionsChart", "actions/", "Apps ranking by performed actions", startTimestamp, endTimestamp)
     populatePieChart("turnoverChart", "turnover/", "Apps ranking by money spent", startTimestamp, endTimestamp)
     populateLineChart("dailyCountChart", "", "Active apps count", startTimestamp, endTimestamp)
   })
