@@ -169,7 +169,7 @@
       let beginTimestamp = new Date(Date.UTC(beginNotCorrectedTimestamp.substring(0,4), parseInt(beginNotCorrectedTimestamp.substring(5,7)) - 1, beginNotCorrectedTimestamp.substring(8,10), 0, 0, 0, 0)).getTime() / 1000
       let endTimestamp = parseInt(dateTimestamp)
       var searchFilename = searchPhrase.replace(/\//g, '#')
-      var url = "https://raw.githubusercontent.com/trendscharts/output/master/" + computedTxHash + "/" + computerAddress + "/turnover/" + type + "/" + step + "/" + searchFilename + ".json"
+      var url = "https://raw.githubusercontent.com/trendscharts/output/master/turnover/" + type + "/" + step + "/" + searchFilename + ".json"
 
       fetch(url).then(function(r) {
         return r.json()
@@ -258,7 +258,7 @@
       let beginTimestamp = new Date(Date.UTC(beginNotCorrectedTimestamp.substring(0,4), parseInt(beginNotCorrectedTimestamp.substring(5,7)) - 1, beginNotCorrectedTimestamp.substring(8,10), 0, 0, 0, 0)).getTime() / 1000
       let endTimestamp = parseInt(dateTimestamp)
       var searchFilename = searchPhrase.replace(/\//g, '#')
-      var url = "https://raw.githubusercontent.com/trendscharts/output/master/" + computedTxHash + "/" + computerAddress + "/" + type + "/" + step + "/" + searchFilename + ".json"
+      var url = "https://raw.githubusercontent.com/trendscharts/output/master/" + type + "/" + step + "/" + searchFilename + ".json"
 
       fetch(url).then(function(r) {
         return r.json()
@@ -475,10 +475,6 @@
   document.getElementById("loaded").style.display = "none";
   document.getElementById("turnoverChartGrid").style.display = "none";
   document.getElementById("protocolContentGrid").style.display = "none";
-
-  var computedProtocolId = "19LtLM6H2CMjYKq2mSZitAGUGgYXYh4m4Z"
-  var computedTxHash = "35e5888c2b2a39c05f0917bb75311b8263efb53e4c9d1e12d6278ce5e503e8c6"
-  var computerAddress = "19vi1SG78XRZfzrxRAKPMqPjsf5Rf2hmub"
 
   // populate search phrases
   var searchPhrases = []

@@ -107,7 +107,7 @@
       for (let iii = 0; iii < types.length; ++iii) {
         let type = types[iii]['id']
         let label = types[iii]['label']
-        var url = "https://raw.githubusercontent.com/trendscharts/output/master/" + computedTxHash + "/" + computerAddress + "/dailyCount/" + type + "/" + step + ".json"
+        var url = "https://raw.githubusercontent.com/trendscharts/output/master/dailyCount/" + type + "/" + step + ".json"
         fetch(url).then(function(r) {
           return r.json()
         }).then(response => {
@@ -192,10 +192,6 @@
   document.getElementById("loading").style.display = "block";
   document.getElementById("error").style.display = "none";
   document.getElementById("loaded").style.display = "none";
-
-  var computedProtocolId = "19LtLM6H2CMjYKq2mSZitAGUGgYXYh4m4Z"
-  var computedTxHash = "35e5888c2b2a39c05f0917bb75311b8263efb53e4c9d1e12d6278ce5e503e8c6"
-  var computerAddress = "19vi1SG78XRZfzrxRAKPMqPjsf5Rf2hmub"
 
   // populate period
   var periodInput = parseInt(getUrlVars()["period"]) || window.searchPeriodDefault
