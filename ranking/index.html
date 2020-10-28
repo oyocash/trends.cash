@@ -207,8 +207,8 @@
           for (let i = 0; i < data[0].length; i++) {
             var rankingData
             if (data[0][i]) {
-              if (data[0][i]['data'][3]) {
-                rankingData = JSON.parse(data[0][i]['data'][3])
+              if (data[0][i]['data'][0]) {
+                rankingData = JSON.parse(data[0][i]['data'][0])
               }
 
               for (let ii = 0; ii < rankingData.length; ii++) {
