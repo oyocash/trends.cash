@@ -146,7 +146,7 @@
         beginTimestamp -= endTimestampModStep
         let period = Math.ceil((endTimestamp - beginTimestamp) / localStep)
         for (let i = 0; i < period; i++) {
-          var requestUrl = "https://raw.githubusercontent.com/trendscharts/output/master/" + subdir + (beginTimestamp + i * localStep) + "-" + localStep + "-all-0.json"
+          var requestUrl = "https://raw.githubusercontent.com/trendscharts/output/master/actions/" + subdir + (beginTimestamp + i * localStep) + "-" + localStep + "-all-0.json"
           promises.push(getPromise(requestUrl));
         }
 
