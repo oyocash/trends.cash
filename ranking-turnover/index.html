@@ -1,6 +1,6 @@
 <html>
 <head>
-  <title>Trends.cash - Popular Bitcoin SV apps (by money spent)</title>
+  <title>Trends.cash - Popular Bitcoin SV apps (by satoshis spent)</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:creator" content="@pmitchev" />
@@ -43,7 +43,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.8.0/css/pikaday.min.css" integrity="sha256-+RIb33VoW3hHdfmp0+G4FrGAxzlKBXiwo6thzduwZdU=" crossorigin="anonymous" />
 </head>
 <body>
-  <noscript>Ranking of popular Bitcoins SV apps sorted by money spent</noscript>
+  <noscript>Ranking of popular Bitcoins SV apps sorted by satoshis spent</noscript>
   <div id="app" class="container">
     <div id="nav"></div>
       <div class="grid" id="loading">
@@ -321,11 +321,11 @@
         var item = { "name": itemLabel, "y": pieChartDataSliced[i][1]}
         pieChartDataset.push(item)
       }
-      var pieChartTitle = "Distribution of money spent within app"
+      var pieChartTitle = "Distribution of satoshis spent within app"
       var pieChart = JSON.parse(JSON.stringify(pieChartConfig));
       pieChart.title = { text: pieChartTitle }
       pieChart.series = [{
-          name: "Money spent",
+          name: "Satoshis spent",
           colors: window.colors,
           colorByPoint: true,
           dataLabels: {
@@ -396,7 +396,7 @@
         }
         areaDatasets.push({name: itemLabel, data: areaDataset, color: window.colors[iiiii]})
       }
-      var lineChartLabel = "Timeline of money spent within app"
+      var lineChartLabel = "Timeline of satoshis spent within app"
       var lineChart = JSON.parse(JSON.stringify(lineChartConfig));
       lineChart.title = { text: lineChartLabel }
       lineChart.series = areaDatasets
