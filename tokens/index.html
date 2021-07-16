@@ -1,16 +1,16 @@
 <html>
 <head>
-  <title>Trends.cash - Popular Bitcoin SV apps (by money spent)</title>
+  <title>Trends.cash - Tokens prices and marketcap</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:creator" content="@pmitchev" />
-  <meta name="twitter:title" content="Trends.cash - Popular Bitcoin SV (BSV) apps (sorted by money spent)" />
-  <meta name="twitter:description" content="Ranking of popular Bitcoins SV (BSV) apps sorted by money spent" />
+  <meta name="twitter:title" content="Trends.cash - Marketcap and price of BSV tokens" />
+  <meta name="twitter:description" content="Marketcap and price of BSV tokens" />
   <meta name="twitter:image" content="https://trends.cash/assets/images/logo-large.png" />
-  <meta property="og:url" content="https://trends.cash/ranking-turnover/" />
+  <meta property="og:url" content="https://trends.cash/tokens/" />
   <meta property="og:type"   content="website" />
-  <meta property="og:title" content="Trends.cash - Popular Bitcoin SV apps (sorted by money spent)" />
-  <meta property="og:description" content="Ranking of popular Bitcoins SV apps sorted by money spent" />
+  <meta property="og:title" content="Trends.cash - Marketcap and price of BSV tokens" />
+  <meta property="og:description" content="Marketcap and price of BSV tokens" />
   <meta property="og:image" content="https://trends.cash/assets/images/logo-large.png" />
 
   <link rel="stylesheet" href="/assets/css/styles.css?240101">
@@ -37,13 +37,11 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.8.0/pikaday.min.js" integrity="sha256-+B1vOR24Jpk4oWE/+SWu7AxoQqrqDT4SF+12bixBdjw=" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/bchaddrjs@0.4.4/dist/bchaddrjs-0.4.4.min.js"></script>
   <script src="https://code.highcharts.com/highcharts.js"></script>
-
   <script src="/assets/js/scripts.js"></script>
-
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.8.0/css/pikaday.min.css" integrity="sha256-+RIb33VoW3hHdfmp0+G4FrGAxzlKBXiwo6thzduwZdU=" crossorigin="anonymous" />
 </head>
 <body>
-  <noscript>Ranking of popular Bitcoins SV apps sorted by money spent</noscript>
+  <noscript>Today's BSV tokens prices and marketcap</noscript>
   <div id="app" class="container">
     <div id="nav"></div>
       <div class="grid" id="loading">
@@ -61,32 +59,10 @@
         </div>
       </div>
       <div class="grid chartGrid" id="loaded">
-        <div class="chartSection">
-          <div class="chartNav">
-            <div class="chartNavLeft">Zoom:
-              <button class="periodButton" value="1">1d</button>
-              <button class="periodButton" value="7">7d</button>
-              <button class="periodButton" value="30">30d</button>
-              <button class="periodButton" value="90">90d</button>
-            </div>
-            <div class="chartNavCenter"></div>
-            <div class="chartNavRight">
-              From: <input type="text" name="startDateForm" id="startDateForm" title="Search date start" placeholder="YYYY-MM-DD" disabled/>
-              To: <input type="text" name="endDateForm" id="endDateForm" title="Search date end" placeholder="YYYY-MM-DD"/>
-            </div>
-          </div>
-          <div class="rankingChartWrapper">
-            <div id="pieChart" style="height:500px;"></div>
-          </div>
-          <div class="rankingChartWrapper">
-            <div id="areaChart" style="height:500px;"></div>
-          </div>
-        </div>
-
         <div class="resultTable">
           <div class="resultTable-container resultTable-separator">
             <div class="resultTable-title">
-              Popular BSV apps (sorted by satoshis spent)
+              Today's BSV tokens prices and marketcap
             </div>
           </div>
           <div id="tableContent"></div>
@@ -129,11 +105,11 @@
     }
     dateForm = new Date().toISOString().substring(0, 10)
   }
+
   document.getElementById('endDateForm').value = dateForm
   var startDateTimestamp = dateTimestamp - (periodInput * 24 * 60 * 60)
   var startDateForm = new Date(startDateTimestamp * 1000).toISOString().substring(0, 10)
   document.getElementById('startDateForm').value = startDateForm
-
   var picker = new Pikaday(
   {
       field: document.getElementById('endDateForm'),
@@ -145,7 +121,7 @@
   document.addEventListener("DOMContentLoaded", function() {
     // on date change
     document.getElementById('endDateForm').addEventListener("change", function() {
-      changeEndDate("ranking-turnover", periodInput, document.getElementById('endDateForm').value)
+      changeEndDate("ranking", periodInput, document.getElementById('endDateForm').value)
     })
     // on period button click
     let periodButtons = document.getElementsByClassName('periodButton');
@@ -155,7 +131,7 @@
       }
       periodButtons[i].addEventListener("click", function() {
         periodInput = periodButtons[i].value
-        changeRoute("ranking-turnover", periodInput, dateInput)
+        changeRoute("ranking", periodInput, dateInput)
       })
     }
     loadHead()
@@ -186,20 +162,20 @@
         var today = new Date().setUTCHours(0, 0, 0, 0) / 1000
         var endTimestampDay = new Date(endTimestamp * 1000).setUTCHours(0, 0, 0, 0) / 1000
 
-        if(today === endTimestampDay && period === 1){
+        if(today === endTimestampDay && period === 1) {
           localStep = 3600
           var endTimestampModStep = (endTimestamp - new Date(1548979200 * 1000).setUTCHours(0, 0, 0, 0)) % localStep
           endTimestamp -= endTimestampModStep
           beginTimestamp -= endTimestampModStep
           period = Math.ceil((endTimestamp - beginTimestamp) / localStep)
           for (let i = 0; i < period; i++) {
-            var requestUrl = "https://raw.githubusercontent.com/trendscharts/output/master/turnover/" + (beginTimestamp + i * localStep) + "-" + localStep + "-all-0.json"
+            var requestUrl = "https://raw.githubusercontent.com/trendscharts/output/master/actions/" + (beginTimestamp + i * localStep) + "-" + localStep + "-all-0.json"
             promises.push(getPromise(requestUrl));
           }
         } else {
           beginTimestamp = new Date(beginTimestamp * 1000).setUTCHours(0, 0, 0, 0) / 1000
           for (let i = 0; i < period; i++) {
-            var requestUrl = "https://raw.githubusercontent.com/trendscharts/output/master/turnover/" + (beginTimestamp + i * step) + "-" + step + "-all-0.json"
+            var requestUrl = "https://raw.githubusercontent.com/trendscharts/output/master/actions/" + (beginTimestamp + i * step) + "-" + step + "-all-0.json"
             promises.push(getPromise(requestUrl));
           }
         }
@@ -215,7 +191,7 @@
 
               for (let ii = 0; ii < rankingData.length; ii++) {
                 const base64Id = rankingData[ii][0]
-                const turnoverAmount = rankingData[ii][1]
+                const count = rankingData[ii][1]
                 const type = rankingData[ii][2]
                 if (base64Id === undefined || base64Id === "undefined") {
                   continue
@@ -229,17 +205,18 @@
                 } else {
                   itemName = itemId
                 }
+                // pie chart generation
                 if (pieChartData[itemName] !== undefined) {
-                  pieChartData[itemName]['turnoverAmount'] = pieChartData[itemName]['turnoverAmount'] + turnoverAmount
+                  pieChartData[itemName]['count'] = pieChartData[itemName]['count'] + count
                   if (!(pieChartData[itemName]['base64'].includes(base64Id))) {
                     pieChartData[itemName]['base64'].push(base64Id)
                   }
-                  if (turnoverAmount > pieChartData[itemName]['turnoverAmount']) {
+                  if (count > pieChartData[itemName]['count']) {
                     pieChartData[itemName]['type'] = type
                   }
                 } else {
                   pieChartData[itemName] = {}
-                  pieChartData[itemName]['turnoverAmount'] = turnoverAmount
+                  pieChartData[itemName]['count'] = count
                   pieChartData[itemName]['base64'] = []
                   pieChartData[itemName]['base64'].push(base64Id)
                   pieChartData[itemName]['itemId'] = itemId.replace(/[^0-9a-zA-Z\.@]/g,"")
@@ -249,7 +226,7 @@
                 if (areaChartData[itemName] === undefined) {
                   areaChartData[itemName] = []
                 }
-                areaChartData[itemName].push({"t": data[0][i]['data'][4] * 1000, "y": turnoverAmount})
+                areaChartData[itemName].push({"t": data[0][i]['data'][4] * 1000, "y": count})
 
                 // B protocol names population
                 let prefix = itemId
@@ -266,7 +243,7 @@
 
           for (var k in pieChartData){
             if (pieChartData.hasOwnProperty(k)) {
-              pieChartDataUnordered.push([k, pieChartData[k]['turnoverAmount'], pieChartData[k]['base64'], pieChartData[k]['itemId'], pieChartData[k]['type']])
+              pieChartDataUnordered.push([k, pieChartData[k]['count'], pieChartData[k]['base64'], pieChartData[k]['itemId'], pieChartData[k]['type']])
             }
           }
           pieChartDataUnordered.sort((a, b) => parseFloat(b[1]) - parseFloat(a[1]))
@@ -309,6 +286,10 @@
     var populateRankings = function () {
       pieChartDataFull = pieChartDataUnordered
       pieChartDataSliced = pieChartDataUnordered.slice(0, parseInt(itemsOnChart))
+
+      //populate table
+      rankingTable("tableContent", pieChartDataFull, window.colors)
+
       // draw chart
       var pieChartDataset = []
       var pieChartLabels = []
@@ -321,11 +302,12 @@
         var item = { "name": itemLabel, "y": pieChartDataSliced[i][1]}
         pieChartDataset.push(item)
       }
-      var pieChartTitle = "Distribution of money spent within app"
+
+      var pieChartTitle = "Distribution of app actions"
       var pieChart = JSON.parse(JSON.stringify(pieChartConfig));
       pieChart.title = { text: pieChartTitle }
       pieChart.series = [{
-          name: "Money spent",
+          name: "Performed actions",
           colors: window.colors,
           colorByPoint: true,
           dataLabels: {
@@ -365,7 +347,7 @@
             if (diffSteps > 1) {
               for (let j = 1; j < diffSteps; ++j) {
                 let fillDate = new Date(prevItemDate.getTime() + 1000 * localStep * j)
-                areaDataset.push([fillDate.getTime(), localCount])
+                areaDataset.push([ fillDate.getTime(), localCount ])
               }
             }
           }
@@ -373,7 +355,7 @@
           areaDatasetOrg[iiiij]['y'] = localCount
 
           // push real data
-          areaDataset.push([areaDatasetOrg[iiiij].t, areaDatasetOrg[iiiij].y])
+          areaDataset.push([areaDatasetOrg[iiiij]['t'], areaDatasetOrg[iiiij]['y']])
           prevItemDate = itemDate
         }
 
@@ -396,14 +378,12 @@
         }
         areaDatasets.push({name: itemLabel, data: areaDataset, color: window.colors[iiiii]})
       }
-      var lineChartLabel = "Timeline of money spent within app"
+      var lineChartLabel = "Timeline of performed actions by app"
       var lineChart = JSON.parse(JSON.stringify(lineChartConfig));
       lineChart.title = { text: lineChartLabel }
       lineChart.series = areaDatasets
       var lineChartObj = Highcharts.chart("areaChart", lineChart);
 
-      //populate table
-      rankingTable("tableContent", pieChartDataFull, window.colors)
       // show loaded
       document.getElementById("loading").style.display = "none";
       document.getElementById("error").style.display = "none";
