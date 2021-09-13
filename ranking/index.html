@@ -191,13 +191,13 @@
           beginTimestamp -= endTimestampModStep
           period = Math.ceil((endTimestamp - beginTimestamp) / localStep)
           for (let i = 0; i < period; i++) {
-            var requestUrl = "https://raw.githubusercontent.com/trendscharts/output/master/actions/" + (beginTimestamp + i * localStep) + "-" + localStep + "-all-0.json"
+            var requestUrl = dataURL + "actions/" + (beginTimestamp + i * localStep) + "-" + localStep + "-all-0.json"
             promises.push(getPromise(requestUrl));
           }
         } else {
           beginTimestamp = new Date(beginTimestamp * 1000).setUTCHours(0, 0, 0, 0) / 1000
           for (let i = 0; i < period; i++) {
-            var requestUrl = "https://raw.githubusercontent.com/trendscharts/output/master/actions/" + (beginTimestamp + i * step) + "-" + step + "-all-0.json"
+            var requestUrl = dataURL + "actions/" + (beginTimestamp + i * step) + "-" + step + "-all-0.json"
             promises.push(getPromise(requestUrl));
           }
         }

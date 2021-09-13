@@ -146,7 +146,7 @@
         beginTimestamp -= endTimestampModStep
         let period = Math.ceil((endTimestamp - beginTimestamp) / localStep)
         for (let i = 0; i < period; i++) {
-          var requestUrl = "https://raw.githubusercontent.com/trendscharts/output/master/" + subdir + (beginTimestamp + i * localStep) + "-" + localStep + "-all-0.json"
+          var requestUrl = dataURL + subdir + (beginTimestamp + i * localStep) + "-" + localStep + "-all-0.json"
           promises.push(getPromise(requestUrl));
         }
 
@@ -278,7 +278,7 @@
         var endTimestampModStep = (endTimestamp - new Date(1548979200 * 1000).setUTCHours(0, 0, 0, 0)) % step
         endTimestamp -= endTimestampModStep
         beginTimestamp -= endTimestampModStep
-        var url = "https://raw.githubusercontent.com/trendscharts/output/master/" + "actions/dailyCount/" + type + "/" + step + ".json"
+        var url = dataURL + "actions/dailyCount/" + type + "/" + step + ".json"
         fetch(url).then(function(r) {
           return r.json()
         }).then(response => {

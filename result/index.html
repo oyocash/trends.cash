@@ -169,7 +169,7 @@
       let beginTimestamp = new Date(Date.UTC(beginNotCorrectedTimestamp.substring(0,4), parseInt(beginNotCorrectedTimestamp.substring(5,7)) - 1, beginNotCorrectedTimestamp.substring(8,10), 0, 0, 0, 0)).getTime() / 1000
       let endTimestamp = parseInt(dateTimestamp)
       var searchFilename = searchPhrase.replace(/\//g, '#')
-      var url = "https://raw.githubusercontent.com/trendscharts/output/master/turnover/" + type + "/" + step + "/" + searchFilename + ".json"
+      var url = dataURL + "turnover/" + type + "/" + step + "/" + searchFilename + ".json"
 
       fetch(url).then(function(r) {
         return r.json()
@@ -258,7 +258,7 @@
       let beginTimestamp = new Date(Date.UTC(beginNotCorrectedTimestamp.substring(0,4), parseInt(beginNotCorrectedTimestamp.substring(5,7)) - 1, beginNotCorrectedTimestamp.substring(8,10), 0, 0, 0, 0)).getTime() / 1000
       let endTimestamp = parseInt(dateTimestamp)
       var searchFilename = searchPhrase.replace(/\//g, '#')
-      var url = "https://raw.githubusercontent.com/trendscharts/output/master/actions/" + type + "/" + step + "/" + searchFilename + ".json"
+      var url = dataURL + "actions/" + type + "/" + step + "/" + searchFilename + ".json"
 
       fetch(url).then(function(r) {
         return r.json()

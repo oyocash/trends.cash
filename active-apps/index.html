@@ -107,7 +107,7 @@
       for (let iii = 0; iii < types.length; ++iii) {
         let type = types[iii]['id']
         let label = types[iii]['label']
-        var url = "https://raw.githubusercontent.com/trendscharts/output/master/dailyCount/" + type + "/" + step + ".json"
+        var url = dataURL + "actions/dailyCount/" + type + "/" + step + ".json"
         fetch(url).then(function(r) {
           return r.json()
         }).then(response => {
@@ -162,19 +162,18 @@
 
             chartData.push({name: label, data: singleChartData, color: window.colors[iii]})
 
-            if (iii === types.length - 1) {
-              var lineChartLabel = "Active apps count"
-              var lineChart = JSON.parse(JSON.stringify(lineChartConfig));
-              lineChart.title = { text: lineChartLabel }
-              lineChart.series = chartData
-              var lineChartObj = Highcharts.chart("lineChart", lineChart);
+            var lineChartLabel = "Active apps count"
+            var lineChart = JSON.parse(JSON.stringify(lineChartConfig));
+            lineChart.title = { text: lineChartLabel }
+            lineChart.series = chartData
+            var lineChartObj = Highcharts.chart("lineChart", lineChart);
+            lineChartObj.redraw();
 
-              // show loaded
-              document.getElementById("loading").style.display = "none";
-              document.getElementById("error").style.display = "none";
-              document.getElementById("loaded").style.display = "block";
-              resolve(singleChartData.length)
-            }
+            // show loaded
+            document.getElementById("loading").style.display = "none";
+            document.getElementById("error").style.display = "none";
+            document.getElementById("loaded").style.display = "block";
+            resolve(singleChartData.length)
           }
         })
         .catch(error => {

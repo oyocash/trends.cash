@@ -1,3 +1,5 @@
+window.dataURL = "https://data.trends.cash/"
+
 // default search period
 window.searchPeriodDefault = 7
 window.rankingPeriodDefault = 1
