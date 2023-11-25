@@ -1,16 +1,16 @@
 <html>
 <head>
-  <title>Trends.cash - Chart Bitcoin SV</title>
+  <title>Trends.cash - Chart Bitcoin SV Locks</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:creator" content="@pmitchev" />
   <meta name="twitter:title" content="Bitcoin SV Trends" />
-  <meta name="twitter:description" content="Chart Bitcoin SV. Analyzes the popularity of top apps and mentions on the Bitcoin blockchain" />
+  <meta name="twitter:description" content="Chart locked coins on the Bitcoin SV blockchain." />
   <meta name="twitter:image" content="https://trends.cash/assets/images/logo-large.png" />
   <meta property="og:url" content="https://trends.cash" />
   <meta property="og:type"   content="website" />
   <meta property="og:title" content="Bitcoin SV Trends" />
-  <meta property="og:description" content="Chart Bitcoin SV. Analyzes the popularity of top apps and mentions on the Bitcoin blockchain" />
+  <meta property="og:description" content="Chart locked coins on the Bitcoin SV blockchain.  Chart individual posts, overall locked coins, and more." />
   <meta property="og:image" content="https://trends.cash/assets/images/logo-large.png" />
 
   <link rel="stylesheet" href="/assets/css/styles.css?240101">
@@ -31,36 +31,33 @@
   <meta name="msapplication-TileColor" content="#ffffff">
   <meta name="msapplication-TileImage" content="/assets/icons/ms-icon-144x144.png">
   <meta name="theme-color" content="#ffffff">
-  <meta name="bitcoin-address" content="1bGBx5H9NRmT3TbMHjXuUzo19CXmSfd6j">
 
-  <script src="https://unpkg.com/bchaddrjs@0.4.4/dist/bchaddrjs-0.4.4.min.js"></script>
   <script src="https://code.highcharts.com/highcharts.js"></script>
 
   <script src="/assets/js/scripts.js"></script>
 </head>
 <body>
-  <noscript>Trends.cash is charting tool for the Bitcoin SV blockchain. You can chart phrase mentions or protocol/app onchain usage.</noscript>
+  <noscript>Trends.cash is charting tool for locked transactions the Bitcoin SV blockchain.</noscript>
   <div id="app" class="container">
     <div id="landingPage">
       <center>
         <img src="/assets/images/logo-large.png" srcset="/assets/images/logo-large@2x.png 2x, /assets/images/logo-large@3x.png 3x">
-        <h1>Chart Bitcoin SV</h1>
+        <h1>Chart Bitcoin SV Locks</h1>
       	<div class="main">
       		<div class="sbox">
-      			<input type="text" name="searchText" id="searchText" title="Explore Bitcoin" placeholder="Enter a search term or a topic" autocomplete="off">
+      			<input type="text" name="searchText" id="searchText" title="Chart Bitcoin Locks" placeholder="Enter transaction id" autocomplete="off">
       		</div>
 
       		<div class="buttons">
-      			<input value="Explore" type="submit" id="searchButton">
+      			<input value="Search" type="submit" id="searchButton">
       		</div>
       	</div>
-      <div cla
 
         <div class="grid gridHome">
 
           <div class="gridColumnSpanSix">
             <a href="/ranking/">
-              <h3 style="display:none">Apps ranking by actions</h3>
+              <h3 style="display:none">Locked coins</h3>
               <div class="card">
                 <div class="card-container">
                   <div style="height: 350px;">
@@ -72,7 +69,7 @@
           </div>
           <div class="gridColumnSpanSix">
             <a href="/ranking-turnover/">
-              <h3 style="display:none">Apps ranking  by satoshis spent</h3>
+              <h3 style="display:none">Newly locked coins</h3>
               <div class="card">
                 <div class="card-container">
                   <div style="height: 350px;">
@@ -85,7 +82,7 @@
 
           <div class="gridColumnSpanSix">
             <a href="/active-apps/">
-              <h3 style="display:none">Active apps count</h3>
+              <h3 style="display:none">Locking transactions count</h3>
               <div class="card">
                 <div class="card-container">
                   <div style="height: 200px;">
