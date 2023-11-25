@@ -1,4 +1,4 @@
-window.dataURL = "http://data.trends.cash:9007/"
+window.dataURL = "https://data.trends.cash:9007/"
 
 // default search period
 window.searchPeriodDefault = 7
