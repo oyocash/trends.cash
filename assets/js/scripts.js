@@ -239,7 +239,7 @@ var lineChartConfig = {
         title: false
     },
     tooltip: {
-        pointFormat: '{series.name}: <b>{point.y}</b>'
+        pointFormat: '<b>{point.y}</b>'
     },
     legend: {
       itemStyle: {
