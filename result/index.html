@@ -86,7 +86,7 @@
 
   var getLockValues = async function(searchText) {
     return new Promise(function(resolve, reject) {
-      var url = dataURL + "/txLikesPerBlock/" + searchText
+      var url = dataURL + "txLikesPerBlock/" + searchText
 
       fetch(url).then(function(r) {
         return r.json()
