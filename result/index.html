@@ -91,15 +91,16 @@
       fetch(url).then(function(r) {
         return r.json()
       }).then(response => {
-        console.log(response)
         if (response.length >= 0) {
           let singleChartData = []
           for (let index = 0; index < response.length; ++index) {
-            console.log(response[index])
+            {satoshis: 1000000000, count: 1, lockHeight: 819301, lockCountType: "n"}
             // push real data
-            // var chartItemDate = new Date(response[index]['_id'] * 1000).getTime()
-            // singleChartData.push([ chartItemDate, response[index]['count']])
-            // prevItemDate = itemDate
+            response[index]['cumulativeSatoshis'] = response[index]['satoshis'];
+            if (response[index]['lockCountType'] === 'n' && index > 0) {
+              response[index]['cumulativeSatoshis'] = response[index-1]['cumulativeSatoshis'] + response[index]['satoshis']
+            }
+            singleChartData.push([ response[index]['lockHeight'], response[index]['cumulativeSatoshis']])
           }
 
           lockValuesDatasets.push({name: searchText, data: singleChartData, color: window.colors[0]})
