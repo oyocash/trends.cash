@@ -233,7 +233,7 @@ var lineChartConfig = {
       text: "trends.cash"
     },
     xAxis: {
-        type: 'datetime'
+        type: 'number'
     },
     yAxis: {
         title: false
