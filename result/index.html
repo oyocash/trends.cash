@@ -94,7 +94,6 @@
         if (response.length >= 0) {
           let singleChartData = []
           for (let index = 0; index < response.length; ++index) {
-            {satoshis: 1000000000, count: 1, lockHeight: 819301, lockCountType: "n"}
             // push real data
             response[index]['cumulativeSatoshis'] = response[index]['satoshis'];
             if (response[index]['lockCountType'] === 'n' && index > 0) {
@@ -102,6 +101,8 @@
             }
             singleChartData.push([ response[index]['lockHeight'], response[index]['cumulativeSatoshis']])
           }
+
+          console.log(singleChartData)
 
           lockValuesDatasets.push({name: searchText, data: singleChartData, color: window.colors[0]})
 
