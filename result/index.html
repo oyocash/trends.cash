@@ -91,6 +91,7 @@
       fetch(url).then(function(r) {
         return r.json()
       }).then(response => {
+        console.log(response)
         if (response.length >= 0) {
           let singleChartData = []
           for (let index = 0; index < response.length; ++index) {
@@ -101,7 +102,7 @@
             // prevItemDate = itemDate
           }
 
-          lockValuesDatasets.push({name: searchText, data: singleChartData, color: window.colors[index]})
+          lockValuesDatasets.push({name: searchText, data: singleChartData, color: window.colors[0]})
 
           var lineChartLabel = "Satoshis locked"
           var lineChart = JSON.parse(JSON.stringify(lineChartConfig));
