@@ -37,12 +37,12 @@
   <script src="/assets/js/scripts.js"></script>
 </head>
 <body>
-  <noscript>Trends.cash is charting tool for locked transactions the Bitcoin SV blockchain.</noscript>
+  <noscript>Trends.cash is charting tool for locked coins the Bitcoin SV blockchain.</noscript>
   <div id="app" class="container">
     <div id="landingPage">
       <center>
         <img src="/assets/images/logo-large.png" srcset="/assets/images/logo-large@2x.png 2x, /assets/images/logo-large@3x.png 3x">
-        <h1>Chart Bitcoin SV Locks</h1>
+        <h1>Chart Bitcoin SV Locked coins</h1>
       	<div class="main">
       		<div class="sbox">
       			<input type="text" name="searchText" id="searchText" title="Chart Bitcoin Locks" placeholder="Enter transaction id" autocomplete="off">
@@ -56,40 +56,27 @@
         <div class="grid gridHome">
 
           <div class="gridColumnSpanSix">
-            <a href="/ranking/">
+            <a href="#">
               <h3 style="display:none">Locked coins</h3>
               <div class="card">
                 <div class="card-container">
                   <div style="height: 350px;">
-                    <div id="actionsChart" style="height:350px"></div>
+                    <div id="lockedCoinsChart" style="height:350px"></div>
                   </div>
                 </div>
               </div>
             </a>
           </div>
           <div class="gridColumnSpanSix">
-            <a href="/ranking-turnover/">
+            <a href="#">
               <h3 style="display:none">Newly locked coins</h3>
               <div class="card">
                 <div class="card-container">
                   <div style="height: 350px;">
-                    <div id="turnoverChart" style="height:350px"></div>
+                    <div id="newlyLockedCoinsChart" style="height:350px"></div>
                   </div>
                 </div>
             </div>
-            </a>
-          </div>
-
-          <div class="gridColumnSpanSix">
-            <a href="/active-apps/">
-              <h3 style="display:none">Locking transactions count</h3>
-              <div class="card">
-                <div class="card-container">
-                  <div style="height: 200px;">
-                    <div id="dailyCountChart" style="height:200px"></div>
-                  </div>
-                </div>
-              </div>
             </a>
           </div>
         </div>
@@ -111,7 +98,7 @@
     loadFooter()
     // Search clicked
     document.getElementById('searchButton').addEventListener("click", function() {
-      window.open('/result/?search=' + btoa(document.getElementById('searchText').value) + '&period=' + window.searchPeriodDefault, "_self")
+      window.open('/result/?search=' + btoa(document.getElementById('searchText').value), "_self")
     })
     document.getElementById('searchText').addEventListener("keydown", function(event) {
       if (event.keyCode === 13) {
@@ -128,154 +115,11 @@
         return {"data": response, "url": url}
       })
     };
-    function promiseAllSkippingErrors(promises) {
-      return Promise.all(
-        promises.map(p => p.catch(error => null))
-      )
-    }
-    function populatePieChart(chartDiv, subdir, label, beginTimestamp, endTimestamp) {
-      return new Promise(function(resolve, reject) {
-        let promises = [];
 
-        var localStep = 3600
-        var endTimestampModStep = (endTimestamp - new Date(1548979200 * 1000).setUTCHours(0, 0, 0, 0)) % localStep
-        endTimestamp -= endTimestampModStep
-        beginTimestamp -= endTimestampModStep
-        let period = Math.ceil((endTimestamp - beginTimestamp) / localStep)
-        for (let i = 0; i < period; i++) {
-          var requestUrl = dataURL + subdir + (beginTimestamp + i * localStep) + "-" + localStep + "-all-0.json"
-          promises.push(getPromise(requestUrl));
-        }
-
-        promiseAllSkippingErrors(promises)
-        .then((data) => {
-          var chartDataUnordered = []
-          var chartDataFull = []
-          var chartDataSliced = []
-          var chartData = {}
-          for (let i = 0; i < data.length; i++) {
-            let rankingData
-            if (data[i] && data[i]['data'] && data[i]['data'][0]) {
-            console.log(data[i]['data'])
-              if (data[i]['data'][0]) {
-                rankingData = JSON.parse(data[i]['data'][0])
-                console.log(JSON.stringify(rankingData))
-              }
-
-              for (let ii = 0; ii < rankingData.length; ii++) {
-                const base64Id = rankingData[ii][0]
-                const count = rankingData[ii][1]
-                const type = rankingData[ii][2]
-                if (base64Id === undefined || base64Id === "undefined") {
-                  continue
-                }
-                let itemId = atob(base64Id)
-                let itemName = ''
-                if (protocols[base64Id] !== undefined) {
-                  itemName = protocols[base64Id].name
-                } else if (base64Id.length <= 6) {
-                  itemName = itemId + ' (' + base64Id + ')'
-                } else {
-                  itemName = itemId
-                }
-                if (chartData[itemName] !== undefined) {
-                  chartData[itemName]['count'] = chartData[itemName]['count'] + count
-                  if (!(chartData[itemName]['base64'].includes(base64Id))) {
-                    chartData[itemName]['base64'].push(base64Id)
-                  }
-                  if (count > chartData[itemName]['count']) {
-                    chartData[itemName]['type'] = type
-                  }
-                } else {
-                  chartData[itemName] = {}
-                  chartData[itemName]['count'] = count
-                  chartData[itemName]['base64'] = []
-                  chartData[itemName]['base64'].push(base64Id)
-                  chartData[itemName]['itemId'] = itemId.replace(/[^0-9a-zA-Z\.@]/g,"")
-                  chartData[itemName]['type'] = type
-                }
-                // B protocol names population
-                let prefix = itemId
-                if (!(bitcomPrefixes.includes(prefix)) && protocols[prefix] === undefined) {
-                  try {
-                    bchaddr.isLegacyAddress(prefix)
-                    bitcomPrefixes.push(prefix)
-                  } catch (e) {
-                  }
-                }
-              }
-            }
-          }
-
-          for (var k in chartData){
-            if (chartData.hasOwnProperty(k)) {
-              chartDataUnordered.push([k, chartData[k]['count'], chartData[k]['base64'], chartData[k]['itemId'], chartData[k]['type']])
-            }
-          }
-          chartDataUnordered.sort((a, b) => parseFloat(b[1]) - parseFloat(a[1]))
-          var dummyChartObj = {}
-          dummyChartObj.chartData = JSON.parse(JSON.stringify(chartDataUnordered));
-          getBitcomProtocols().then(function() {
-            for (let key in bitcomProtocols) {
-              if (!bitcomProtocols.hasOwnProperty(key)) continue;
-              for (let ii = 0; ii < dummyChartObj.chartData.length; ii++) {
-                if (dummyChartObj.chartData[ii][0] === key) {
-                  dummyChartObj.chartData[ii][0] = bitcomProtocols[key]['name']
-                }
-              }
-            }
-            chartDataUnordered = JSON.parse(JSON.stringify(dummyChartObj.chartData))
-
-            chartDataFull = chartDataUnordered
-            chartDataSliced = chartDataUnordered.slice(0, parseInt(itemsOnChart))
-
-            // shorten names
-            for (let i = 0; i < chartDataSliced.length; i++) {
-              if (chartDataSliced[i][0].length > 10) {
-                chartDataSliced[i][0] = chartDataSliced[i][0].substring(0, 7) + "...";
-              }
-            }
-
-            // draw chart
-            var chartDataset = []
-            for (let i = 0; i < chartDataSliced.length; i++) {
-              var item = { "name": chartDataSliced[i][0], "y": chartDataSliced[i][1]}
-              chartDataset.push(item)
-            }
-
-            var pieChart = JSON.parse(JSON.stringify(pieChartHomeConfig));
-            pieChart.title = { text: label }
-            pieChart.series = [{
-                name: label,
-                colors: window.colors,
-                colorByPoint: true,
-                dataLabels: {
-                    distance: 3,
-                    style: {
-                        color: "#888",
-                        fontSize: 9
-                    }
-                },
-                data: chartDataset
-            }]
-
-            Highcharts.chart(chartDiv, pieChart);
-          })
-        })
-        .catch(error => {
-          console.log(error)
-        })
-      })
-    }
-
-    function populateLineChart(chartDiv, subdir, label, beginTimestamp, endTimestamp) {
+    function populateLineChart(chartDiv, label) {
       return new Promise(function(resolve, reject) {
         let type = "all"
-        let step = 3600
-        var endTimestampModStep = (endTimestamp - new Date(1548979200 * 1000).setUTCHours(0, 0, 0, 0)) % step
-        endTimestamp -= endTimestampModStep
-        beginTimestamp -= endTimestampModStep
-        var url = dataURL + "actions/dailyCount/" + type + "/" + step + ".json"
+        var url = dataURL + "actions/dailyCount/" + type + ".json"
         fetch(url).then(function(r) {
           return r.json()
         }).then(response => {
@@ -283,49 +127,10 @@
             let prevItemDate = null
             let singleChartData = []
             for (let index = 0; index < response.length; ++index) {
-              if (parseInt(response[index]['_id']) < beginTimestamp) {
-                continue
-              }
-              let itemDate = new Date(response[index]['_id'] * 1000)
-              if (index === 0 || prevItemDate === null) {
-                // fill with 0 if it's not the beginning
-                let timeDiff = Math.abs(itemDate.getTime() - (beginTimestamp * 1000))
-                let diffSteps = Math.ceil(timeDiff / (1000 * step))
-                if (diffSteps > 0) {
-                  for (let j = diffSteps; j > 0; --j) {
-                    let fillDate = new Date(itemDate.getTime() - 1000 * step * j)
-                    singleChartData.push([fillDate.getTime(), 0])
-                  }
-                }
-              } else {
-                let timeDiff = Math.abs(itemDate.getTime() - prevItemDate.getTime())
-                let diffSteps = Math.floor(timeDiff / (1000 * step))
-                // fill empty dates with 0
-                if (diffSteps > 1) {
-                  for (let j = 1; j < diffSteps; ++j) {
-                    let fillDate = new Date(prevItemDate.getTime() + 1000 * step * j)
-                    singleChartData.push([fillDate.getTime(), 0])
-                  }
-                }
-              }
-
               // push real data
               var chartItemDate = new Date(response[index]['_id'] * 1000).getTime()
               singleChartData.push([chartItemDate, response[index]['count']])
               prevItemDate = itemDate
-            }
-
-            // fill with 0 till the end
-            if (prevItemDate === null) {
-              prevItemDate = new Date(beginTimestamp * 1000)
-            }
-            let timeDiff = Math.abs(endTimestamp * 1000 - prevItemDate.getTime())
-            let diffSteps = Math.ceil(timeDiff / (1000 * step))
-            if (diffSteps > 1) {
-              for (let j = 1; j < diffSteps; ++j) {
-                let fillDate = new Date(prevItemDate.getTime() + 1000 * step * j)
-                singleChartData.push([fillDate.getTime(), 0])
-              }
             }
 
             var lineChart = JSON.parse(JSON.stringify(lineChartHomeConfig));
@@ -345,9 +150,8 @@
         })
       })
     }
-    populatePieChart("actionsChart", "actions/", "Apps ranking by performed actions", startTimestamp, endTimestamp)
-    populatePieChart("turnoverChart", "turnover/", "Apps ranking by money spent", startTimestamp, endTimestamp)
-    populateLineChart("dailyCountChart", "", "Active apps count", startTimestamp, endTimestamp)
+    populateLineChart("lockedCoinsChart", "Locked coins")
+    populateLineChart("newlyLockedCoinsChart", "Newly locked coins")
   })
 </script>
 </body>

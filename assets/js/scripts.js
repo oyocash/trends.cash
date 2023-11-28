@@ -36,78 +36,11 @@ var navSearchPerformed = function(period, date) {
     }
   });
 }
-var changeEndDate = function(path, periodInput, date) {
-  if (date === 0) {
-    date = new Date().toISOString().substring(0, 10)
-  }
-  if (date.length !== 10) {
-    return
-  }
-  dateInput = date.substring(0,4) + date.substring(5,7) + date.substring(8,10)
-  changeRoute(path, periodInput, dateInput)
-}
-var changeRoute = function(path, period, date) {
-    window.open('/' + path + '/?period=' + period + '&date=' + date, "_self")
-}
-var changeSearchRoute = function(searchText, period, date, step = 86400) {
+var changeSearchRoute = function(searchText,) {
   if (document.getElementById('navSearchText').value) {
-    window.open('/result/?search=' + btoa(searchText) + '&period=' + period + '&date=' + date + '&step=' + step, "_self")
+    window.open('/result/?search=' + btoa(searchText), "_self")
   }
 }
-var rankingTable = function(parentElementId, items, colors) {
-  for (let i = 0; i < items.length; i++) {
-    var color = ""
-    if (i < 10) {
-      color = colors[i]
-    }
-    addRankingRow(parentElementId, i, items[i], color)
-  }
-}
-var addRankingRow = function(parentElementId, index, item, color)
-{
-  var row=document.createElement("div");
-  row.className = "resultTable-item resultTable-container resultTable-separator";
-  var cell1 = document.createElement("div");
-  cell1.className = "label-line-number"
-  if (index < 10) {
-    cell1.style.backgroundColor = color;
-  }
-  var cell2 = document.createElement("div");
-  cell2.className = "label-text"
-  var cell3 = document.createElement("div");
-  cell3.className = "label-value"
-  var textNode1=document.createTextNode(index + 1);
-  var textNode2=document.createTextNode(item[0]);
-  var textNode3=document.createTextNode(item[1]);
-  var a = document.createElement("a");
-  var href = getTrendsLink(item[2], item[4])
-  if (item[2].length == 1 && item[3] && item[2][0] == btoa(item[3])) {
-    href = getTrendsLink([item[3]], item[4])
-  }
-  a.setAttribute("href", href);
-  cell1.appendChild(textNode1);
-  cell2.appendChild(a).appendChild(textNode2);
-  cell3.appendChild(textNode3);
-  row.appendChild(cell1);
-  row.appendChild(cell2);
-  row.appendChild(cell3);
-  document.getElementById(parentElementId).appendChild(row)
-}
-
-var isToday = function(someDate) {
-  const today = new Date()
-  return someDate.getDate() == today.getDate() &&
-    someDate.getMonth() == today.getMonth() &&
-    someDate.getFullYear() == today.getFullYear()
-}
-var getPromise = function (url, header){
-  return fetch(url, header).then(function(r) {
-    var url = r.url
-    return r.json()
-  }).then(function(response) {
-    return {"data": response, "url": url}
-  })
-};
 
 var hexToBase64 = function(str) {
   return btoa(String.fromCharCode.apply(null,
@@ -115,30 +48,6 @@ var hexToBase64 = function(str) {
   );
 }
 
-function extractHostname(url) {
-  if (Array.isArray(url)) {
-    url = url[0]
-  }
-  if (!validURL(dummyTxUrl(url)))
-    return url;
-  var pathArray = url.split( '/' );
-  var protocol = pathArray[0];
-  var host = pathArray[2];
-  host = host.split( '?' )[0];
-  return protocol + '//' + host;
-}
-function validURL(str) {
-  var pattern = new RegExp('^(https?:\\/\\/)'+ // protocol
-    '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
-    '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
-    '(\\:\\d+)?(\\/[-a-z\\d%_.~\{\}+]*)*'+ // port and path
-    '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
-    '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
-  return !!pattern.test(str);
-}
-function dummyTxUrl(url) {
-  return url.replace("{tx_hash}", "000000000000000000000000000000000000000000000000000000000000")
-}
 
 var pieChartHomeConfig = {
     chart: {
@@ -349,48 +258,3 @@ async function loadFooter() {
     }
 }
 // END loader
-
-// BOB queries
-var bitcomPrefixes = []
-var bitcomProtocols = {}
-
-var getPromise = function (url, header){
-  return fetch(url, header).then(function(r) {
-    var url = r.url
-    return r.json()
-  }).then(function(response) {
-    return response
-  })
-};
-
-var searchQueryCreator = function(searchPhrase, beginTimestamp, endTimestamp) {
-  let matchPhrase = searchPhrase
-  let queryMatch = {}
-  queryMatch['$and'] = []
-
-  // transform prefix "h" to prefix "b"
-  if (matchPhrase.match(/prefix:\s*[0-9a-fA-F]+\b\s*/)) {
-    let match = matchPhrase.match(/(?:^|\s+)prefix:\s*([0-9a-fA-F]+)\s*/u)
-    if (match && match[1]) {
-      var bPrefix = hexToBase64(match[1])
-      matchPhrase = matchPhrase.replace(/(?:^|\s+)prefix:\s*[0-9a-fA-F]+\s*/gu, ' prefix:' + bPrefix + ' ')
-    }
-  }
-  matchPhrase = matchPhrase.trim()
-  //quoting words containing '.'
-  let tmpMatchPhraseArray = matchPhrase.match(/\S+|"[^"]+"/gu) || []
-  for (let i = 0; i < tmpMatchPhraseArray.length; ++i) {
-    if (tmpMatchPhraseArray[i].includes('.') && !tmpMatchPhraseArray[i].includes('"')) {
-      tmpMatchPhraseArray[i] = '"' + tmpMatchPhraseArray[i] + '"'
-    }
-  }
-  matchPhrase = tmpMatchPhraseArray.join(" ")
-
-  if (matchPhrase) {
-    queryMatch['$and'].push({'$text': {'$search': '\"' + matchPhrase + '\"'}})
-  }
-  queryMatch['$and'].push({'blk.t': {'$gte': beginTimestamp, '$lte': endTimestamp}})
-
-  return queryMatch
-}
-// end BOB queries
