@@ -129,7 +129,8 @@
             var lineChart = JSON.parse(JSON.stringify(lineChartConfig));
             lineChart.title = { text: lineChartLabel }
             lineChart.series = lockValuesDatasets
-            var lineChartObj = Highcharts.chart("lockValuesChart", lineChart);
+            var lineChartObj = Highcharts.chart("lockedCoinsChart", lineChart);
+            lineChartObj.reflow()
 
             Highcharts.chart(chartDiv, lineChart);
           }
@@ -141,7 +142,7 @@
       })
     }
     populateLineChart("lockedCoinsChart", "Locked coins")
-    populateLineChart("newlyLockedCoinsChart", "Newly locked coins")
+//    populateLineChart("newlyLockedCoinsChart", "Newly locked coins")
   })
 </script>
 </body>
