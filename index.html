@@ -87,11 +87,6 @@
   </div>
 
 <script language='javascript'>
-  var itemsOnChart = 10
-  var endTimestamp = parseInt(new Date().getTime() / 1000)
-  var startTimestamp = endTimestamp - (1 * 24 * 60 * 60)
-
-
   document.addEventListener("DOMContentLoaded", function() {
     loadHead()
     loadNav()
@@ -107,39 +102,33 @@
       }
     });
 
-    function getPromise (url, header){
-      return fetch(url, header).then(function(r) {
-        var url = r.url
-        return r.json()
-      }).then(function(response) {
-        return {"data": response, "url": url}
-      })
-    };
-
     function populateLineChart(chartDiv, label) {
       return new Promise(function(resolve, reject) {
-        let type = "all"
-        var url = dataURL + "actions/dailyCount/" + type + ".json"
+        var url = dataURL + "allLockedCoins/"
         fetch(url).then(function(r) {
           return r.json()
         }).then(response => {
           if (response.length >= 0) {
-            let prevItemDate = null
+
             let singleChartData = []
             for (let index = 0; index < response.length; ++index) {
               // push real data
-              var chartItemDate = new Date(response[index]['_id'] * 1000).getTime()
-              singleChartData.push([chartItemDate, response[index]['count']])
-              prevItemDate = itemDate
+              response[index]['cumulativeSatoshis'] = response[index]['satoshis'];
+              if (response[index]['lockCountType'] === 'n' && index > 0) {
+                response[index]['cumulativeSatoshis'] = response[index-1]['cumulativeSatoshis'] + response[index]['satoshis']
+              }
+              singleChartData.push([ response[index]['lockHeight'], response[index]['cumulativeSatoshis']])
             }
+            singleChartData.unshift([ response[0]['lockHeight']-1, 0])
+            singleChartData.push([ response[response.length-1]['lockHeight']+1, 0])
 
-            var lineChart = JSON.parse(JSON.stringify(lineChartHomeConfig));
-            lineChart.title = { text: label }
-            lineChart.series = [{
-                name: label,
-                color: window.colors[0],
-                data: singleChartData
-            }]
+            lockValuesDatasets.push({name: label, data: singleChartData, color: window.colors[0]})
+
+            var lineChartLabel = label
+            var lineChart = JSON.parse(JSON.stringify(lineChartConfig));
+            lineChart.title = { text: lineChartLabel }
+            lineChart.series = lockValuesDatasets
+            var lineChartObj = Highcharts.chart("lockValuesChart", lineChart);
 
             Highcharts.chart(chartDiv, lineChart);
           }
