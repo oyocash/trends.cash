@@ -111,6 +111,7 @@
         }).then(response => {
           if (response.length >= 0) {
 
+console.log(JSON.stringify(response))
             let singleChartData = []
             for (let index = 0; index < response.length; ++index) {
               // push real data
@@ -122,7 +123,7 @@
             }
             singleChartData.unshift([ response[0]['lockHeight']-1, 0])
             singleChartData.push([ response[response.length-1]['lockHeight']+1, 0])
-console.log(singleChartData)
+console.log(JSON.stringify(singleChartData))
             lockValuesDatasets.push({name: label, data: singleChartData, color: window.colors[0]})
 
             var lineChartLabel = label
