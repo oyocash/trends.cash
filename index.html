@@ -103,6 +103,11 @@
       }
     });
 
+
+    let allLockedCoinsChartData = []
+    function populateAllLockedCoinsChartData(item, index, arr) {
+      allLockedCoinsChartData.push([ index, item ])
+    }
     function populateLineChart(chartDiv, label) {
       return new Promise(function(resolve, reject) {
         var url = dataURL + "allLockedCoins/"
@@ -119,12 +124,18 @@ console.log(JSON.stringify(response))
               if (response[index]['lockCountType'] === 'n' && index > 0) {
                 response[index]['cumulativeSatoshis'] = response[index-1]['cumulativeSatoshis'] + response[index]['totalSatoshis']
               }
-              singleChartData.push([ response[index]['lockHeight'], response[index]['cumulativeSatoshis']])
+              if (!aggregatedData[response[index]['lockHeight']]) {  
+                aggregatedData[response[index]['lockHeight']] = 0;
+              }
+              aggregatedData[response[index]['lockHeight']] += response[index]['cumulativeSatoshis'];
             }
-            singleChartData.unshift([ response[0]['lockHeight']-1, 0])
-            singleChartData.push([ response[response.length-1]['lockHeight']+1, 0])
-console.log(JSON.stringify(singleChartData))
-            lockValuesDatasets.push({name: label, data: singleChartData, color: window.colors[0]})
+
+            aggregatedData.forEach(populateAllLockedCoinsChartData)
+
+            allLockedCoinsChartData.unshift([ response[0]['lockHeight']-1, 0])
+            allLockedCoinsChartData.push([ response[response.length-1]['lockHeight']+1, 0])
+console.log(JSON.stringify(allLockedCoinsChartData))
+            lockValuesDatasets.push({name: label, data: allLockedCoinsChartData, color: window.colors[0]})
 
             var lineChartLabel = label
             var lineChart = JSON.parse(JSON.stringify(lineChartConfig));
