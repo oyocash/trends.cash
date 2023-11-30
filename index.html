@@ -106,7 +106,9 @@
 
     let allLockedCoinsChartData = []
     function populateAllLockedCoinsChartData(item, index, arr) {
-      allLockedCoinsChartData.push([ index, item ])
+      if (index < 821000) {
+        allLockedCoinsChartData.push([ index, item ])
+      }
     }
     function populateLineChart(chartDiv, label) {
       return new Promise(function(resolve, reject) {
@@ -115,8 +117,6 @@
           return r.json()
         }).then(response => {
           if (response.length >= 0) {
-
-console.log(JSON.stringify(response))
             let aggregatedData = []
             var sumCoins = 0;
             var subtractCoins = 0;
