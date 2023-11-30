@@ -119,6 +119,8 @@
 console.log(JSON.stringify(response))
             let aggregatedData = []
             var sumCoins = 0;
+            var subtractCoins = 0;
+            var currentBlockHeight = 0;
             for (let index = 0; index < response.length; ++index) {
               // + from this block
               if (response[index]['lockCountType'] === 'n') {
@@ -130,8 +132,8 @@ console.log(JSON.stringify(response))
               }
 
               // - from next block
-              var subtractCoins = 0
-              var currentBlockHeight = 0;
+              subtractCoins = 0;
+              currentBlockHeight = 0;
               if (response[index]['lockCountType'] === 'i') {
                 subtractCoins = response[index]['totalSatoshis'];
                 currentBlockHeight = response[index]['lockHeight'];
