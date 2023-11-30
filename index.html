@@ -118,16 +118,26 @@
 
 console.log(JSON.stringify(response))
             let aggregatedData = []
+            var sumCoins = 0;
             for (let index = 0; index < response.length; ++index) {
-              // push real data
-              response[index]['cumulativeSatoshis'] = response[index]['totalSatoshis'];
-              if (response[index]['lockCountType'] === 'n' && index > 0) {
-                response[index]['cumulativeSatoshis'] = response[index-1]['cumulativeSatoshis'] + response[index]['totalSatoshis']
+              // + from this block
+              if (response[index]['lockCountType'] === 'n') {
+                sumCoins += response[index]['totalSatoshis'];
               }
-              if (!aggregatedData[response[index]['lockHeight']]) {  
-                aggregatedData[response[index]['lockHeight']] = 0;
+              // - old substraction
+              if (currentBlockHeight < response[index]['lockHeight']) {
+                sumCoins -= subtractCoins;
               }
-              aggregatedData[response[index]['lockHeight']] += response[index]['cumulativeSatoshis'];
+
+              // - from next block
+              var subtractCoins = 0
+              var currentBlockHeight = 0;
+              if (response[index]['lockCountType'] === 'i') {
+                subtractCoins = response[index]['totalSatoshis'];
+                currentBlockHeight = response[index]['lockHeight'];
+              }
+
+              aggregatedData[response[index]['lockHeight']] = sumCoins;
             }
 
             aggregatedData.forEach(populateAllLockedCoinsChartData)

@@ -101,8 +101,8 @@
             }
             singleChartData.push([ response[index]['lockHeight'], response[index]['cumulativeSatoshis']])
           }
-          singleChartData.unshift([ response[0]['lockHeight']-1, 0])
-          singleChartData.push([ response[response.length-1]['lockHeight']+1, 0])
+          singleChartData.unshift([ response[0]['lockHeight']-1, 0 ])
+          singleChartData.push([ response[response.length-1]['lockHeight']+1, 0 ])
 
           lockValuesDatasets.push({name: searchText, data: singleChartData, color: window.colors[0]})
 
