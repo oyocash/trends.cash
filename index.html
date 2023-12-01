@@ -137,7 +137,7 @@
             aggregatedData.forEach(populateAllLockedCoinsChartData)
             if (response.length >= 0) {
               lockedCoinsChartData.unshift([ response[0]['lockHeight']-1, 0 ])
-              lockedCoinsChartData.push([ response[response.length-1]['lockHeight']+1, 0 ])
+//              lockedCoinsChartData.push([ response[response.length-1]['lockHeight']+1, 0 ])
             }
 
 console.log(JSON.stringify(lockedCoinsChartData))
