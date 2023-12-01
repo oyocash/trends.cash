@@ -104,10 +104,10 @@
     });
 
 
-    let allLockedCoinsChartData = []
+    let lockedCoinsChartData = []
     function populateAllLockedCoinsChartData(item, index, arr) {
-      if (index < 821000) {
-        allLockedCoinsChartData.push([ index, item ])
+      if (index < 821600) {
+        lockedCoinsChartData.push([ index, item ])
       }
     }
     function populateLineChart(chartDiv, label) {
@@ -118,36 +118,25 @@
         }).then(response => {
           if (response.length >= 0) {
             let aggregatedData = []
-            var sumCoins = 0;
-            var subtractCoins = 0;
-            var currentBlockHeight = 0;
             for (let index = 0; index < response.length; ++index) {
-              // + from this block
-              if (response[index]['lockCountType'] === 'n') {
-                sumCoins += response[index]['totalSatoshis'];
+              if (!aggregatedData[response[index]['lockHeight']]) {
+                aggregatedData[response[index]['lockHeight']] = 0;
               }
-              // - old substraction
-              if (currentBlockHeight < response[index]['lockHeight']) {
-                sumCoins -= subtractCoins;
+              // push real data
+              response[index]['cumulativeSatoshis'] = response[index]['satoshis'];
+              if (response[index]['lockCountType'] === 'a') {
+                aggregatedData[response[index]['lockHeight']] = aggregatedData[response[index]['lockHeight']] + response[index]['satoshis']
               }
-
-              // - from next block
-              subtractCoins = 0;
-              currentBlockHeight = 0;
-              if (response[index]['lockCountType'] === 'i') {
-                subtractCoins = response[index]['totalSatoshis'];
-                currentBlockHeight = response[index]['lockHeight'];
+              if (response[index]['lockCountType'] === 's') {
+                aggregatedData[response[index]['lockHeight']] = aggregatedData[response[index]['lockHeight']] - response[index]['satoshis']
               }
-
-              aggregatedData[response[index]['lockHeight']] = sumCoins;
             }
-
             aggregatedData.forEach(populateAllLockedCoinsChartData)
+            lockedCoinsChartData.unshift([ response[0]['lockHeight']-1, 0 ])
+            lockedCoinsChartData.push([ response[response.length-1]['lockHeight']+1, 0 ])
 
-            allLockedCoinsChartData.unshift([ response[0]['lockHeight']-1, 0])
-            allLockedCoinsChartData.push([ response[response.length-1]['lockHeight']+1, 0])
-console.log(JSON.stringify(allLockedCoinsChartData))
-            lockValuesDatasets.push({name: label, data: allLockedCoinsChartData, color: window.colors[0]})
+console.log(JSON.stringify(lockedCoinsChartData))
+            lockValuesDatasets.push({name: label, data: lockedCoinsChartData, color: window.colors[0]})
 
             var lineChartLabel = label
             var lineChart = JSON.parse(JSON.stringify(lineChartConfig));

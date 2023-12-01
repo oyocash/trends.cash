@@ -84,6 +84,13 @@
     })
   }
 
+  var totalCoins = 0
+  var lockedCoinsChartData = [];
+  function populateAllLockedCoinsChartData(item, index) {
+    totalCoins += item
+    lockedCoinsChartData.push([ index, totalCoins ])
+  }
+
   var getLockValues = async function(searchText) {
     return new Promise(function(resolve, reject) {
       var url = dataURL + "txLikesPerBlock/" + searchText
@@ -92,19 +99,25 @@
         return r.json()
       }).then(response => {
         if (response.length >= 0) {
-          let singleChartData = []
+          let aggregatedData = []
           for (let index = 0; index < response.length; ++index) {
+            if (!aggregatedData[response[index]['lockHeight']]) {
+              aggregatedData[response[index]['lockHeight']] = 0;
+            }
             // push real data
             response[index]['cumulativeSatoshis'] = response[index]['satoshis'];
-            if (response[index]['lockCountType'] === 'n' && index > 0) {
-              response[index]['cumulativeSatoshis'] = response[index-1]['cumulativeSatoshis'] + response[index]['satoshis']
+            if (response[index]['lockCountType'] === 'a') {
+              aggregatedData[response[index]['lockHeight']] = aggregatedData[response[index]['lockHeight']] + response[index]['satoshis']
             }
-            singleChartData.push([ response[index]['lockHeight'], response[index]['cumulativeSatoshis']])
+            if (response[index]['lockCountType'] === 's') {
+              aggregatedData[response[index]['lockHeight']] = aggregatedData[response[index]['lockHeight']] - response[index]['satoshis']
+            }
           }
-          singleChartData.unshift([ response[0]['lockHeight']-1, 0 ])
-          singleChartData.push([ response[response.length-1]['lockHeight']+1, 0 ])
+          aggregatedData.forEach(populateAllLockedCoinsChartData)
+          lockedCoinsChartData.unshift([ response[0]['lockHeight']-1, 0 ])
+          lockedCoinsChartData.push([ response[response.length-1]['lockHeight']+1, 0 ])
 
-          lockValuesDatasets.push({name: searchText, data: singleChartData, color: window.colors[0]})
+          lockValuesDatasets.push({name: searchText, data: lockedCoinsChartData, color: window.colors[0]})
 
           var lineChartLabel = "Satoshis locked"
           var lineChart = JSON.parse(JSON.stringify(lineChartConfig));
@@ -117,7 +130,7 @@
           document.getElementById("error").style.display = "none";
           document.getElementById("loaded").style.display = "block";
           lineChartObj.reflow()
-          resolve(singleChartData.length)
+          resolve(lockedCoinsChartData.length)
         }
       })
       .catch(error => {
