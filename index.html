@@ -132,6 +132,7 @@
               if (response[index]['lockCountType'] === 's') {
                 aggregatedData[response[index]['lockHeight']] = aggregatedData[response[index]['lockHeight']] - response[index]['satoshis']
               }
+              lastHeight = response[index]['lockHeight']
             }
             aggregatedData.forEach(populateAllLockedCoinsChartData)
             if (response.length >= 0) {
