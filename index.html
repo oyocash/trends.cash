@@ -117,12 +117,14 @@
           return r.json()
         }).then(response => {
             let aggregatedData = []
+            let lastHeight = 0;
             for (let index = 0; index < response.length; ++index) {
-              if (!aggregatedData[response[index]['lockHeight']]) {
+              // push real data
+              if (lastHeight !== 0) {
+                aggregatedData[response[index]['lockHeight']] = aggregatedData[lastHeight]
+              } else {
                 aggregatedData[response[index]['lockHeight']] = 0;
               }
-              // push real data
-              response[index]['cumulativeSatoshis'] = response[index]['satoshis'];
               if (response[index]['lockCountType'] === 'a') {
                 aggregatedData[response[index]['lockHeight']] = aggregatedData[response[index]['lockHeight']] + response[index]['satoshis']
               }
