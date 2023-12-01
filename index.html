@@ -116,7 +116,6 @@
         fetch(url).then(function(r) {
           return r.json()
         }).then(response => {
-          if (response.length >= 0) {
             let aggregatedData = []
             for (let index = 0; index < response.length; ++index) {
               if (!aggregatedData[response[index]['lockHeight']]) {
@@ -132,8 +131,10 @@
               }
             }
             aggregatedData.forEach(populateAllLockedCoinsChartData)
-            lockedCoinsChartData.unshift([ response[0]['lockHeight']-1, 0 ])
-            lockedCoinsChartData.push([ response[response.length-1]['lockHeight']+1, 0 ])
+            if (response.length >= 0) {
+              lockedCoinsChartData.unshift([ response[0]['lockHeight']-1, 0 ])
+              lockedCoinsChartData.push([ response[response.length-1]['lockHeight']+1, 0 ])
+            }
 
 console.log(JSON.stringify(lockedCoinsChartData))
             lockValuesDatasets.push({name: label, data: lockedCoinsChartData, color: window.colors[0]})
@@ -146,7 +147,6 @@ console.log(JSON.stringify(lockedCoinsChartData))
             lineChartObj.reflow()
 
             Highcharts.chart(chartDiv, lineChart);
-          }
         })
         .catch(error => {
           console.log(error)
