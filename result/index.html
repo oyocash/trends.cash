@@ -113,6 +113,7 @@
               aggregatedData[response[index]['lockHeight']] = aggregatedData[response[index]['lockHeight']] - response[index]['satoshis']
             }
           }
+          console.log(JSON.stringify(aggregatedData))
           aggregatedData.forEach(populateAllLockedCoinsChartData)
           lockedCoinsChartData.unshift([ response[0]['lockHeight']-1, 0 ])
           lockedCoinsChartData.push([ response[response.length-1]['lockHeight']+1, 0 ])
