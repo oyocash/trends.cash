@@ -118,6 +118,7 @@
         }).then(response => {
             let aggregatedData = []
             let lastHeight = 0;
+            console.log(JSON.stringify(response))
             for (let index = 0; index < response.length; ++index) {
               // push real data
               if (lastHeight !== 0) {
