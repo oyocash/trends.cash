@@ -112,10 +112,6 @@
 
 <script language='javascript'>
   document.addEventListener("DOMContentLoaded", function() {
-    let lockCoinsDatasets = []
-    let lockCoinsCountDatasets = []
-    let newlyLockCoinsDatasets = []
-    let expiredLockCoinsDatasets = []
     loadHead()
     loadNav()
     loadFooter()
@@ -202,6 +198,7 @@
             }
 
 
+            let lockCoinsDatasets = []
             lockCoinsDatasets.push({name: "Locked coins", data: lockedCoinsChartData, color: window.colors[0]})
             var lineChartLabel1 = "Locked coins"
             var lineChart1 = JSON.parse(JSON.stringify(lineChartConfig));
@@ -210,27 +207,33 @@
             var lineChartObj1 = Highcharts.chart("lockedCoinsChart", lineChart1);
             lineChartObj1.reflow()
 
+            let lockCoinsCountDatasets = []
             lockCoinsCountDatasets.push({name: "Locked coins transaction count", data: lockedCoinsCountChartData, color: window.colors[1]})
             var lineChartLabel2 = "Locked coins transactions count"
             var lineChart2 = JSON.parse(JSON.stringify(lineChartConfig));
             lineChart2.title = { text: lineChartLabel2 }
             lineChart2.series = lockCoinsCountDatasets
+            console.log(JSON.stringify(lineChart2))
             var lineChartObj2 = Highcharts.chart("lockedCoinsCountChart", lineChart2);
             lineChartObj2.reflow()
             
+            let newlyLockCoinsDatasets = []
             newlyLockCoinsDatasets.push({name: "Newly locked coins", data: newLockedCoinsChartData, color: window.colors[2]})
             var lineChartLabel3 = "Newly locked coins"
             var lineChart3 = JSON.parse(JSON.stringify(lineChartConfig));
             lineChart3.title = { text: lineChartLabel3 }
             lineChart3.series = newlyLockCoinsDatasets
+            console.log(JSON.stringify(lineChart3))
             var lineChartObj3 = Highcharts.chart("nealyLockedCoinsChart", lineChart3);
             lineChartObj3.reflow()
             
+            let expiredLockCoinsDatasets = []
             expiredLockCoinsDatasets.push({name: "Expired locked coins", data: expiredLockedCoinsChartData, color: window.colors[3]})
             var lineChartLabel4 = "Expired locked coins"
             var lineChart4 = JSON.parse(JSON.stringify(lineChartConfig));
             lineChart4.title = { text: lineChartLabel4 }
             lineChart4.series = expiredLockCoinsDatasets
+            console.log(JSON.stringify(lineChart4))
             var lineChartObj4 = Highcharts.chart("expiredLockedCoinsChart", lineChart4);
             lineChartObj4.reflow()
 
