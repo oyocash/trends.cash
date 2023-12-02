@@ -175,16 +175,19 @@
                 aggregatedTotalCoinsData[response[index]['lockHeight']] = aggregatedTotalCoinsData[response[index]['lockHeight']] + response[index]['satoshis']
                 aggregatedTotalCountData[response[index]['lockHeight']] = aggregatedTotalCountData[response[index]['lockHeight']] + response[index]['count']
                 aggregatedNewCoinsData[response[index]['lockHeight']] = response[index]['satoshis']
+                console.log("NewCoinsData: " + aggregatedNewCoinsData[response[index]['lockHeight']])
               }
               if (response[index]['lockCountType'] === 's') {
                 aggregatedTotalCoinsData[response[index]['lockHeight']] = aggregatedTotalCoinsData[response[index]['lockHeight']] - response[index]['satoshis']
                 aggregatedTotalCountData[response[index]['lockHeight']] = aggregatedTotalCountData[response[index]['lockHeight']] - response[index]['count']
                 aggregatedExpiredCoinsData[response[index]['lockHeight']] = response[index]['satoshis']
+                console.log("ExpiredCoinsData: " + aggregatedExpiredCoinsData[response[index]['lockHeight']])
               }
               lastHeight = response[index]['lockHeight']
             }
             aggregatedTotalCoinsData.forEach(populateLockedCoinsChartData)
             aggregatedTotalCountData.forEach(populateLockedCoinsCountChartData)
+
             aggregatedNewCoinsData.forEach(populateNewLockedCoinsChartData)
             aggregatedExpiredCoinsData.forEach(populateExpiredLockedCoinsChartData)
 
