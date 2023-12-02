@@ -69,11 +69,35 @@
           </div>
           <div class="gridColumnSpanSix">
             <a href="#">
+              <h3 style="display:none">Locked coins transactions count</h3>
+              <div class="card">
+                <div class="card-container">
+                  <div style="height: 350px;">
+                    <div id="lockedCoinsCountChart" style="height:350px"></div>
+                  </div>
+                </div>
+            </div>
+            </a>
+          </div>
+          <div class="gridColumnSpanSix">
+            <a href="#">
               <h3 style="display:none">Newly locked coins</h3>
               <div class="card">
                 <div class="card-container">
                   <div style="height: 350px;">
                     <div id="newlyLockedCoinsChart" style="height:350px"></div>
+                  </div>
+                </div>
+            </div>
+            </a>
+          </div>
+          <div class="gridColumnSpanSix">
+            <a href="#">
+              <h3 style="display:none">Expired locked coins</h3>
+              <div class="card">
+                <div class="card-container">
+                  <div style="height: 350px;">
+                    <div id="expiredLockedCoinsChart" style="height:350px"></div>
                   </div>
                 </div>
             </div>
@@ -88,7 +112,10 @@
 
 <script language='javascript'>
   document.addEventListener("DOMContentLoaded", function() {
-    let lockValuesDatasets = []
+    let lockCoinsDatasets = []
+    let lockCoinsCountDatasets = []
+    let newlyLockCoinsDatasets = []
+    let lockCoinsDatasets = []
     loadHead()
     loadNav()
     loadFooter()
@@ -105,52 +132,109 @@
 
 
     let lockedCoinsChartData = []
-    function populateAllLockedCoinsChartData(item, index) {
+    let lockedCoinsCountChartData = []
+    let newLockedCoinsChartData = []
+    let expiredLockCoinsDatasets = []
+    function populateLockedCoinsChartData(item, index) {
       if (index < 821600) {
         lockedCoinsChartData.push([ index, item ])
       }
     }
-    function populateLineChart(chartDiv, label) {
+    function populateLockedCoinsCountChartData(item, index) {
+      if (index < 821600) {
+        lockedCoinsCountChartData.push([ index, item ])
+      }
+    }
+    function populateNewLockedCoinsChartData(item, index) {
+      if (index < 821600) {
+        newLockedCoinsChartData.push([ index, item ])
+      }
+    }
+    function populateExpiredLockedCoinsChartData(item, index) {
+      if (index < 821600) {
+        expiredLockedCoinsChartData.push([ index, item ])
+      }
+    }
+    function populateLineChart() {
       return new Promise(function(resolve, reject) {
         var url = dataURL + "allLockedCoins/"
         fetch(url).then(function(r) {
           return r.json()
         }).then(response => {
-            let aggregatedData = []
+            let aggregatedTotalCoinsData = []
+            let aggregatedTotalCountData = []
+            let aggregatedNewCoinsData = []
+            let aggregatedExpiredCoinsData = []
             let lastHeight = 0;
-            console.log(JSON.stringify(response))
             for (let index = 0; index < response.length; ++index) {
               // push real data
               if (lastHeight !== 0) {
-                aggregatedData[response[index]['lockHeight']] = aggregatedData[lastHeight]
+                aggregatedTotalCoinsData[response[index]['lockHeight']] = aggregatedTotalCoinsData[lastHeight]
+                aggregatedTotalCountData[response[index]['lockHeight']] = aggregatedTotalCountData[lastHeight]
               } else {
-                aggregatedData[response[index]['lockHeight']] = 0;
+                aggregatedTotalCoinsData[response[index]['lockHeight']] = 0;
+                aggregatedTotalCountData[response[index]['lockHeight']] = 0;
               }
               if (response[index]['lockCountType'] === 'a') {
-                aggregatedData[response[index]['lockHeight']] = aggregatedData[response[index]['lockHeight']] + response[index]['satoshis']
+                aggregatedTotalCoinsData[response[index]['lockHeight']] = aggregatedTotalCoinsData[response[index]['lockHeight']] + response[index]['satoshis']
+                aggregatedTotalCountData[response[index]['lockHeight']] = aggregatedTotalCountData[response[index]['lockHeight']] + response[index]['satoshis']
+                aggregatedNewCoinsData[response[index]['lockHeight']] = response[index]['satoshis']
               }
               if (response[index]['lockCountType'] === 's') {
-                aggregatedData[response[index]['lockHeight']] = aggregatedData[response[index]['lockHeight']] - response[index]['satoshis']
+                aggregatedTotalCoinsData[response[index]['lockHeight']] = aggregatedTotalCoinsData[response[index]['lockHeight']] - response[index]['satoshis']
+                aggregatedTotalCountData[response[index]['lockHeight']] = aggregatedTotalCountData[response[index]['lockHeight']] - response[index]['satoshis']
+                aggregatedExpiredCoinsData[response[index]['lockHeight']] = response[index]['satoshis']
               }
               lastHeight = response[index]['lockHeight']
             }
-            aggregatedData.forEach(populateAllLockedCoinsChartData)
+            aggregatedTotalCoinsData.forEach(populateLockedCoinsChartData)
+            //populate all new!!!
+
             if (response.length >= 0) {
               lockedCoinsChartData.unshift([ response[0]['lockHeight']-1, 0 ])
+              lockedCoinsCountChartData.unshift([ response[0]['lockHeight']-1, 0 ])
+              newLockedCoinsChartData.unshift([ response[0]['lockHeight']-1, 0 ])
+              expiredLockedCoinsChartData.unshift([ response[0]['lockHeight']-1, 0 ])
 //              lockedCoinsChartData.push([ response[response.length-1]['lockHeight']+1, 0 ])
+//              lockedCoinsCountChartData.push([ response[response.length-1]['lockHeight']+1, 0 ])
+//              newLockedCoinsChartData.push([ response[response.length-1]['lockHeight']+1, 0 ])
+//              expiredLockedCoinsChartData.push([ response[response.length-1]['lockHeight']+1, 0 ])
             }
 
-console.log(JSON.stringify(lockedCoinsChartData))
-            lockValuesDatasets.push({name: label, data: lockedCoinsChartData, color: window.colors[0]})
+            var lineChartLabel, lineChart, lineChartObj
 
-            var lineChartLabel = label
-            var lineChart = JSON.parse(JSON.stringify(lineChartConfig));
+            lockCoinsDatasets.push({name: "Locked coins", data: lockedCoinsChartData, color: window.colors[0]})
+            lineChartLabel = "Locked coins"
+            lineChart = JSON.parse(JSON.stringify(lineChartConfig));
             lineChart.title = { text: lineChartLabel }
-            lineChart.series = lockValuesDatasets
-            var lineChartObj = Highcharts.chart("lockedCoinsChart", lineChart);
+            lineChart.series = lockCoinsDatasets
+            lineChartObj = Highcharts.chart("lockedCoinsChart", lineChart);
             lineChartObj.reflow()
 
-            Highcharts.chart(chartDiv, lineChart);
+            lockCoinsCountDatasets.push({name: "Locked coins transaction count", data: lockedCoinsCountChartData, color: window.colors[1]})
+            lineChartLabel = "Locked coins transactions count"
+            lineChart = JSON.parse(JSON.stringify(lineChartConfig));
+            lineChart.title = { text: lineChartLabel }
+            lineChart.series = lockCoinsCountDatasets
+            lineChartObj = Highcharts.chart("lockedCoinsCountChart", lineChart);
+            lineChartObj.reflow()
+            
+            newlyLockCoinsDatasets.push({name: "Newly locked coins", data: newLockedCoinsChartData, color: window.colors[2]})
+            lineChartLabel = "Newly locked coins"
+            lineChart = JSON.parse(JSON.stringify(lineChartConfig));
+            lineChart.title = { text: lineChartLabel }
+            lineChart.series = newlyLockCoinsDatasets
+            lineChartObj = Highcharts.chart("nealyLockedCoinsChart", lineChart);
+            lineChartObj.reflow()
+            
+            expiredLockCoinsDatasets.push({name: "Expired locked coins", data: expiredLockedCoinsChartData, color: window.colors[3]})
+            lineChartLabel = "Expired locked coins"
+            lineChart = JSON.parse(JSON.stringify(lineChartConfig));
+            lineChart.title = { text: lineChartLabel }
+            lineChart.series = expiredLockCoinsDatasets
+            lineChartObj = Highcharts.chart("expiredLockedCoinsChart", lineChart);
+            lineChartObj.reflow()
+
         })
         .catch(error => {
           console.log(error)
@@ -158,8 +242,7 @@ console.log(JSON.stringify(lockedCoinsChartData))
         })
       })
     }
-    populateLineChart("lockedCoinsChart", "Locked coins")
-//    populateLineChart("newlyLockedCoinsChart", "Newly locked coins")
+    populateLineChart()
   })
 </script>
 </body>
