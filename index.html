@@ -188,8 +188,6 @@
             aggregatedNewCoinsData.forEach(populateNewLockedCoinsChartData)
             console.log(JSON.stringify(aggregatedNewCoinsData))
             aggregatedExpiredCoinsData.forEach(populateExpiredLockedCoinsChartData)
-            console.log(JSON.stringify(aggregatedExpiredCoinsData))
-            //populate all new!!!
 
             if (response.length >= 0) {
               lockedCoinsChartData.unshift([ response[0]['lockHeight']-1, 0 ])
