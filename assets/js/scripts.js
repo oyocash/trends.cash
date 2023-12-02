@@ -133,7 +133,37 @@ var lineChartHomeConfig = {
       enabled: false
     }
 };
-
+var columnChartHomeConfig = {
+    chart: {
+      type: 'column'
+    },
+    subtitle: {
+      text: "trends.cash"
+    },
+    xAxis: {
+        type: 'datetime'
+    },
+    yAxis: {
+        title: false
+    },
+    tooltip: { enabled: false },
+    legend: { enabled: false },
+    plotOptions: {
+        series: {
+          states: {
+            inactive: {
+              opacity: 1
+            },
+            hover: {
+              enabled: false
+            }
+          }
+        }
+    },
+    credits: {
+      enabled: false
+    }
+};
 var lineChartConfig = {
     chart: {
       type: 'line'
