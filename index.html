@@ -173,12 +173,12 @@
               }
               if (response[index]['lockCountType'] === 'a') {
                 aggregatedTotalCoinsData[response[index]['lockHeight']] = aggregatedTotalCoinsData[response[index]['lockHeight']] + response[index]['satoshis']
-                aggregatedTotalCountData[response[index]['lockHeight']] = aggregatedTotalCountData[response[index]['lockHeight']] + response[index]['satoshis']
+                aggregatedTotalCountData[response[index]['lockHeight']] = aggregatedTotalCountData[response[index]['lockHeight']] + response[index]['count']
                 aggregatedNewCoinsData[response[index]['lockHeight']] = response[index]['satoshis']
               }
               if (response[index]['lockCountType'] === 's') {
                 aggregatedTotalCoinsData[response[index]['lockHeight']] = aggregatedTotalCoinsData[response[index]['lockHeight']] - response[index]['satoshis']
-                aggregatedTotalCountData[response[index]['lockHeight']] = aggregatedTotalCountData[response[index]['lockHeight']] - response[index]['satoshis']
+                aggregatedTotalCountData[response[index]['lockHeight']] = aggregatedTotalCountData[response[index]['lockHeight']] - response[index]['count']
                 aggregatedExpiredCoinsData[response[index]['lockHeight']] = response[index]['satoshis']
               }
               lastHeight = response[index]['lockHeight']
@@ -186,7 +186,9 @@
             aggregatedTotalCoinsData.forEach(populateLockedCoinsChartData)
             aggregatedTotalCountData.forEach(populateLockedCoinsCountChartData)
             aggregatedNewCoinsData.forEach(populateNewLockedCoinsChartData)
+            console.log(JSON.stringify(aggregatedNewCoinsData))
             aggregatedExpiredCoinsData.forEach(populateExpiredLockedCoinsChartData)
+            console.log(JSON.stringify(aggregatedExpiredCoinsData))
             //populate all new!!!
 
             if (response.length >= 0) {
@@ -216,7 +218,6 @@
             var lineChart2 = JSON.parse(JSON.stringify(lineChartConfig));
             lineChart2.title = { text: lineChartLabel2 }
             lineChart2.series = lockCoinsCountDatasets
-            console.log(JSON.stringify(lineChart2))
             var lineChartObj2 = Highcharts.chart("lockedCoinsCountChart", lineChart2);
             lineChartObj2.reflow()
             
