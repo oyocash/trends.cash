@@ -98,7 +98,7 @@ var lineChartHomeConfig = {
       text: "trends.cash"
     },
     xAxis: {
-        type: 'datetime'
+        type: 'number'
     },
     yAxis: {
         title: false
@@ -141,7 +141,7 @@ var columnChartHomeConfig = {
       text: "trends.cash"
     },
     xAxis: {
-        type: 'datetime'
+        type: 'number'
     },
     yAxis: {
         title: false

@@ -212,24 +212,24 @@
             var lineChartObj1 = Highcharts.chart("lockedCoinsChart", lineChart1);
             lineChartObj1.reflow()
 
-            // let lockCoinsCountDatasets = []
-            // lockCoinsCountDatasets.push({name: "Locked coins transaction count", data: lockedCoinsCountChartData, color: window.colors[1]})
-            // var lineChartLabel2 = "Locked coins transactions count"
-            // var lineChart2 = JSON.parse(JSON.stringify(lineChartHomeConfig));
-            // lineChart2.title = { text: lineChartLabel2 }
-            // lineChart2.series = lockCoinsCountDatasets
-            // var lineChartObj2 = Highcharts.chart("lockedCoinsCountChart", lineChart2);
-            // lineChartObj2.reflow()
+            let lockCoinsCountDatasets = []
+            lockCoinsCountDatasets.push({name: "Locked coins transaction count", data: lockedCoinsCountChartData, color: window.colors[1]})
+            var lineChartLabel2 = "Locked coins transactions count"
+            var lineChart2 = JSON.parse(JSON.stringify(lineChartHomeConfig));
+            lineChart2.title = { text: lineChartLabel2 }
+            lineChart2.series = lockCoinsCountDatasets
+            var lineChartObj2 = Highcharts.chart("lockedCoinsCountChart", lineChart2);
+            lineChartObj2.reflow()
             
-            // let newlyLockCoinsDatasets = []
-            // newlyLockCoinsDatasets.push({name: "Newly locked coins", data: newLockedCoinsChartData, color: window.colors[2]})
-            // var lineChartLabel3 = "Newly locked coins"
-            // var lineChart3 = JSON.parse(JSON.stringify(columnChartHomeConfig));
-            // lineChart3.title = { text: lineChartLabel3 }
-            // lineChart3.series = newlyLockCoinsDatasets
-            // console.log(JSON.stringify(lineChart3))
-            // var lineChartObj3 = Highcharts.chart("newlyLockedCoinsChart", lineChart3);
-            // lineChartObj3.reflow()
+            let newlyLockCoinsDatasets = []
+            newlyLockCoinsDatasets.push({name: "Newly locked coins", data: newLockedCoinsChartData, color: window.colors[2]})
+            var lineChartLabel3 = "Newly locked coins"
+            var lineChart3 = JSON.parse(JSON.stringify(columnChartHomeConfig));
+            lineChart3.title = { text: lineChartLabel3 }
+            lineChart3.series = newlyLockCoinsDatasets
+            console.log(JSON.stringify(lineChart3))
+            var lineChartObj3 = Highcharts.chart("newlyLockedCoinsChart", lineChart3);
+            lineChartObj3.reflow()
             
             let expiredLockCoinsDatasets = []
             expiredLockCoinsDatasets.push({name: "Expired locked coins", data: expiredLockedCoinsChartData, color: window.colors[3]})
