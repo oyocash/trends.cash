@@ -184,6 +184,9 @@
               lastHeight = response[index]['lockHeight']
             }
             aggregatedTotalCoinsData.forEach(populateLockedCoinsChartData)
+            aggregatedTotalCountData.forEach(populateLockedCoinsCountChartData)
+            aggregatedNewCoinsData.forEach(populateNewLockedCoinsChartData)
+            aggregatedExpiredCoinsData.forEach(populateExpiredLockedCoinsChartData)
             //populate all new!!!
 
             if (response.length >= 0) {
