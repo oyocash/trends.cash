@@ -264,8 +264,8 @@
       const bres = await b.json();
       const currentBlock = bres?.height || 825000;;
       populateLocksChart(currentBlock, period)
-      // populateLocksCountChart(currentBlock, period)
-      // populateNewLocksChart(currentBlock, period)
+      populateLocksCountChart(currentBlock, period)
+      populateNewLocksChart(currentBlock, period)
       populateExpiredLocksChart(currentBlock, period)
     })().catch(e => console.log("Caught: " + e)); // Catches it.
 
