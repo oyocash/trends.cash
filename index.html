@@ -129,7 +129,7 @@
     const startBlock = 808839;
     const period = 4320;
 
-    async function getCurrentHeight() {
+    const getCurrentHeight = new Promise((resolve, reject) => {
       try {
           const b = await fetch(`${dataURL}lockcrawl`);
           const bres = await b.json();
@@ -139,8 +139,9 @@
           resolve(currentBlock)
       } catch(e) {
           console.log({e})
+          reject(e)
       }
-    }
+    })
 
     function populateLocksChart(currentBlock, period) {
       console.log(currentBlock, " ", period)
