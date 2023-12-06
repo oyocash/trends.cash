@@ -131,7 +131,7 @@
 
     async function getCurrentHeight() {
       try {
-          const b = await fetch(`${dataURL}/lockcrawl`);
+          const b = await fetch(`${dataURL}lockcrawl`);
           const bres = await b.json();
           const currentBlock = bres?.height || 825000;
           resolve(currentBlock)
