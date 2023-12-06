@@ -111,11 +111,7 @@ var lineChartHomeConfig = {
         pointFormat: '<b>{point.y}</b>'
     },
     legend: {
-      itemStyle: {
-         fontSize: '10px',
-         fontWeight: 'normal',
-         color: '#666666'
-      },
+      enabled:false 
     },
     plotOptions: {
         series: {
@@ -164,11 +160,7 @@ var columnChartHomeConfig = {
         pointFormat: '<b>{point.y}</b>'
     },
     legend: {
-      itemStyle: {
-         fontSize: '10px',
-         fontWeight: 'normal',
-         color: '#666666'
-      },
+      enabled:false 
     },
     plotOptions: {
         series: {

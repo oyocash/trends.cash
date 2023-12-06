@@ -141,6 +141,7 @@
     }
 
     function populateLocksChart(currentBlock, period) {
+      console.log(currentBlock, " ", period)
       return new Promise(function(resolve, reject) {
         var url = dataURL + "lockedCoins.json"
         fetch(url).then(function(r) {
@@ -179,9 +180,6 @@ console.log(response.slice(currentBlock - period, currentBlock));
           return r.json()
         }).then(response => {
             let lockedCoinsCountChartData = []
-
-            
-console.log(response.slice(currentBlock - period, currentBlock));
             for (let index = startBlock; index < response.length; ++index) {
               if (index <= currentBlock && index >= currentBlock - period) {
                 lockedCoinsCountChartData.push([ index, item ])
@@ -274,9 +272,9 @@ console.log(response.slice(currentBlock - period, currentBlock));
     }
     getCurrentHeight().then(function(currentBlock) {       
       populateLocksChart(currentBlock, period)
-      populateLocksCountChart(currentBlock, period)
-      populateNewLocksChart(currentBlock, period)
-      populateExpiredLocksChart(currentBlock, period)
+      // populateLocksCountChart(currentBlock, period)
+      // populateNewLocksChart(currentBlock, period)
+      // populateExpiredLocksChart(currentBlock, period)
     })
   })
 </script>
