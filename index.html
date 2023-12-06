@@ -134,6 +134,8 @@
           const b = await fetch(`${dataURL}lockcrawl`);
           const bres = await b.json();
           const currentBlock = bres?.height || 825000;
+          console.log(bres)
+          console.log(currentBlock)
           resolve(currentBlock)
       } catch(e) {
           console.log({e})
