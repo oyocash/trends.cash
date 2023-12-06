@@ -129,7 +129,7 @@
     const startBlock = 808839;
     const period = 4320;
 
-    const async getCurrentHeight = new Promise((resolve, reject) => {
+    const getCurrentHeight = new Promise((resolve, reject) => {
       try {
           const b = await fetch(`${dataURL}lockcrawl`);
           const bres = await b.json();
@@ -274,13 +274,16 @@ console.log(response.slice(currentBlock - period, currentBlock));
         })
       })
     }
-    getCurrentHeight().then(function(currentBlock) {  
-    console.log(currentBlock)     
+
+
+    (async () => {
+      const currentBlock = await getCurrentHeight;
       populateLocksChart(currentBlock, period)
       // populateLocksCountChart(currentBlock, period)
       // populateNewLocksChart(currentBlock, period)
       // populateExpiredLocksChart(currentBlock, period)
-    })
+    })().catch(e => console.log("Caught: " + e)); // Catches it.
+
   })
 </script>
 </body>
