@@ -27,7 +27,7 @@ var navToggled = function() {
 var navSearchPerformed = function(period, date) {
   document.getElementById('navSearchButton').addEventListener("click", function() {
     searchText = document.getElementById('navSearchText').value;
-    changeSearchRoute(searchText, period, date)
+    changeSearchRoute(searchText)
   })
   document.getElementById('navSearchText').addEventListener("keydown", function(event) {
     if (event.keyCode === 13) {
@@ -36,7 +36,7 @@ var navSearchPerformed = function(period, date) {
     }
   });
 }
-var changeSearchRoute = function(searchText,) {
+var changeSearchRoute = function(searchText) {
   if (document.getElementById('navSearchText').value) {
     window.open('/result/?search=' + btoa(searchText), "_self")
   }
