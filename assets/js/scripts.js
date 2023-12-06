@@ -54,7 +54,9 @@ var pieChartHomeConfig = {
         plotBackgroundColor: null,
         plotBorderWidth: null,
         plotShadow: false,
-        type: 'pie'
+        type: 'pie',
+        zoomBySingleTouch: true,
+        zoomType: 'xy'
     },
     subtitle: {
       text: "trends.cash"
@@ -92,7 +94,9 @@ var pieChartHomeConfig = {
 }
 var lineChartHomeConfig = {
     chart: {
-      type: 'line'
+      type: 'line',
+      zoomBySingleTouch: true,
+      zoomType: 'xy'
     },
     subtitle: {
       text: "trends.cash"
@@ -103,8 +107,16 @@ var lineChartHomeConfig = {
     yAxis: {
         title: false
     },
-    tooltip: { enabled: false },
-    legend: { enabled: false },
+    tooltip: {
+        pointFormat: '<b>{point.y}</b>'
+    },
+    legend: {
+      itemStyle: {
+         fontSize: '10px',
+         fontWeight: 'normal',
+         color: '#666666'
+      },
+    },
     plotOptions: {
         series: {
           states: {
@@ -135,7 +147,9 @@ var lineChartHomeConfig = {
 };
 var columnChartHomeConfig = {
     chart: {
-      type: 'column'
+      type: 'column',
+      zoomBySingleTouch: true,
+      zoomType: 'xy'
     },
     subtitle: {
       text: "trends.cash"
@@ -146,8 +160,16 @@ var columnChartHomeConfig = {
     yAxis: {
         title: false
     },
-    tooltip: { enabled: false },
-    legend: { enabled: false },
+    tooltip: {
+        pointFormat: '<b>{point.y}</b>'
+    },
+    legend: {
+      itemStyle: {
+         fontSize: '10px',
+         fontWeight: 'normal',
+         color: '#666666'
+      },
+    },
     plotOptions: {
         series: {
           states: {
@@ -166,7 +188,9 @@ var columnChartHomeConfig = {
 };
 var lineChartConfig = {
     chart: {
-      type: 'line'
+      type: 'line',
+      zoomBySingleTouch: true,
+      zoomType: 'xy'
     },
     subtitle: {
       text: "trends.cash"
@@ -222,7 +246,9 @@ var pieChartConfig = {
         plotBackgroundColor: null,
         plotBorderWidth: null,
         plotShadow: false,
-        type: 'pie'
+        type: 'pie',
+        zoomBySingleTouch: true,
+        zoomType: 'xy'
     },
     subtitle: {
       text: "trends.cash"
