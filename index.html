@@ -126,7 +126,6 @@
       }
     });
 
-    const startBlock = 808839;
     const period = 4320;
 
     function populateLocksChart(currentBlock, period) {
@@ -137,7 +136,7 @@
           return r.json()
         }).then(response => {
             let lockedCoinsChartData = []
-            for (let index = startBlock; index < response.length; ++index) {
+            for (let index = 0; index < response.length; ++index) {
               if (response[index][0] <= currentBlock && response[index][0] >= currentBlock - period) {
                 lockedCoinsChartData.push([ response[index][0], response[index][1] ])
               }
@@ -168,11 +167,11 @@
           return r.json()
         }).then(response => {
             let lockedCoinsCountChartData = []
-            for (let index = startBlock; index < response.length; ++index) {
-              if (index <= currentBlock && index >= currentBlock - period) {
-                lockedCoinsCountChartData.push([ index, item ])
+            for (let index = 0; index < response.length; ++index) {
+              if (response[index][0] <= currentBlock && response[index][0] >= currentBlock - period) {
+                lockedCoinsCountChartData.push([ response[index][0], response[index][1] ])
               }
-              if (index > currentBlock) {
+              if (response[index][0] > currentBlock) {
                 break;
               }
             }
@@ -199,11 +198,11 @@
           return r.json()
         }).then(response => {
             let newLockedCoinsChartData = []
-            for (let index = startBlock; index < response.length; ++index) {
-              if (index <= currentBlock && index >= currentBlock - period) {
-                newLockedCoinsChartData.push([ index, item ])
+            for (let index = 0; index < response.length; ++index) {
+              if (response[index][0] <= currentBlock && response[index][0] >= currentBlock - period) {
+                newLockedCoinsChartData.push([ response[index][0], response[index][1] ])
               }
-              if (index > currentBlock) {
+              if (response[index][0] > currentBlock) {
                 break;
               }
             }
