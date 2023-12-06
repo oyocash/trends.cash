@@ -129,7 +129,7 @@
     const startBlock = 808839;
     const period = 4320;
 
-    const getCurrentHeight = new Promise((resolve, reject) => {
+    const async getCurrentHeight = new Promise((resolve, reject) => {
       try {
           const b = await fetch(`${dataURL}lockcrawl`);
           const bres = await b.json();
