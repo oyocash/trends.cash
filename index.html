@@ -126,6 +126,7 @@
       }
     });
 
+    const startBlock = 808839;
     const period = 4320;
 
     async function getCurrentHeight() {
@@ -145,11 +146,19 @@
         fetch(url).then(function(r) {
           return r.json()
         }).then(response => {
-            let lockedCoinsChartData = response;
+            let lockedCoinsChartData = []
+            for (let index = startBlock; index < response.length; ++index) {
+              if (index <= currentBlock && index >= currentBlock - period) {
+                lockedCoinsChartData.push([ index, item ])
+              }
+              if (index > currentBlock) {
+                break;
+              }
+            }
 
             let lockCoinsDatasets = []
             lockCoinsDatasets.push({name: "Locked coins", data: lockedCoinsChartData, color: window.colors[0]})
-            var lineChartLabel1 = "Locked coins"
+            var lineChartLabel = "Locked coins"
             var lineChart = JSON.parse(JSON.stringify(lineChartHomeConfig));
             lineChart.title = { text: lineChartLabel }
             lineChart.series = lockCoinsDatasets
@@ -168,7 +177,15 @@
         fetch(url).then(function(r) {
           return r.json()
         }).then(response => {
-            let lockedCoinsCountChartData = response;
+            let lockedCoinsCountChartData = []
+            for (let index = startBlock; index < response.length; ++index) {
+              if (index <= currentBlock && index >= currentBlock - period) {
+                lockedCoinsCountChartData.push([ index, item ])
+              }
+              if (index > currentBlock) {
+                break;
+              }
+            }
 
             let lockCoinsCountDatasets = []
             lockCoinsCountDatasets.push({name: "Locked coins transaction count", data: lockedCoinsCountChartData, color: window.colors[1]})
@@ -187,11 +204,19 @@
     }
     function populateNewLocksChart(currentBlock, period) {
       return new Promise(function(resolve, reject) {
-        var url = dataURL + "lockedCoins.json"
+        var url = dataURL + "newlyLockedCoins.json"
         fetch(url).then(function(r) {
           return r.json()
         }).then(response => {
-            let newLockedCoinsChartData = response;
+            let newLockedCoinsChartData = []
+            for (let index = startBlock; index < response.length; ++index) {
+              if (index <= currentBlock && index >= currentBlock - period) {
+                newLockedCoinsChartData.push([ index, item ])
+              }
+              if (index > currentBlock) {
+                break;
+              }
+            }
 
             let newlyLockCoinsDatasets = []
             newlyLockCoinsDatasets.push({name: "Newly locked coins", data: newLockedCoinsChartData, color: window.colors[2]})
@@ -212,11 +237,19 @@
     }
     function populateExpiredLocksChart(currentBlock, period) {
       return new Promise(function(resolve, reject) {
-        var url = dataURL + "lockedCoins.json"
+        var url = dataURL + "expiredLockedCoins.json"
         fetch(url).then(function(r) {
           return r.json()
         }).then(response => {
-            let expiredLockedCoinsChartData = response;
+            let expiredLockedCoinsChartData = []
+            for (let index = startBlock; index < response.length; ++index) {
+              if (index <= currentBlock && index >= currentBlock - period) {
+                expiredLockedCoinsChartData.push([ index, item ])
+              }
+              if (index > currentBlock) {
+                break;
+              }
+            }
 
             let expiredLockCoinsDatasets = []
             expiredLockCoinsDatasets.push({name: "Expired locked coins", data: expiredLockedCoinsChartData, color: window.colors[3]})
