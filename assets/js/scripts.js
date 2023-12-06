@@ -24,7 +24,7 @@ var navToggled = function() {
     document.getElementById("nav-list").classList.remove('inactive')
   }
 }
-var navSearchPerformed = function(period, date) {
+var navSearchPerformed = function() {
   document.getElementById('navSearchButton').addEventListener("click", function() {
     searchText = document.getElementById('navSearchText').value;
     changeSearchRoute(searchText)
