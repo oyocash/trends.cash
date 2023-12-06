@@ -137,16 +137,14 @@
           return r.json()
         }).then(response => {
             let lockedCoinsChartData = []
-console.log(response.slice(currentBlock - period, currentBlock));
             for (let index = startBlock; index < response.length; ++index) {
-              if (index <= currentBlock && index >= currentBlock - period) {
-                lockedCoinsChartData.push([ index, item ])
+              if (response[index][0] <= currentBlock && response[index][0] >= currentBlock - period) {
+                lockedCoinsChartData.push([ response[index][0], response[index][1] ])
               }
-              if (index > currentBlock) {
+              if (response[index][0] > currentBlock) {
                 break;
               }
             }
-            console.log(JSON.stringify(lockedCoinsChartData))
 
             let lockCoinsDatasets = []
             lockCoinsDatasets.push({name: "Locked coins", data: lockedCoinsChartData, color: window.colors[0]})
@@ -234,11 +232,11 @@ console.log(response.slice(currentBlock - period, currentBlock));
           return r.json()
         }).then(response => {
             let expiredLockedCoinsChartData = []
-            for (let index = startBlock; index < response.length; ++index) {
-              if (index <= currentBlock && index >= currentBlock - period) {
-                expiredLockedCoinsChartData.push([ index, item ])
+            for (let index = 0; index < response.length; ++index) {
+              if (response[index][0] <= currentBlock && response[index][0] >= currentBlock - period) {
+                expiredLockedCoinsChartData.push([ response[index][0], response[index][1] ])
               }
-              if (index > currentBlock) {
+              if (response[index][0] > currentBlock) {
                 break;
               }
             }
@@ -269,7 +267,7 @@ console.log(response.slice(currentBlock - period, currentBlock));
       populateLocksChart(currentBlock, period)
       // populateLocksCountChart(currentBlock, period)
       // populateNewLocksChart(currentBlock, period)
-      // populateExpiredLocksChart(currentBlock, period)
+      populateExpiredLocksChart(currentBlock, period)
     })().catch(e => console.log("Caught: " + e)); // Catches it.
 
   })
