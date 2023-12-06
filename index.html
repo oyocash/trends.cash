@@ -125,123 +125,123 @@
        document.getElementById("searchButton").click();
       }
     });
-
-    const period = 4320;
-
-    async function getCurrentHeight() {
-      try {
-          const b = await fetch(`dataURL/lockcrawl`);
-          const bres = await b.json();
-          const currentBlock = bres?.height || 825000;
-          resolve(currentBlock)
-      } catch(e) {
-          console.log({e})
-          reject(e)
-      }
-    }
-
-    function populateLocksChart(currentBlock, period) {
-      return new Promise(function(resolve, reject) {
-        var url = dataURL + "lockedCoins.json"
-        fetch(url).then(function(r) {
-          return r.json()
-        }).then(response => {
-            let lockedCoinsChartData = response;
-
-            let lockCoinsDatasets = []
-            lockCoinsDatasets.push({name: "Locked coins", data: lockedCoinsChartData, color: window.colors[0]})
-            var lineChartLabel1 = "Locked coins"
-            var lineChart = JSON.parse(JSON.stringify(lineChartHomeConfig));
-            lineChart.title = { text: lineChartLabel }
-            lineChart.series = lockCoinsDatasets
-            var lineChartObj = Highcharts.chart("lockedCoinsChart", lineChart);
-            lineChartObj.reflow()
-        })
-        .catch(error => {
-          console.log(error)
-          reject(error)
-        })
-      })
-    }
-    function populateLocksCountChart(currentBlock, period) {
-      return new Promise(function(resolve, reject) {
-        var url = dataURL + "lockedCoinsTransactions.json"
-        fetch(url).then(function(r) {
-          return r.json()
-        }).then(response => {
-            let lockedCoinsCountChartData = response;
-
-            let lockCoinsCountDatasets = []
-            lockCoinsCountDatasets.push({name: "Locked coins transaction count", data: lockedCoinsCountChartData, color: window.colors[1]})
-            var lineChartLabel = "Locked coins transactions count"
-            var lineChart = JSON.parse(JSON.stringify(lineChartHomeConfig));
-            lineChart.title = { text: lineChartLabel }
-            lineChart.series = lockCoinsCountDatasets
-            var lineChartObj = Highcharts.chart("lockedCoinsCountChart", lineChart);
-            lineChartObj.reflow()
-        })
-        .catch(error => {
-          console.log(error)
-          reject(error)
-        })
-      })
-    }
-    function populateNewLocksChart(currentBlock, period) {
-      return new Promise(function(resolve, reject) {
-        var url = dataURL + "lockedCoins.json"
-        fetch(url).then(function(r) {
-          return r.json()
-        }).then(response => {
-            let newLockedCoinsChartData = response;
-
-            let newlyLockCoinsDatasets = []
-            newlyLockCoinsDatasets.push({name: "Newly locked coins", data: newLockedCoinsChartData, color: window.colors[2]})
-            var lineChartLabel = "Newly locked coins"
-            var lineChart = JSON.parse(JSON.stringify(columnChartHomeConfig));
-            lineChart.title = { text: lineChartLabel }
-            lineChart.series = newlyLockCoinsDatasets
-            console.log(JSON.stringify(lineChart))
-            var lineChartObj = Highcharts.chart("newlyLockedCoinsChart", lineChart);
-            lineChartObj.reflow()
-
-        })
-        .catch(error => {
-          console.log(error)
-          reject(error)
-        })
-      })
-    }
-    function populateExpiredLocksChart(currentBlock, period) {
-      return new Promise(function(resolve, reject) {
-        var url = dataURL + "lockedCoins.json"
-        fetch(url).then(function(r) {
-          return r.json()
-        }).then(response => {
-            let expiredLockedCoinsChartData = response;
-
-            let expiredLockCoinsDatasets = []
-            expiredLockCoinsDatasets.push({name: "Expired locked coins", data: expiredLockedCoinsChartData, color: window.colors[3]})
-            var lineChartLabel = "Expired locked coins"
-            var lineChart = JSON.parse(JSON.stringify(columnChartHomeConfig));
-            lineChart.title = { text: lineChartLabel }
-            lineChart.series = expiredLockCoinsDatasets
-            console.log(JSON.stringify(lineChart))
-            var lineChartObj = Highcharts.chart("expiredLockedCoinsChart", lineChart);
-            lineChartObj.reflow()
-
-        })
-        .catch(error => {
-          console.log(error)
-          reject(error)
-        })
-      })
-    }
-    const currentBlock = await getCurrentHeight();
-    populateLocksChart(currentBlock, period)
-    populateLocksCountChart(currentBlock, period)
-    populateNewLocksChart(currentBlock, period)
-    populateExpiredLocksChart(currentBlock, period)
   })
+
+  const period = 4320;
+
+  async function getCurrentHeight() {
+    try {
+        const b = await fetch(`dataURL/lockcrawl`);
+        const bres = await b.json();
+        const currentBlock = bres?.height || 825000;
+        resolve(currentBlock)
+    } catch(e) {
+        console.log({e})
+        reject(e)
+    }
+  }
+
+  function populateLocksChart(currentBlock, period) {
+    return new Promise(function(resolve, reject) {
+      var url = dataURL + "lockedCoins.json"
+      fetch(url).then(function(r) {
+        return r.json()
+      }).then(response => {
+          let lockedCoinsChartData = response;
+
+          let lockCoinsDatasets = []
+          lockCoinsDatasets.push({name: "Locked coins", data: lockedCoinsChartData, color: window.colors[0]})
+          var lineChartLabel1 = "Locked coins"
+          var lineChart = JSON.parse(JSON.stringify(lineChartHomeConfig));
+          lineChart.title = { text: lineChartLabel }
+          lineChart.series = lockCoinsDatasets
+          var lineChartObj = Highcharts.chart("lockedCoinsChart", lineChart);
+          lineChartObj.reflow()
+      })
+      .catch(error => {
+        console.log(error)
+        reject(error)
+      })
+    })
+  }
+  function populateLocksCountChart(currentBlock, period) {
+    return new Promise(function(resolve, reject) {
+      var url = dataURL + "lockedCoinsTransactions.json"
+      fetch(url).then(function(r) {
+        return r.json()
+      }).then(response => {
+          let lockedCoinsCountChartData = response;
+
+          let lockCoinsCountDatasets = []
+          lockCoinsCountDatasets.push({name: "Locked coins transaction count", data: lockedCoinsCountChartData, color: window.colors[1]})
+          var lineChartLabel = "Locked coins transactions count"
+          var lineChart = JSON.parse(JSON.stringify(lineChartHomeConfig));
+          lineChart.title = { text: lineChartLabel }
+          lineChart.series = lockCoinsCountDatasets
+          var lineChartObj = Highcharts.chart("lockedCoinsCountChart", lineChart);
+          lineChartObj.reflow()
+      })
+      .catch(error => {
+        console.log(error)
+        reject(error)
+      })
+    })
+  }
+  function populateNewLocksChart(currentBlock, period) {
+    return new Promise(function(resolve, reject) {
+      var url = dataURL + "lockedCoins.json"
+      fetch(url).then(function(r) {
+        return r.json()
+      }).then(response => {
+          let newLockedCoinsChartData = response;
+
+          let newlyLockCoinsDatasets = []
+          newlyLockCoinsDatasets.push({name: "Newly locked coins", data: newLockedCoinsChartData, color: window.colors[2]})
+          var lineChartLabel = "Newly locked coins"
+          var lineChart = JSON.parse(JSON.stringify(columnChartHomeConfig));
+          lineChart.title = { text: lineChartLabel }
+          lineChart.series = newlyLockCoinsDatasets
+          console.log(JSON.stringify(lineChart))
+          var lineChartObj = Highcharts.chart("newlyLockedCoinsChart", lineChart);
+          lineChartObj.reflow()
+
+      })
+      .catch(error => {
+        console.log(error)
+        reject(error)
+      })
+    })
+  }
+  function populateExpiredLocksChart(currentBlock, period) {
+    return new Promise(function(resolve, reject) {
+      var url = dataURL + "lockedCoins.json"
+      fetch(url).then(function(r) {
+        return r.json()
+      }).then(response => {
+          let expiredLockedCoinsChartData = response;
+
+          let expiredLockCoinsDatasets = []
+          expiredLockCoinsDatasets.push({name: "Expired locked coins", data: expiredLockedCoinsChartData, color: window.colors[3]})
+          var lineChartLabel = "Expired locked coins"
+          var lineChart = JSON.parse(JSON.stringify(columnChartHomeConfig));
+          lineChart.title = { text: lineChartLabel }
+          lineChart.series = expiredLockCoinsDatasets
+          console.log(JSON.stringify(lineChart))
+          var lineChartObj = Highcharts.chart("expiredLockedCoinsChart", lineChart);
+          lineChartObj.reflow()
+
+      })
+      .catch(error => {
+        console.log(error)
+        reject(error)
+      })
+    })
+  }
+  const currentBlock = await getCurrentHeight();
+  populateLocksChart(currentBlock, period)
+  populateLocksCountChart(currentBlock, period)
+  populateNewLocksChart(currentBlock, period)
+  populateExpiredLocksChart(currentBlock, period)
 </script>
 </body>
 </html>
