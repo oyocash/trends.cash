@@ -273,7 +273,8 @@ console.log(response.slice(currentBlock - period, currentBlock));
         })
       })
     }
-    getCurrentHeight().then(function(currentBlock) {       
+    getCurrentHeight().then(function(currentBlock) {  
+    console.log(currentBlock)     
       populateLocksChart(currentBlock, period)
       // populateLocksCountChart(currentBlock, period)
       // populateNewLocksChart(currentBlock, period)
