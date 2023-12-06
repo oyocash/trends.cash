@@ -36,9 +36,9 @@ var navSearchPerformed = function() {
     }
   });
 }
-var changeSearchRoute = function(searchText) {
+var changeSearchRoute = function() {
   if (document.getElementById('navSearchText').value) {
-    window.open('/result/?search=' + btoa(searchText), "_self")
+    window.open('/result/?search=' + btoa(document.getElementById('navSearchText').value), "_self")
   }
 }
 
