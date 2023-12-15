@@ -150,6 +150,8 @@
             var lineChartLabel = "Locked coins"
             var lineChart = JSON.parse(JSON.stringify(lineChartHomeConfig));
             lineChart.title = { text: lineChartLabel }
+            lineChart.xAxis = { title: { text: 'Block'} }
+            lineChart.yAxis = { title: { text: 'BSV'} }
             lineChart.series = lockCoinsDatasets
             var lineChartObj = Highcharts.chart("lockedCoinsChart", lineChart);
             lineChartObj.reflow()
@@ -181,6 +183,8 @@
             var lineChartLabel = "Locked coins transactions count"
             var lineChart = JSON.parse(JSON.stringify(lineChartHomeConfig));
             lineChart.title = { text: lineChartLabel }
+            lineChart.xAxis = { title: { text: 'Block'} }
+            lineChart.yAxis = { title: { text: 'Transactions'} }
             lineChart.series = lockCoinsCountDatasets
             var lineChartObj = Highcharts.chart("lockedCoinsCountChart", lineChart);
             lineChartObj.reflow()
@@ -212,6 +216,8 @@
             var lineChartLabel = "Newly locked coins"
             var lineChart = JSON.parse(JSON.stringify(columnChartHomeConfig));
             lineChart.title = { text: lineChartLabel }
+            lineChart.xAxis = { title: { text: 'Block'} }
+            lineChart.yAxis = { title: { text: 'BSV'} }
             lineChart.series = newlyLockCoinsDatasets
             console.log(JSON.stringify(lineChart))
             var lineChartObj = Highcharts.chart("newlyLockedCoinsChart", lineChart);
@@ -245,6 +251,8 @@
             var lineChartLabel = "Expired locked coins"
             var lineChart = JSON.parse(JSON.stringify(columnChartHomeConfig));
             lineChart.title = { text: lineChartLabel }
+            lineChart.xAxis = { title: { text: 'Block'} }
+            lineChart.yAxis = { title: { text: 'BSV'} }
             lineChart.series = expiredLockCoinsDatasets
             console.log(JSON.stringify(lineChart))
             var lineChartObj = Highcharts.chart("expiredLockedCoinsChart", lineChart);
