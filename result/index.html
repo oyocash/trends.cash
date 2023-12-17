@@ -104,12 +104,12 @@
               aggregatedData[response[index]['lockHeight']] = 0;
             }
             // push real data
-            response[index]['cumulativeSatoshis'] = response[index]['satoshis'];
+            response[index]['cumulativeSatoshis'] = parseFloat(response[index]['satoshis']);
             if (response[index]['lockCountType'] === 'a') {
-              aggregatedData[response[index]['lockHeight']] = aggregatedData[response[index]['lockHeight']] + response[index]['satoshis']
+              aggregatedData[response[index]['lockHeight']] = aggregatedData[response[index]['lockHeight']] + parseFloat(response[index]['satoshis'])
             }
             if (response[index]['lockCountType'] === 's') {
-              aggregatedData[response[index]['lockHeight']] = aggregatedData[response[index]['lockHeight']] - response[index]['satoshis']
+              aggregatedData[response[index]['lockHeight']] = aggregatedData[response[index]['lockHeight']] - parseFloat(response[index]['satoshis'])
             }
           }
           aggregatedData.forEach(populateAllLockedCoinsChartData)
@@ -122,7 +122,9 @@
 
           var lineChartLabel = "Satoshis locked"
           var lineChart = JSON.parse(JSON.stringify(lineChartConfig));
-          lineChart.title = { text: lineChartLabel }
+          lineChart.title = { text: lineChartLabel }          
+          lineChart.xAxis = { title: { text: 'Block'} }
+          lineChart.yAxis = { title: { text: 'BSV'} }
           lineChart.series = lockValuesDatasets
           var lineChartObj = Highcharts.chart("lockValuesChart", lineChart);
 

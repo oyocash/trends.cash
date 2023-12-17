@@ -55,8 +55,6 @@ var pieChartHomeConfig = {
         plotBorderWidth: null,
         plotShadow: false,
         type: 'pie',
-        zoomBySingleTouch: true,
-        zoomType: 'xy'
     },
     subtitle: {
       text: "trends.cash"
@@ -95,8 +93,6 @@ var pieChartHomeConfig = {
 var lineChartHomeConfig = {
     chart: {
       type: 'line',
-      zoomBySingleTouch: true,
-      zoomType: 'xy'
     },
     subtitle: {
       text: "trends.cash"
@@ -143,9 +139,7 @@ var lineChartHomeConfig = {
 };
 var columnChartHomeConfig = {
     chart: {
-      type: 'column',
-      zoomBySingleTouch: true,
-      zoomType: 'xy'
+      type: 'column'
     },
     subtitle: {
       text: "trends.cash"
@@ -180,9 +174,7 @@ var columnChartHomeConfig = {
 };
 var lineChartConfig = {
     chart: {
-      type: 'line',
-      zoomBySingleTouch: true,
-      zoomType: 'xy'
+      type: 'line'
     },
     subtitle: {
       text: "trends.cash"
@@ -238,9 +230,7 @@ var pieChartConfig = {
         plotBackgroundColor: null,
         plotBorderWidth: null,
         plotShadow: false,
-        type: 'pie',
-        zoomBySingleTouch: true,
-        zoomType: 'xy'
+        type: 'pie'
     },
     subtitle: {
       text: "trends.cash"
