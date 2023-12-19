@@ -83,7 +83,7 @@
 
     function populateChart(currentBlock, period) {
       return new Promise(function(resolve, reject) {
-        var url = dataURL + "lockedCoinsTransactions.json"
+        var url = dataURL + "lockedCoins.json"
         fetch(url).then(function(r) {
           return r.json()
         }).then(response => {
@@ -98,8 +98,8 @@
             }
 
             let lockCoinsDatasets = []
-            lockCoinsDatasets.push({name: "Locked transactions", data: lockedCoinsChartData, color: window.colors[0]})
-            var lineChartLabel = "Locked transactions"
+            lockCoinsDatasets.push({name: "Locked coins", data: lockedCoinsChartData, color: window.colors[0]})
+            var lineChartLabel = "Locked coins"
             var lineChart = JSON.parse(JSON.stringify(lineChartHomeConfig));
             lineChart.title = { text: lineChartLabel }
             lineChart.xAxis = { title: { text: 'Block'} }
