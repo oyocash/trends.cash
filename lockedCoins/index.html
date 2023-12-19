@@ -44,28 +44,13 @@
   <noscript>Locked coins on Bitcoin SV (BSV) chart</noscript>
   <div id="app" class="container">
     <div id="nav"></div>
-      <div class="grid" id="loading">
-        <div class="s_results">
-          <div class="n_results">
-            Loading...
-          </div>
-        </div>
-      </div>
-      <div class="grid" id="error">
-        <div class="s_results">
-          <div class="n_results">
-            Error occured while loading. <a href="javascript:void(0)" onClick="window.location.reload();">Try again</a>
-          </div>
-        </div>
-      </div>
-      <div class="grid chartGrid" id="loaded">
+      <div class="grid chartGrid">
         <div class="chartSection">
           <div class="chartNav">
             <div class="chartNavCenter"></div>
             <div class="chartNavRight">
               From: <input type="text" name="fromBlock" id="fromBlock" title="Show from block [X]"/>
               To: <input type="text" name="toBlock" id="toBlock" title="Show up to block [X]" />
-
             </div>
           </div>
           <div class="rankingChartWrapper">
