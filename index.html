@@ -129,7 +129,6 @@
     const period = 144*7;
 
     function populateLocksChart(currentBlock, period) {
-      console.log(currentBlock, " ", period)
       return new Promise(function(resolve, reject) {
         var url = dataURL + "lockedCoins.json"
         fetch(url).then(function(r) {

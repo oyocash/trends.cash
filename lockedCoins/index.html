@@ -51,7 +51,7 @@
             <div class="chartNavRight">
               From: <input type="text" name="fromBlock" id="fromBlock" title="Show from block [X]"/>
               To: <input type="text" name="toBlock" id="toBlock" title="Show up to block [X]" />
-              <button type="submit" id="showChart" onclick="refreshChart()">Show</button>
+              <button onclick="refreshChart()">Show</button>
             </div>
           </div>
           <div class="rankingChartWrapper">
@@ -78,7 +78,6 @@
     }
 
     function populateLocksChart(currentBlock, period) {
-      console.log(currentBlock, " ", period)
       return new Promise(function(resolve, reject) {
         var url = dataURL + "lockedCoins.json"
         fetch(url).then(function(r) {
