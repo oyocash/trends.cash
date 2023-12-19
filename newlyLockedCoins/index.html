@@ -1,16 +1,16 @@
 <html>
 <head>
-  <title>Trends.cash - Popular Bitcoin SV apps (by actions)</title>
+  <title>Trends.cash - Newly locked coins on Bitcoin SV (BSV) chart</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:creator" content="@pmitchev" />
-  <meta name="twitter:title" content="Trends.cash - Popular Bitcoin SV (BSV) apps (sorted by actions)" />
-  <meta name="twitter:description" content="Ranking of popular Bitcoins SV (BSV) apps sorted by performed actions" />
+  <meta name="twitter:title" content="Trends.cash - Newly locked coins on Bitcoin SV (BSV) chart" />
+  <meta name="twitter:description" content="Newly locked coins on Bitcoin SV (BSV) chart" />
   <meta name="twitter:image" content="https://trends.cash/assets/images/logo-large.png" />
   <meta property="og:url" content="https://trends.cash/ranking/" />
   <meta property="og:type"   content="website" />
-  <meta property="og:title" content="Trends.cash - Popular Bitcoin SV apps (sorted by actions)" />
-  <meta property="og:description" content="Ranking of popular Bitcoins SV apps sorted by performed actions" />
+  <meta property="og:title" content="Trends.cash - Newly locked coins on Bitcoin SV (BSV) chart" />
+  <meta property="og:description" content="Newly locked coins on Bitcoin SV (BSV) chart" />
   <meta property="og:image" content="https://trends.cash/assets/images/logo-large.png" />
 
   <link rel="stylesheet" href="/assets/css/styles.css?240101">
@@ -41,378 +41,90 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.8.0/css/pikaday.min.css" integrity="sha256-+RIb33VoW3hHdfmp0+G4FrGAxzlKBXiwo6thzduwZdU=" crossorigin="anonymous" />
 </head>
 <body>
-  <noscript>Ranking of popular Bitcoins SV apps sorted by performed actions</noscript>
+  <noscript>Newly locked coins on Bitcoin SV (BSV) chart</noscript>
   <div id="app" class="container">
     <div id="nav"></div>
-      <div class="grid" id="loading">
-        <div class="s_results">
-          <div class="n_results">
-            Loading...
-          </div>
-        </div>
-      </div>
-      <div class="grid" id="error">
-        <div class="s_results">
-          <div class="n_results">
-            Error occured while loading. <a href="javascript:void(0)" onClick="window.location.reload();">Try again</a>
-          </div>
-        </div>
-      </div>
-      <div class="grid chartGrid" id="loaded">
+      <div class="grid chartGrid">
         <div class="chartSection">
           <div class="chartNav">
             <div class="chartNavCenter"></div>
             <div class="chartNavRight">
-              From: <input type="text" name="startDateForm" id="startDateForm" title="Search date start" placeholder="YYYY-MM-DD" disabled/>
-              To: <input type="text" name="endDateForm" id="endDateForm" title="Search date end" placeholder="YYYY-MM-DD"/>
+              From block: <input type="text" name="fromBlock" id="fromBlock" title="Show from block [X]"/>
+              To: <input type="text" name="toBlock" id="toBlock" title="Show up to block [X]" />
+              <button id="showButton">Show</button>
             </div>
           </div>
           <div class="rankingChartWrapper">
-            <div id="pieChart" style="height:500px;"></div>
+            <div id="chart" style="height:500px;"></div>
           </div>
-          <div class="rankingChartWrapper">
-            <div id="areaChart" style="height:500px;"></div>
-          </div>
-        </div>
-
-        <div class="resultTable">
-          <div class="resultTable-container resultTable-separator">
-            <div class="resultTable-title">
-              Popular BSV apps (sorted by actions)
-            </div>
-          </div>
-          <div id="tableContent"></div>
         </div>
       </div>
     <div id="footer"></div>
   </div>
 
 <script language='javascript'>
-  // initiate loading
-  document.getElementById("loading").style.display = "block";
-  document.getElementById("error").style.display = "none";
-  document.getElementById("loaded").style.display = "none";
-
-  var step = 86400
-  var localStep = step
-  var itemsOnChart = 10
-  var pieChartDataUnordered = []
-  var pieChartDataFull = []
-  var pieChartDataSliced = []
-  let pieChartData = {}
-  let areaChartData = {}
-
-  // populate period
-  var periodInput = parseInt(getUrlVars()["period"]) || window.rankingPeriodDefault
-  // populate date
-  var dateTimestamp, dateForm
-  var dateInput = getUrlVars()["date"] || 0
-  if (parseInt(dateInput) && parseInt(dateInput) !== 0) {
-    let dateReal = new Date(Date.UTC(dateInput.substring(0,4), parseInt(dateInput.substring(4,6)) - 1, dateInput.substring(6,8), 23, 59, 59, 0))
-    dateTimestamp = parseInt(dateReal.getTime() / 1000) + 1
-    dateForm = dateReal.toISOString().substring(0, 10)
-  } else {
-    if (periodInput > 1) {
-        var d = new Date()
-        let dateReal = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate(), 23, 59, 59, 0))
-        dateTimestamp = parseInt(dateReal.getTime() / 1000) + 1
-    } else {
-      dateTimestamp = parseInt(new Date().getTime() / 1000)
-    }
-    dateForm = new Date().toISOString().substring(0, 10)
-  }
-
-  document.getElementById('endDateForm').value = dateForm
-  var startDateTimestamp = dateTimestamp - (periodInput * 24 * 60 * 60)
-  var startDateForm = new Date(startDateTimestamp * 1000).toISOString().substring(0, 10)
-  document.getElementById('startDateForm').value = startDateForm
-  var picker = new Pikaday(
-  {
-      field: document.getElementById('endDateForm'),
-      firstDay: 1,
-      minDate: new Date(2009, 01, 03),
-      maxDate: new Date()
-  });
-
   document.addEventListener("DOMContentLoaded", function() {
-    // on date change
-    document.getElementById('endDateForm').addEventListener("change", function() {
-      changeEndDate("ranking", periodInput, document.getElementById('endDateForm').value)
-    })
-    // on period button click
-    let periodButtons = document.getElementsByClassName('periodButton');
-    for(let i=0; i<periodButtons.length; i++){
-      if (parseInt(periodInput) === parseInt(periodButtons[i].value)) {
-        periodButtons[i].classList.add("active")
-      }
-      periodButtons[i].addEventListener("click", function() {
-        periodInput = periodButtons[i].value
-        changeRoute("ranking", periodInput, dateInput)
-      })
-    }
     loadHead()
-    loadNav().then(function(r) {
-      navSearchPerformed(window.searchPeriodDefault, 0)
-    })
+    loadNav()
     loadFooter()
 
+    const period = 144*30;
 
-    function getPromise (url, header){
-      return fetch(url, header).then(function(r) {
-        var url = r.url
-        return r.json()
-      }).then(function(response) {
-        return {"data": response, "url": url}
-      })
-    };
-    function promiseAllSkippingErrors(promises) {
-      return Promise.all(
-        promises.map(p => p.catch(error => null))
-      )
+    function refreshChart() {
+      let fromBlock = document.getElementById('fromBlock').value;
+      let toBlock = document.getElementById('toBlock').value;
+
+      populateLocksChart(toBlock, toBlock - fromBlock)
     }
-    function getComputedResult (beginTimestamp, endTimestamp, step) {
+
+    document.getElementById('showButton').addEventListener("click", function() {
+      refreshChart();
+    })
+
+    function populateChart(currentBlock, period) {
       return new Promise(function(resolve, reject) {
-        let promises = [];
-        let period = Math.ceil((endTimestamp - beginTimestamp) / step)
-
-        var today = new Date().setUTCHours(0, 0, 0, 0) / 1000
-        var endTimestampDay = new Date(endTimestamp * 1000).setUTCHours(0, 0, 0, 0) / 1000
-
-        if(today === endTimestampDay && period === 1) {
-          localStep = 3600
-          var endTimestampModStep = (endTimestamp - new Date(1548979200 * 1000).setUTCHours(0, 0, 0, 0)) % localStep
-          endTimestamp -= endTimestampModStep
-          beginTimestamp -= endTimestampModStep
-          period = Math.ceil((endTimestamp - beginTimestamp) / localStep)
-          for (let i = 0; i < period; i++) {
-            var requestUrl = dataURL + "actions/" + (beginTimestamp + i * localStep) + "-" + localStep + "-all-0.json"
-            promises.push(getPromise(requestUrl));
-          }
-        } else {
-          beginTimestamp = new Date(beginTimestamp * 1000).setUTCHours(0, 0, 0, 0) / 1000
-          for (let i = 0; i < period; i++) {
-            var requestUrl = dataURL + "actions/" + (beginTimestamp + i * step) + "-" + step + "-all-0.json"
-            promises.push(getPromise(requestUrl));
-          }
-        }
-
-        promiseAllSkippingErrors(promises)
-        .then((...data) => {
-          for (let i = 0; i < data[0].length; i++) {
-            var rankingData
-            if (data[0][i]) {
-              if (data[0][i]['data'][0]) {
-                rankingData = JSON.parse(data[0][i]['data'][0])
+        var url = dataURL + "newlyLockedCoins.json"
+        fetch(url).then(function(r) {
+          return r.json()
+        }).then(response => {
+            let lockedCoinsChartData = []
+            for (let index = 0; index < response.length; ++index) {
+              if (response[index][0] <= currentBlock && response[index][0] >= currentBlock - period) {
+                lockedCoinsChartData.push([ response[index][0], response[index][1] ])
               }
-
-              for (let ii = 0; ii < rankingData.length; ii++) {
-                const base64Id = rankingData[ii][0]
-                const count = rankingData[ii][1]
-                const type = rankingData[ii][2]
-                if (base64Id === undefined || base64Id === "undefined") {
-                  continue
-                }
-                let itemId = atob(base64Id)
-                let itemName = ''
-                if (protocols[base64Id] !== undefined) {
-                  itemName = protocols[base64Id].name
-                } else if (base64Id.length <= 6) {
-                  itemName = itemId + ' (' + base64Id + ')'
-                } else {
-                  itemName = itemId
-                }
-                // pie chart generation
-                if (pieChartData[itemName] !== undefined) {
-                  pieChartData[itemName]['count'] = pieChartData[itemName]['count'] + count
-                  if (!(pieChartData[itemName]['base64'].includes(base64Id))) {
-                    pieChartData[itemName]['base64'].push(base64Id)
-                  }
-                  if (count > pieChartData[itemName]['count']) {
-                    pieChartData[itemName]['type'] = type
-                  }
-                } else {
-                  pieChartData[itemName] = {}
-                  pieChartData[itemName]['count'] = count
-                  pieChartData[itemName]['base64'] = []
-                  pieChartData[itemName]['base64'].push(base64Id)
-                  pieChartData[itemName]['itemId'] = itemId.replace(/[^0-9a-zA-Z\.@]/g,"")
-                  pieChartData[itemName]['type'] = type
-                }
-                //area chart generation
-                if (areaChartData[itemName] === undefined) {
-                  areaChartData[itemName] = []
-                }
-                areaChartData[itemName].push({"t": data[0][i]['data'][4] * 1000, "y": count})
-
-                // B protocol names population
-                let prefix = itemId
-                if (!(bitcomPrefixes.includes(prefix)) && protocols[prefix] === undefined) {
-                  try {
-                    bchaddr.isLegacyAddress(prefix)
-                    bitcomPrefixes.push(prefix)
-                  } catch (e) {
-                  }
-                }
+              if (response[index][0] > currentBlock) {
+                break;
               }
             }
-          }
 
-          for (var k in pieChartData){
-            if (pieChartData.hasOwnProperty(k)) {
-              pieChartDataUnordered.push([k, pieChartData[k]['count'], pieChartData[k]['base64'], pieChartData[k]['itemId'], pieChartData[k]['type']])
-            }
-          }
-          pieChartDataUnordered.sort((a, b) => parseFloat(b[1]) - parseFloat(a[1]))
-          var dummyChartObj = {}
-          dummyChartObj.chartData = JSON.parse(JSON.stringify(pieChartDataUnordered));
-          getBitcomProtocols().then(function() {
-            for (let key in bitcomProtocols) {
-              if (!bitcomProtocols.hasOwnProperty(key)) continue;
-              for (let ii = 0; ii < dummyChartObj.chartData.length; ii++) {
-                if (dummyChartObj.chartData[ii][0] === key) {
-                  dummyChartObj.chartData[ii][0] = bitcomProtocols[key]['name']
-                  var localOldCount = 0
-                  var localCount = 0
-                  if (areaChartData[bitcomProtocols[key]['name']] !== undefined) {
-                    for (let iij = 0; iij < areaChartData[bitcomProtocols[key]['name']].length; ++iij) {
-                      localOldCount += areaChartData[bitcomProtocols[key]['name']][iij]['y']
-                    }
-                  }
-                  if (areaChartData[key] !== undefined) {
-                    for (let iij = 0; iij < areaChartData[key].length; ++iij) {
-                      localCount += areaChartData[key][iij]['y']
-                    }
-                  }
-                  if (localCount > localOldCount) {
-                    areaChartData[bitcomProtocols[key]['name']] = areaChartData[key];
-                    delete areaChartData[key];
-                  }
-                }
-              }
-            }
-            pieChartDataUnordered = JSON.parse(JSON.stringify(dummyChartObj.chartData))
-            populateRankings()
-          })
+            let lockCoinsDatasets = []
+            lockCoinsDatasets.push({name: "Newly locked coins", data: lockedCoinsChartData, color: window.colors[0]})
+            var lineChartLabel = "Newly locked coins"
+            var lineChart = JSON.parse(JSON.stringify(columnChartHomeConfig));
+            lineChart.title = { text: lineChartLabel }
+            lineChart.xAxis = { title: { text: 'Block'} }
+            lineChart.yAxis = { title: { text: 'BSV'} }
+            lineChart.series = lockCoinsDatasets
+            var lineChartObj = Highcharts.chart("chart", lineChart);
+            lineChartObj.reflow()
         })
         .catch(error => {
           console.log(error)
+          reject(error)
         })
       })
     }
-    var populateRankings = function () {
-      pieChartDataFull = pieChartDataUnordered
-      pieChartDataSliced = pieChartDataUnordered.slice(0, parseInt(itemsOnChart))
 
-      //populate table
-      rankingTable("tableContent", pieChartDataFull, window.colors)
+    (async () => {
+      const b = await fetch(`${dataURL}lockcrawl`);
+      const bres = await b.json();
+      const currentBlock = bres?.height || 825000;;
+      document.getElementById('fromBlock').value = currentBlock - period;
+      document.getElementById('toBlock').value = currentBlock;
 
-      // draw chart
-      var pieChartDataset = []
-      var pieChartLabels = []
-      for (let i = 0; i < pieChartDataSliced.length; i++) {
-        var itemLabel = pieChartDataSliced[i][0]
-        if (pieChartDataSliced[i][0].length > 10) {
-          itemLabel = pieChartDataSliced[i][0].substring(0, 7) + "...";
-        }
-        pieChartLabels.push(pieChartDataSliced[i][0])
-        var item = { "name": itemLabel, "y": pieChartDataSliced[i][1]}
-        pieChartDataset.push(item)
-      }
+      populateChart(currentBlock, period)
+    })().catch(e => console.log("Caught: " + e)); // Catches it.
 
-      var pieChartTitle = "Distribution of app actions"
-      var pieChart = JSON.parse(JSON.stringify(pieChartConfig));
-      pieChart.title = { text: pieChartTitle }
-      pieChart.series = [{
-          name: "Performed actions",
-          colors: window.colors,
-          colorByPoint: true,
-          dataLabels: {
-              distance: 3,
-              style: {
-                  color: "#888",
-                  fontSize: 9
-              }
-          },
-          data: pieChartDataset
-      }]
-
-      var pieChartObj = Highcharts.chart("pieChart", pieChart);
-
-      var areaDatasets = []
-      for (let iiiii = 0; iiiii < pieChartLabels.length; ++iiiii) {
-        var areaDatasetOrg = areaChartData[pieChartLabels[iiiii]]
-        let prevItemDate = null
-        let areaDataset = []
-        var localCount = 0
-        for (let iiiij = 0; iiiij < areaDatasetOrg.length; ++iiiij) {
-          var itemDate = new Date(areaDatasetOrg[iiiij]['t'])
-          if (iiiij === 0 || prevItemDate === null) {
-            // fill with 0 if it's not the beginning
-            let timeDiff = Math.abs(itemDate.getTime() - (beginTimestamp * 1000))
-            let diffSteps = Math.ceil(timeDiff / (1000 * localStep))
-            if (diffSteps > 0) {
-              for (let j = diffSteps; j > 0; --j) {
-                let fillDate = new Date(itemDate.getTime() - 1000 * localStep * j)
-                areaDataset.push([ fillDate.getTime(), localCount])
-              }
-            }
-          } else {
-            let timeDiff = Math.abs(itemDate.getTime() - prevItemDate.getTime())
-            let diffSteps = Math.floor(timeDiff / (1000 * localStep))
-            // fill empty dates with 0
-            if (diffSteps > 1) {
-              for (let j = 1; j < diffSteps; ++j) {
-                let fillDate = new Date(prevItemDate.getTime() + 1000 * localStep * j)
-                areaDataset.push([ fillDate.getTime(), localCount ])
-              }
-            }
-          }
-          localCount = areaDatasetOrg[iiiij]['y'] + localCount
-          areaDatasetOrg[iiiij]['y'] = localCount
-
-          // push real data
-          areaDataset.push([areaDatasetOrg[iiiij]['t'], areaDatasetOrg[iiiij]['y']])
-          prevItemDate = itemDate
-        }
-
-        // fill with 0 till the end
-        if (prevItemDate === null) {
-          prevItemDate = new Date(beginTimestamp * 1000)
-        }
-        let timeDiff = Math.abs(dateTimestamp * 1000 - prevItemDate.getTime())
-        let diffSteps = Math.ceil(timeDiff / (1000 * localStep))
-        if (diffSteps > 1) {
-          for (let j = 1; j < diffSteps; ++j) {
-            let fillDate = new Date(prevItemDate.getTime() + 1000 * localStep * j)
-            areaDataset.push([fillDate.getTime(), localCount])
-          }
-        }
-
-        var itemLabel = pieChartLabels[iiiii]
-        if (pieChartLabels[iiiii].length > 10) {
-          itemLabel = pieChartLabels[iiiii].substring(0, 7) + "...";
-        }
-        areaDatasets.push({name: itemLabel, data: areaDataset, color: window.colors[iiiii]})
-      }
-      var lineChartLabel = "Timeline of performed actions by app"
-      var lineChart = JSON.parse(JSON.stringify(lineChartConfig));
-      lineChart.title = { text: lineChartLabel }
-      lineChart.series = areaDatasets
-      var lineChartObj = Highcharts.chart("areaChart", lineChart);
-
-      // show loaded
-      document.getElementById("loading").style.display = "none";
-      document.getElementById("error").style.display = "none";
-      document.getElementById("loaded").style.display = "grid";
-
-      pieChartObj.reflow()
-      lineChartObj.reflow()
-    }
-
-    // get actions chart data
-    var beginTimestamp = startDateTimestamp
-    var endTimestamp = dateTimestamp
-    getComputedResult(beginTimestamp, endTimestamp, step)
   })
 </script>
 </body>

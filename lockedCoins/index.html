@@ -1,16 +1,16 @@
 <html>
 <head>
-  <title>Trends.cash - Popular Bitcoin SV apps (by actions)</title>
+  <title>Trends.cash - Locked coins on Bitcoin SV (BSV) chart</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:creator" content="@pmitchev" />
-  <meta name="twitter:title" content="Trends.cash - Popular Bitcoin SV (BSV) apps (sorted by actions)" />
-  <meta name="twitter:description" content="Ranking of popular Bitcoins SV (BSV) apps sorted by performed actions" />
+  <meta name="twitter:title" content="Trends.cash - Locked coins on Bitcoin SV (BSV) chart" />
+  <meta name="twitter:description" content="Locked coins on Bitcoin SV (BSV) chart" />
   <meta name="twitter:image" content="https://trends.cash/assets/images/logo-large.png" />
   <meta property="og:url" content="https://trends.cash/ranking/" />
   <meta property="og:type"   content="website" />
-  <meta property="og:title" content="Trends.cash - Popular Bitcoin SV apps (sorted by actions)" />
-  <meta property="og:description" content="Ranking of popular Bitcoins SV apps sorted by performed actions" />
+  <meta property="og:title" content="Trends.cash - Locked coins on Bitcoin SV (BSV) chart" />
+  <meta property="og:description" content="Locked coins on Bitcoin SV (BSV) chart" />
   <meta property="og:image" content="https://trends.cash/assets/images/logo-large.png" />
 
   <link rel="stylesheet" href="/assets/css/styles.css?240101">
@@ -49,13 +49,13 @@
           <div class="chartNav">
             <div class="chartNavCenter"></div>
             <div class="chartNavRight">
-              From: <input type="text" name="fromBlock" id="fromBlock" title="Show from block [X]"/>
+              From block: <input type="text" name="fromBlock" id="fromBlock" title="Show from block [X]"/>
               To: <input type="text" name="toBlock" id="toBlock" title="Show up to block [X]" />
               <button id="showButton">Show</button>
             </div>
           </div>
           <div class="rankingChartWrapper">
-            <div id="lockedCoinsChart" style="height:500px;"></div>
+            <div id="chart" style="height:500px;"></div>
           </div>
         </div>
       </div>
@@ -81,7 +81,7 @@
       refreshChart();
     })
 
-    function populateLocksChart(currentBlock, period) {
+    function populateChart(currentBlock, period) {
       return new Promise(function(resolve, reject) {
         var url = dataURL + "lockedCoins.json"
         fetch(url).then(function(r) {
@@ -105,7 +105,7 @@
             lineChart.xAxis = { title: { text: 'Block'} }
             lineChart.yAxis = { title: { text: 'BSV'} }
             lineChart.series = lockCoinsDatasets
-            var lineChartObj = Highcharts.chart("lockedCoinsChart", lineChart);
+            var lineChartObj = Highcharts.chart("chart", lineChart);
             lineChartObj.reflow()
         })
         .catch(error => {
@@ -122,7 +122,7 @@
       document.getElementById('fromBlock').value = currentBlock - period;
       document.getElementById('toBlock').value = currentBlock;
 
-      populateLocksChart(currentBlock, period)
+      populateChart(currentBlock, period)
     })().catch(e => console.log("Caught: " + e)); // Catches it.
 
   })
