@@ -51,7 +51,7 @@
             <div class="chartNavRight">
               From: <input type="text" name="fromBlock" id="fromBlock" title="Show from block [X]"/>
               To: <input type="text" name="toBlock" id="toBlock" title="Show up to block [X]" />
-              <button onclick="refreshChart()">Show</button>
+              <button id="showButton">Show</button>
             </div>
           </div>
           <div class="rankingChartWrapper">
@@ -76,6 +76,10 @@
 
       populateLocksChart(toBlock, toBlock - fromBlock)
     }
+
+    document.getElementById('showButton').addEventListener("click", function() {
+      refreshChart();
+    })
 
     function populateLocksChart(currentBlock, period) {
       return new Promise(function(resolve, reject) {
