@@ -83,7 +83,7 @@
 
     function populateChart(currentBlock, period) {
       return new Promise(function(resolve, reject) {
-        var url = dataURL + "lockedCoins.json"
+        var url = dataURL + "lockedCoinsTransactions.json"
         fetch(url).then(function(r) {
           return r.json()
         }).then(response => {

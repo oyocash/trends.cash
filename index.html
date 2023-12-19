@@ -69,7 +69,7 @@
           </div>
           <div class="gridColumnSpanSix">
             <a href="/lockedTransactions/">
-              <h3 style="display:none">Locked coins transactions count</h3>
+              <h3 style="display:none">Locked transactions count</h3>
               <div class="card">
                 <div class="card-container">
                   <div style="height: 350px;">
@@ -178,8 +178,8 @@
             }
 
             let lockCoinsCountDatasets = []
-            lockCoinsCountDatasets.push({name: "Locked coins transaction count", data: lockedCoinsCountChartData, color: window.colors[1]})
-            var lineChartLabel = "Locked coins transactions count"
+            lockCoinsCountDatasets.push({name: "Locked transaction count", data: lockedCoinsCountChartData, color: window.colors[1]})
+            var lineChartLabel = "Locked transactions count"
             var lineChart = JSON.parse(JSON.stringify(lineChartHomeConfig));
             lineChart.title = { text: lineChartLabel }
             lineChart.xAxis = { title: { text: 'Block'} }
