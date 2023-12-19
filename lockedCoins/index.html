@@ -63,8 +63,9 @@
           <div class="chartNav">
             <div class="chartNavCenter"></div>
             <div class="chartNavRight">
-              From: <input type="text" name="startDateForm" id="startDateForm" title="Search date start" placeholder="YYYY-MM-DD" disabled/>
-              To: <input type="text" name="endDateForm" id="endDateForm" title="Search date end" placeholder="YYYY-MM-DD"/>
+              From: <input type="text" name="fromBlock" id="fromBlock" title="Show from block [X]"/>
+              To: <input type="text" name="toBlock" id="toBlock" title="Show up to block [X]" />
+
             </div>
           </div>
           <div class="rankingChartWrapper">
@@ -76,36 +77,12 @@
   </div>
 
 <script language='javascript'>
-  // initiate loading
-  document.getElementById("loading").style.display = "block";
-  document.getElementById("error").style.display = "none";
-  document.getElementById("loaded").style.display = "none";
-
-  var step = 86400
-  var localStep = step
-  var itemsOnChart = 10
-  var pieChartDataUnordered = []
-  var pieChartDataFull = []
-  var pieChartDataSliced = []
-  let pieChartData = {}
-  let areaChartData = {}
-
   document.addEventListener("DOMContentLoaded", function() {
     loadHead()
     loadNav()
     loadFooter()
-    // Search clicked
-    document.getElementById('searchButton').addEventListener("click", function() {
-      window.open('/result/?search=' + btoa(document.getElementById('searchText').value), "_self")
-    })
-    document.getElementById('searchText').addEventListener("keydown", function(event) {
-      if (event.keyCode === 13) {
-       event.preventDefault();
-       document.getElementById("searchButton").click();
-      }
-    });
 
-    const period = 144*7;
+    const period = 144*30;
 
     function populateLocksChart(currentBlock, period) {
       console.log(currentBlock, " ", period)
@@ -146,6 +123,9 @@
       const b = await fetch(`${dataURL}lockcrawl`);
       const bres = await b.json();
       const currentBlock = bres?.height || 825000;;
+      document.getElementById('fromBlock').value = currentBlock - period;
+      document.getElementById('toBlock').value = currentBlock;
+
       populateLocksChart(currentBlock, period)
     })().catch(e => console.log("Caught: " + e)); // Catches it.
 
