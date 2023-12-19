@@ -51,6 +51,7 @@
             <div class="chartNavRight">
               From: <input type="text" name="fromBlock" id="fromBlock" title="Show from block [X]"/>
               To: <input type="text" name="toBlock" id="toBlock" title="Show up to block [X]" />
+              <button type="submit" id="showChart" onclick="refreshChart()">Show</button>
             </div>
           </div>
           <div class="rankingChartWrapper">
@@ -68,6 +69,13 @@
     loadFooter()
 
     const period = 144*30;
+
+    function refreshChart() {
+      let fromBlock = document.getElementById('fromBlock').value;
+      let toBlock = document.getElementById('toBlock').value;
+
+      populateLocksChart(toBlock, toBlock - fromBlock)
+    }
 
     function populateLocksChart(currentBlock, period) {
       console.log(currentBlock, " ", period)
