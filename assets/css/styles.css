@@ -944,6 +944,10 @@ background: #bbb;
   font-family: verdana,arial,helvetica,sans-serif;
   margin: 0px 2px;
 }
+.pill a {
+  color: white;
+  text-decoration: none;
+}
 .txid {
   font-size: 12px;
   color: green;
