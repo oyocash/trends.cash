@@ -62,7 +62,7 @@
         }).then(response => {
           let text = "<table border='0'>"
           for (let x in response) {
-            text += "<tr><td class=\"txid\">" + response[x].txid + "</td><td class=\"pill amount\">" + parseFloat(response[x].sumSatoshis) + " ₿</td></tr>";
+            text += "<tr><td class=\"txid\">" + response[x].txid + "</td><td><span class=\"pill amount\">" + parseFloat(response[x].sumSatoshis) + " ₿</span></td></tr>";
           }
           text += "</table>"
           document.getElementById("rankingTable").innerHTML = text;
