@@ -60,11 +60,9 @@
         fetch(url).then(function(r) {
           return r.json()
         }).then(response => {
-          console.log(response)
-          const myObj = JSON.parse(JSON.strigify(response));
           let text = "<table border='0'>"
-          for (let x in myObj) {
-            text += "<tr><td>" + myObj[x].txid + "</td><td>" + myObj[x].sumSatoshis + "</td></tr>";
+          for (let x in response) {
+            text += "<tr><td>" + response[x].txid + "</td><td>" + response[x].sumSatoshis + "</td></tr>";
           }
           text += "</table>"
           document.getElementById("rankingTable").innerHTML = text;
