@@ -42,7 +42,7 @@
       <div class="grid chartGrid">
         <div class="chartSection">
           <div class="rankingChartWrapper">
-            <div id="chart" style="height:500px;"></div>
+            <div id="rankingTable"></div>
           </div>
         </div>
       </div>
@@ -55,45 +55,21 @@
     loadNav()
     loadFooter()
 
-    const period = 144*30;
-
-    function refreshChart() {
-      let fromBlock = document.getElementById('fromBlock').value;
-      let toBlock = document.getElementById('toBlock').value;
-
-      populateChart(toBlock, toBlock - fromBlock)
-    }
-
-    document.getElementById('showButton').addEventListener("click", function() {
-      refreshChart();
-    })
-
-    function populateChart(currentBlock, period) {
+    function populateTable(currentBlock) {
       return new Promise(function(resolve, reject) {
         var url = dataURL + "lockedCoins.json"
         fetch(url).then(function(r) {
           return r.json()
         }).then(response => {
-            let lockedCoinsChartData = []
-            for (let index = 0; index < response.length; ++index) {
-              if (response[index][0] <= currentBlock && response[index][0] >= currentBlock - period) {
-                lockedCoinsChartData.push([ response[index][0], response[index][1] ])
-              }
-              if (response[index][0] > currentBlock) {
-                break;
-              }
-            }
 
-            let lockCoinsDatasets = []
-            lockCoinsDatasets.push({name: "Locked coins", data: lockedCoinsChartData, color: window.colors[0]})
-            var lineChartLabel = "Locked coins"
-            var lineChart = JSON.parse(JSON.stringify(lineChartHomeConfig));
-            lineChart.title = { text: lineChartLabel }
-            lineChart.xAxis = { title: { text: 'Block'} }
-            lineChart.yAxis = { title: { text: 'BSV'} }
-            lineChart.series = lockCoinsDatasets
-            var lineChartObj = Highcharts.chart("chart", lineChart);
-            lineChartObj.reflow()
+          const myObj = JSON.parse(response);
+          let text = "<table border='1'>"
+          for (let x in myObj) {
+            text += "<tr><td>" + myObj[x].txid + "</td><td>" + myObj[x].sumSatoshis + "</td></tr>";
+          }
+          text += "</table>"
+          document.getElementById("rankingTable").innerHTML = text;
+
         })
         .catch(error => {
           console.log(error)
@@ -105,11 +81,9 @@
     (async () => {
       const b = await fetch(`${dataURL}lockcrawl`);
       const bres = await b.json();
-      const currentBlock = bres?.height || 825000;;
-      document.getElementById('fromBlock').value = currentBlock - period;
-      document.getElementById('toBlock').value = currentBlock;
+      const currentBlock = bres?.height || 825000;
 
-      populateChart(currentBlock, period)
+      populateTable(currentBlock)
     })().catch(e => console.log("Caught: " + e)); // Catches it.
 
   })
