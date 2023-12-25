@@ -7,7 +7,7 @@
   <meta name="twitter:title" content="Trends.cash - Search results" />
   <meta name="twitter:description" content="Chart locked coins on the Bitcoin SV blockchain - search results." />
   <meta name="twitter:image" content="https://trends.cash/assets/images/logo-large.png" />
-  <meta property="og:url" content="https://trends.cash" />
+  <meta property="og:url" content="https://trends.cash/results/" />
   <meta property="og:type"   content="website" />
   <meta property="og:title" content="Trends.cash - Search results" />
   <meta property="og:description" content="Chart locked coins on the Bitcoin SV blockchain - search results" />
@@ -32,11 +32,7 @@
   <meta name="msapplication-TileImage" content="/assets/icons/ms-icon-144x144.png">
   <meta name="theme-color" content="#ffffff">
 
-  <script src="https://code.highcharts.com/highcharts.js"></script>
-
   <script src="/assets/js/scripts.js"></script>
-
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.8.0/css/pikaday.min.css" integrity="sha256-+RIb33VoW3hHdfmp0+G4FrGAxzlKBXiwo6thzduwZdU=" crossorigin="anonymous" />
 </head>
 <body>
   <noscript>Search result for locked coins on transaction chart on the Bitcoin SV blockchain</noscript>
@@ -121,7 +117,7 @@
           lockValuesDatasets.push({name: searchText, data: lockedCoinsChartData, color: window.colors[0]})
 
           var lineChartLabel = "Satoshis locked"
-          var lineChart = JSON.parse(JSON.stringify(lineChartConfig));
+          var lineChart = JSON.parse(JSON.stringify(lineChartHomeConfig));
           lineChart.title = { text: lineChartLabel }          
           lineChart.xAxis = { title: { text: 'Block'} }
           lineChart.yAxis = { title: { text: 'BSV'} }
