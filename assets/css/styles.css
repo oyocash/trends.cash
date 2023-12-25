@@ -956,3 +956,6 @@ background: #bbb;
 .txid a {
   text-decoration: none;
 }
+#rankingTable td {
+  white-space: nowrap;
+}
