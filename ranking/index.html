@@ -61,7 +61,7 @@
           return r.json()
         }).then(response => {
           console.log(response)
-          const myObj = JSON.parse(response);
+          const myObj = JSON.parse(JSON.strigify(response));
           let text = "<table border='0'>"
           for (let x in myObj) {
             text += "<tr><td>" + myObj[x].txid + "</td><td>" + myObj[x].sumSatoshis + "</td></tr>";
