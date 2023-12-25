@@ -945,6 +945,7 @@ background: #bbb;
   margin: 0px 2px;
 }
 .txid {
-color: green;
-overflow-wrap: anywhere;
+  font-size: 11px;
+  color: green;
+  overflow-wrap: anywhere;
 }
