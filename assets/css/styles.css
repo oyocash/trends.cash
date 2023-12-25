@@ -927,3 +927,24 @@ footer li.right{
 .card-container {
   padding: 10px 16px;
 }
+
+.amount {
+  color: white;
+  background: #fb3;
+}
+.app {
+color: white;
+background: #bbb;
+}
+.pill {
+  font-size: 10px;
+  line-height: 16px;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-family: verdana,arial,helvetica,sans-serif;
+  margin: 0px 2px;
+}
+.txid {
+color: green;
+overflow-wrap: anywhere;
+}
