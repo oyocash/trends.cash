@@ -949,7 +949,10 @@ background: #bbb;
   text-decoration: none;
 }
 .txid {
-  font-size: 12px;
+  font-size: 14px;
   color: green;
   overflow-wrap: anywhere;
+}
+.txid a {
+  text-decoration: none;
 }
