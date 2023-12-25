@@ -1,16 +1,16 @@
 <html>
 <head>
-  <title>Trends.cash - Locked contracts and posts rankings on Bitcoin SV (BSV)</title>
+  <title>Trends.cash - Locked coins in contracts and posts rankings on Bitcoin SV (BSV)</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:creator" content="@pmitchev" />
-  <meta name="twitter:title" content="Trends.cash - Locked contracts and posts rankings on Bitcoin SV (BSV)" />
-  <meta name="twitter:description" content="Locked contracts and posts rankings on Bitcoin SV (BSV)" />
+  <meta name="twitter:title" content="Trends.cash - Locked coins in contracts and posts rankings on Bitcoin SV (BSV)" />
+  <meta name="twitter:description" content="Locked coins in contracts and posts rankings on Bitcoin SV (BSV)" />
   <meta name="twitter:image" content="https://trends.cash/assets/images/logo-large.png" />
   <meta property="og:url" content="https://trends.cash/ranking/" />
   <meta property="og:type"   content="website" />
-  <meta property="og:title" content="Trends.cash - Locked contracts and posts rankings on Bitcoin SV (BSV)" />
-  <meta property="og:description" content="Locked contracts and posts rankings on Bitcoin SV (BSV)" />
+  <meta property="og:title" content="Trends.cash - Locked coins in contracts and posts rankings on Bitcoin SV (BSV)" />
+  <meta property="og:description" content="Locked coins in contracts and posts rankings on Bitcoin SV (BSV)" />
   <meta property="og:image" content="https://trends.cash/assets/images/logo-large.png" />
 
   <link rel="stylesheet" href="/assets/css/styles.css?240101">
@@ -31,12 +31,11 @@
   <meta name="msapplication-TileColor" content="#ffffff">
   <meta name="msapplication-TileImage" content="/assets/icons/ms-icon-144x144.png">
   <meta name="theme-color" content="#ffffff">
-  <meta name="bitcoin-address" content="1bGBx5H9NRmT3TbMHjXuUzo19CXmSfd6j">
+
   <script src="/assets/js/scripts.js"></script>
-  
 </head>
 <body>
-  <noscript>Locked contracts and posts rankings on Bitcoin SV (BSV)</noscript>
+  <noscript>Locked coins in contracts and posts rankings on Bitcoin SV (BSV)</noscript>
   <div id="app" class="container">
     <div id="nav"></div>
       <div class="grid chartGrid">
@@ -57,13 +56,13 @@
 
     function populateTable(currentBlock) {
       return new Promise(function(resolve, reject) {
-        var url = dataURL + "lockedCoins.json"
+        var url = dataURL + "rankingsAll.json"
         fetch(url).then(function(r) {
           return r.json()
         }).then(response => {
-
+          console.log(response)
           const myObj = JSON.parse(response);
-          let text = "<table border='1'>"
+          let text = "<table border='0'>"
           for (let x in myObj) {
             text += "<tr><td>" + myObj[x].txid + "</td><td>" + myObj[x].sumSatoshis + "</td></tr>";
           }
