@@ -64,7 +64,7 @@
           for (let x in response) {
             text += "<tr><td class=\"txid\">" + response[x].txid + "</td><td><span class=\"pill amount\">" + parseFloat(response[x].sumSatoshis) + " ₿</span>";
             const txId = response[x].txid.split('_')[0]
-            text += "<span class=\"pill app\"><a href=\"https://whatsonchain.com/tx/" + txId + "\" target=\"_blank\">" + woc + "</a></span>"
+            text += "<span class=\"pill app\"><a href=\"https://whatsonchain.com/tx/" + txId + "\" target=\"_blank\">woc</a></span>"
             text += "</td></tr>";
           }
           text += "</table>"
