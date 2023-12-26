@@ -954,6 +954,7 @@ background: #bbb;
   overflow-wrap: anywhere;
 }
 .txid a {
+  color: green;
   text-decoration: none;
 }
 #rankingTable td {
