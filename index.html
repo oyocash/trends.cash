@@ -151,6 +151,7 @@
             lineChart.xAxis = { title: { text: 'Block'} }
             lineChart.yAxis = { title: { text: 'BSV'} }
             lineChart.series = lockCoinsDatasets
+            console.log(lineChart.series)
             var lineChartObj = Highcharts.chart("lockedCoinsChart", lineChart);
             lineChartObj.reflow()
         })
