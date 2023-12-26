@@ -1,3 +1,4 @@
+<!doctype html>
 <html>
 <head>
   <title>Trends.cash - Chart Bitcoin SV Locks</title>
@@ -142,7 +143,6 @@
                 break;
               }
             }
-            console.log(lockedCoinsChartData)
 
             let lockCoinsDatasets = []
             lockCoinsDatasets.push({name: "Locked coins", data: lockedCoinsChartData, color: window.colors[0]})
@@ -152,7 +152,6 @@
             lineChart.xAxis = { title: { text: 'Block'} }
             lineChart.yAxis = { title: { text: 'BSV'} }
             lineChart.series = lockCoinsDatasets
-            console.log(lineChart.series)
             var lineChartObj = Highcharts.chart("lockedCoinsChart", lineChart);
             lineChartObj.reflow()
         })
