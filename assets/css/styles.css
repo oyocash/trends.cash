@@ -937,7 +937,7 @@ color: white;
 background: #bbb;
 }
 .pill {
-  font-size: 10px;
+  font-size: 0.9em;
   line-height: 16px;
   border-radius: 4px;
   padding: 2px 6px;
@@ -949,9 +949,10 @@ background: #bbb;
   text-decoration: none;
 }
 .txid {
-  font-size: 14px;
+  font-size: 1.1em;
   color: green;
   overflow-wrap: anywhere;
+  text-overflow: ellipsis;
 }
 .txid a {
   color: green;
