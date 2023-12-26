@@ -74,9 +74,9 @@
               text += "<span class=\"pill app\"><a href=\"https://whatsonchain.com/tx/" + txId + "\" target=\"_blank\">woc</a></span>"
               text += "</td></tr>";
             }
-            text += "</table>"
-            document.getElementById("rankingTable").innerHTML = text;
           }
+          text += "</table>"
+          document.getElementById("rankingTable").innerHTML = text;
         })
         .catch(error => {
           console.log(error)
