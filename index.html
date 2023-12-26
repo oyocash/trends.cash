@@ -217,7 +217,6 @@
             lineChart.xAxis = { title: { text: 'Block'} }
             lineChart.yAxis = { title: { text: 'BSV'} }
             lineChart.series = newlyLockCoinsDatasets
-            console.log(JSON.stringify(lineChart))
             var lineChartObj = Highcharts.chart("newlyLockedCoinsChart", lineChart);
             lineChartObj.reflow()
 
@@ -252,7 +251,6 @@
             lineChart.xAxis = { title: { text: 'Block'} }
             lineChart.yAxis = { title: { text: 'BSV'} }
             lineChart.series = expiredLockCoinsDatasets
-            console.log(JSON.stringify(lineChart))
             var lineChartObj = Highcharts.chart("expiredLockedCoinsChart", lineChart);
             lineChartObj.reflow()
 
