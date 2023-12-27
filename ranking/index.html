@@ -46,7 +46,7 @@
               BSV transactions with most coins locked
             </div>
           </div>
-          <div id="rankingTable" class="resultTable-item resultTable-container resultTable-separator"></div>
+          <div id="rankingTable"></div>
         </div>
     </div>
 
@@ -65,9 +65,9 @@
         fetch(url).then(function(r) {
           return r.json()
         }).then(response => {
-          let text = ``
           for (let x in response) {
             if (response[x].txid !== "undefined") {
+              let text = `<div class="resultTable-item resultTable-container resultTable-separator">`
               text += `<div class="label-line-number"></div><div class="label-text"><a href="/result/?search=${btoa(response[x].txid)}">${response[x].txid}</div><div class="label-value"><span class="pill amount">${parseFloat(response[x].sumSatoshis)} ₿</span>`;
               const txId = response[x].txid.split('_')[0]
               const isHodlocker = !(response[x].txid.includes('_'))
@@ -76,6 +76,7 @@
               }
               text += `<span class="pill app"><a href="https://whatsonchain.com/tx/${txId}" target="_blank">woc</a></span>`
               text += `</div>`;
+              text += `</div>`
             }
           }
           document.getElementById("rankingTable").innerHTML = text;
