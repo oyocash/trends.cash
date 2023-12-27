@@ -68,14 +68,14 @@
           for (let x in response) {
             if (response[x].txid !== "undefined") {
               let text = `<div class="resultTable-item resultTable-container resultTable-separator">`
-              text += `<div class="label-line-number"></div><div class="label-text"><a href="/result/?search=${btoa(response[x].txid)}">${response[x].txid}</div><div class="label-value"><span class="pill amount">${parseFloat(response[x].sumSatoshis)} ₿</span>`;
+              text += `  <div class="label-line-number"></div><div class="label-text"><a href="/result/?search=${btoa(response[x].txid)}">${response[x].txid}</div><div class="label-value"><span class="pill amount">${parseFloat(response[x].sumSatoshis)} ₿</span>`;
               const txId = response[x].txid.split('_')[0]
               const isHodlocker = !(response[x].txid.includes('_'))
               if (isHodlocker) {
-                text += `<span class="pill app"><a href="https://www.hodlocker.com/bitcoiner/post/${txId}" target="_blank">hodlocker</a></span>`
+                text += `    <span class="pill app"><a href="https://www.hodlocker.com/bitcoiner/post/${txId}" target="_blank">hodlocker</a></span>`
               }
-              text += `<span class="pill app"><a href="https://whatsonchain.com/tx/${txId}" target="_blank">woc</a></span>`
-              text += `</div>`;
+              text += `    <span class="pill app"><a href="https://whatsonchain.com/tx/${txId}" target="_blank">woc</a></span>`
+              text += `  </div>`;
               text += `</div>`
             }
           }
