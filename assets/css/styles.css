@@ -354,7 +354,7 @@ div.main input[type="submit"]:focus {
     position: absolute;
     top: 0;
     text-align: left;
-    width: 55%;
+    width: 60%;
     white-space: nowrap;
     overflow: hidden;
     text-overflow:ellipsis;
@@ -388,9 +388,9 @@ div.main input[type="submit"]:focus {
     padding-right: 15px;
     position: absolute;
     right: 23px;
-    text-align: right;
+    text-align: left;
     top: 24px;
-    width: 40%;
+    width: 35%;
 }
 .resultTable-item .label-value2 {
     font-size: 1.2rem;
