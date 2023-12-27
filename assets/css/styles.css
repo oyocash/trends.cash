@@ -948,13 +948,13 @@ background: #bbb;
   color: white;
   text-decoration: none;
 }
-.txid {
+.label-text {
   font-size: 1.1em;
   color: green;
   overflow-wrap: anywhere;
   text-overflow: ellipsis;
 }
-.txid a {
+.label-text a {
   color: green;
   text-decoration: none;
 }
