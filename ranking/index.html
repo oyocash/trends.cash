@@ -65,10 +65,11 @@
         fetch(url).then(function(r) {
           return r.json()
         }).then(response => {
+          let i = 1;
           for (let x in response) {
             if (response[x].txid !== "undefined") {
               let text = `<div class="resultTable-item resultTable-container resultTable-separator">`
-              text += `  <div class="label-line-number"></div><div class="label-text"><a href="/result/?search=${btoa(response[x].txid)}">${response[x].txid}</div><div class="label-value"><span class="pill amount">${parseFloat(response[x].sumSatoshis)} ₿</span>`;
+              text += `  <div class="label-line-number">${i}</div><div class="label-text"><a href="/result/?search=${btoa(response[x].txid)}">${response[x].txid}</div><div class="label-value"><span class="pill amount">${parseFloat(response[x].sumSatoshis)} ₿</span>`;
               const txId = response[x].txid.split('_')[0]
               const isHodlocker = !(response[x].txid.includes('_'))
               if (isHodlocker) {
@@ -78,6 +79,7 @@
               text += `  </div>`;
               text += `</div>`
             }
+            i++
           }
           document.getElementById("rankingTable").innerHTML = text;
         })
