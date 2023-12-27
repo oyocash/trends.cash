@@ -343,7 +343,7 @@ div.main input[type="submit"]:focus {
   text-decoration: underline;
 }*/
 .resultTable-item .label-line-number {
-  width: 24px;
+  width: 104px;
   background: #fff;
   border: 0px solid #666;
   text-align: center;
@@ -354,7 +354,7 @@ div.main input[type="submit"]:focus {
     position: absolute;
     top: 0;
     text-align: left;
-    width: 45%;
+    width: 55%;
     white-space: nowrap;
     overflow: hidden;
     text-overflow:ellipsis;
@@ -390,7 +390,7 @@ div.main input[type="submit"]:focus {
     right: 23px;
     text-align: right;
     top: 24px;
-    width: 40%;
+    width: 30%;
 }
 .resultTable-item .label-value2 {
     font-size: 1.2rem;
