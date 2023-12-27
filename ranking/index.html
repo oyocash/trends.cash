@@ -46,7 +46,7 @@
               BSV transactions with most coins locked
             </div>
           </div>
-          <div id="rankingTable"></div>
+          <div id="rankingTable" class="resultTable-item resultTable-container resultTable-separator"></div>
         </div>
     </div>
 
@@ -65,7 +65,7 @@
         fetch(url).then(function(r) {
           return r.json()
         }).then(response => {
-          let text = `<div class="resultTable-item resultTable-container resultTable-separator">`
+          let text = ``
           for (let x in response) {
             if (response[x].txid !== "undefined") {
               text += `<div class="label-line-number"></div><div class="label-text"><a href="/result/?search=${btoa(response[x].txid)}">${response[x].txid}</div><div class="label-value"><span class="pill amount">${parseFloat(response[x].sumSatoshis)} ₿</span>`;
@@ -78,7 +78,6 @@
               text += `</div>`;
             }
           }
-          text += "</div>"
           document.getElementById("rankingTable").innerHTML = text;
         })
         .catch(error => {
