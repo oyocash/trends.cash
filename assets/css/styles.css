@@ -937,7 +937,7 @@ color: white;
 background: #bbb;
 }
 .pill {
-  font-size: 10px;
+  font-size: 12px;
   line-height: 16px;
   border-radius: 4px;
   padding: 2px 6px;
@@ -957,7 +957,4 @@ background: #bbb;
 .label-text a {
   color: green;
   text-decoration: none;
-}
-#rankingTable td {
-  white-space: nowrap;
 }
