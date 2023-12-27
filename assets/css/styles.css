@@ -334,14 +334,14 @@ div.main input[type="submit"]:focus {
   color: rgba(0,0,0,0.87);
   text-decoration: none;
 }
-.resultTable-item a {
+/*.resultTable-item a {
   color: rgba(0,0,0,0.87);
   text-decoration: none;
 }
 .resultTable-item a:hover {
   color: rgba(0,0,0,0.87);
   text-decoration: underline;
-}
+}*/
 .resultTable-item .label-line-number {
   width: 24px;
   background: #fff;
@@ -390,7 +390,7 @@ div.main input[type="submit"]:focus {
     right: 23px;
     text-align: right;
     top: 24px;
-    width: 162px;
+    width: 40%;
 }
 .resultTable-item .label-value2 {
     font-size: 1.2rem;
