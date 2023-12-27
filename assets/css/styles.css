@@ -334,14 +334,6 @@ div.main input[type="submit"]:focus {
   color: rgba(0,0,0,0.87);
   text-decoration: none;
 }
-/*.resultTable-item a {
-  color: rgba(0,0,0,0.87);
-  text-decoration: none;
-}
-.resultTable-item a:hover {
-  color: rgba(0,0,0,0.87);
-  text-decoration: underline;
-}*/
 .resultTable-item .label-line-number {
   width: 24px;
   background: #fff;
@@ -354,7 +346,7 @@ div.main input[type="submit"]:focus {
     position: absolute;
     top: 0;
     text-align: left;
-    width: 40%;
+    width: 60%;
     white-space: nowrap;
     overflow: hidden;
     text-overflow:ellipsis;
@@ -386,11 +378,11 @@ div.main input[type="submit"]:focus {
     font-size: 1.2rem;
     line-height: 16px;
     padding-right: 15px;
-    position: right;
+    position: absolute;
     right: 23px;
     text-align: right;
     top: 24px;
-    width: 30%;
+    width: 162px;
 }
 .resultTable-item .label-value2 {
     font-size: 1.2rem;
@@ -412,10 +404,6 @@ div.main input[type="submit"]:focus {
     top: 24px;
     width: 25%;
 }
-/*.resultTable-item .label-value2 a, .resultTable-item .label-value3 a, .resultTable-item .label-text2 a, .resultTable-item .label-text3 a {
-  color: rgba(0,0,0,0.60);
-  text-decoration: underline;
-}*/
 
 .search input[type="text"]{
   box-sizing:border-box;
@@ -937,7 +925,7 @@ color: white;
 background: #bbb;
 }
 .pill {
-  font-size: 12px;
+  font-size: 10px;
   line-height: 16px;
   border-radius: 4px;
   padding: 2px 6px;
@@ -949,7 +937,7 @@ background: #bbb;
   text-decoration: none;
 }
 .label-text {
-  font-size: 1.1em;
+  font-size: 13px;
   color: green;
   overflow-wrap: anywhere;
   text-overflow: ellipsis;
