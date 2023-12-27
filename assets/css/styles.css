@@ -390,7 +390,7 @@ div.main input[type="submit"]:focus {
     right: 23px;
     text-align: right;
     top: 24px;
-    width: 132px;
+    width: 162px;
 }
 .resultTable-item .label-value2 {
     font-size: 1.2rem;
@@ -412,10 +412,10 @@ div.main input[type="submit"]:focus {
     top: 24px;
     width: 25%;
 }
-.resultTable-item .label-value2 a, .resultTable-item .label-value3 a, .resultTable-item .label-text2 a, .resultTable-item .label-text3 a {
+/*.resultTable-item .label-value2 a, .resultTable-item .label-value3 a, .resultTable-item .label-text2 a, .resultTable-item .label-text3 a {
   color: rgba(0,0,0,0.60);
   text-decoration: underline;
-}
+}*/
 
 .search input[type="text"]{
   box-sizing:border-box;
@@ -937,7 +937,7 @@ color: white;
 background: #bbb;
 }
 .pill {
-  font-size: 0.9em;
+  font-size: 10px;
   line-height: 16px;
   border-radius: 4px;
   padding: 2px 6px;
