@@ -72,7 +72,7 @@
     let text = "";
     text += `  <span class="label-text">${searchText}</span>`;
     const txId = searchText.split('_')[0]
-    const isHodlocker = !(response[x].txid.includes('_'))
+    const isHodlocker = !(searchText.includes('_'))
     if (isHodlocker) {
       text += `    <span class="pill app"><a href="https://www.hodlocker.com/bitcoiner/post/${txId}" target="_blank">hodlocker</a></span>`
     }
