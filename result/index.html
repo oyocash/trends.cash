@@ -42,6 +42,8 @@
     <div class="grid">
         <div class="s_results" id="loaded">
           <div class="grid chartGrid">
+            <div class="resultTable" id="lockValuesTable"></div>
+
             <div class="resultTable" id="lockValuesChartGrid">
               <div style="height: 300px;">
                 <div id="lockValuesChart"></div>
@@ -66,6 +68,19 @@
 <script language='javascript'>
   let lockValuesDatasets = []
   let lockCountsDatasets = []
+  var populateTable = function(searchText) {
+    let text = "";
+    text += `  <span class="label-text">${searchText}</span>`;
+    const txId = searchText.split('_')[0]
+    const isHodlocker = !(response[x].txid.includes('_'))
+    if (isHodlocker) {
+      text += `    <span class="pill app"><a href="https://www.hodlocker.com/bitcoiner/post/${txId}" target="_blank">hodlocker</a></span>`
+    }
+    text += `    <span class="pill app"><a href="https://whatsonchain.com/tx/${txId}" target="_blank">woc</a></span>`
+
+    document.getElementById("lockValuesTable").innerHTML = text;
+  }
+
   var populateChart = async function(searchText) {
     return new Promise(function(resolve, reject) {
       var lockValuesChartEl = document.getElementById("lockValuesChartGrid");
@@ -112,7 +127,7 @@
 
           lockValuesDatasets.push({name: searchText, data: lockedCoinsChartData, color: window.colors[0]})
 
-          var lineChartLabel = "Satoshis locked"
+          var lineChartLabel = "BSV locked"
           var lineChart = JSON.parse(JSON.stringify(lineChartHomeConfig));
           lineChart.title = { text: lineChartLabel }          
           lineChart.xAxis = { title: { text: 'Block'} }
@@ -153,6 +168,7 @@
     })
     loadFooter()
 
+    populateTable(searchText);
     // populate chart
     populateChart(searchText).then(function() {
     })

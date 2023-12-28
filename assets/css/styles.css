@@ -931,6 +931,7 @@ background: #bbb;
   padding: 2px 6px;
   font-family: verdana,arial,helvetica,sans-serif;
   margin: 0px 2px;
+  padding-bottom: 4px;
 }
 .pill a {
   color: white;
