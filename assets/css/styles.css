@@ -937,7 +937,7 @@ background: #bbb;
   text-decoration: none;
 }
 .label-text {
-  font-size: 13px;
+  font-size: 14px;
   color: green;
   overflow-wrap: anywhere;
   text-overflow: ellipsis;
