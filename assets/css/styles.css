@@ -346,7 +346,7 @@ div.main input[type="submit"]:focus {
     position: absolute;
     top: 0;
     text-align: left;
-    width: 55%;
+    width: 50%;
     white-space: nowrap;
     overflow: hidden;
     text-overflow:ellipsis;
@@ -381,7 +381,7 @@ div.main input[type="submit"]:focus {
     position: absolute;
     right: 23px;
     text-align: right;
-    top: 24px;
+    top: 12px;
     width: 35%;
 }
 .resultTable-item .label-value2 {
@@ -937,7 +937,7 @@ background: #bbb;
   text-decoration: none;
 }
 .label-text {
-  font-size: 14px;
+  font-size: 15px;
   color: green;
   overflow-wrap: anywhere;
   text-overflow: ellipsis;
