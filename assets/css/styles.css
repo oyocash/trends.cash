@@ -947,3 +947,10 @@ background: #bbb;
   color: green;
   text-decoration: none;
 }
+
+.label-text .dataType {
+  font-size: 13px;
+  color: #060;
+  overflow-wrap: anywhere;
+  text-overflow: ellipsis;
+}

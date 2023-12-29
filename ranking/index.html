@@ -74,7 +74,7 @@
           for (let x in response) {
             if (response[x].txid !== "undefined") {
               text += `<div class="resultTable-item resultTable-container resultTable-separator">`
-              text += `  <div class="label-line-number">${i}.</div><div class="label-text"><a href="/result/?search=${btoa(response[x].txid)}">[${response[x].dataType}] ${response[x].txid}</a></div><div class="label-value"><span class="pill amount">${parseFloat(response[x].sumSatoshis)} ₿</span><br />`;
+              text += `  <div class="label-line-number">${i}.</div><div class="label-text"><a href="/result/?search=${btoa(response[x].txid)}"><span class="dataType">${response[x].dataType}</a> ${response[x].txid}</a></div><div class="label-value"><span class="pill amount">${parseFloat(response[x].sumSatoshis)} ₿</span><br />`;
               const txId = response[x].txid.split('_')[0]
               const isHodlocker = !(response[x].txid.includes('_'))
               if (isHodlocker) {
