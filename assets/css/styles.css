@@ -926,12 +926,12 @@ background: #bbb;
 }
 .pill {
   font-size: 10px;
-  line-height: 16px;
+  line-height: 14px;
   border-radius: 4px;
   padding: 2px 6px;
   font-family: verdana,arial,helvetica,sans-serif;
   margin: 0px 2px;
-  padding-bottom: 4px;
+  margin-bottom: 4px;
 }
 .pill a {
   color: white;
