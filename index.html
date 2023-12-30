@@ -131,7 +131,7 @@
 
     function populateLocksChart(currentBlock, period) {
       return new Promise(function(resolve, reject) {
-        var url = dataURL + "lockedCoins.json"
+        var url = dataURL + "lockedCoinsPrecalculated.json"
         fetch(url).then(function(r) {
           return r.json()
         }).then(response => {
@@ -164,7 +164,7 @@
     }
     function populateLocksCountChart(currentBlock, period) {
       return new Promise(function(resolve, reject) {
-        var url = dataURL + "lockedCoinsTransactions.json"
+        var url = dataURL + "lockedCoinsTransactionsPrecalculated.json"
         fetch(url).then(function(r) {
           return r.json()
         }).then(response => {
@@ -197,7 +197,7 @@
     }
     function populateNewLocksChart(currentBlock, period) {
       return new Promise(function(resolve, reject) {
-        var url = dataURL + "newlyLockedCoins.json"
+        var url = dataURL + "newlyLockedCoinsPrecalculated.json"
         fetch(url).then(function(r) {
           return r.json()
         }).then(response => {
@@ -231,7 +231,7 @@
     }
     function populateExpiredLocksChart(currentBlock, period) {
       return new Promise(function(resolve, reject) {
-        var url = dataURL + "expiredLockedCoins.json"
+        var url = dataURL + "expiredLockedCoinsPrecalculated.json"
         fetch(url).then(function(r) {
           return r.json()
         }).then(response => {
