@@ -308,7 +308,7 @@ div.main input[type="submit"]:focus {
     align-items: center;
     color: rgba(0,0,0,0.87);
     height: 56px;
-    line-height: 56px;
+    line-height: 28px;
     overflow: hidden;
     padding-left: 24px;
     padding-right: 18px;
@@ -329,6 +329,7 @@ div.main input[type="submit"]:focus {
 }
 .resultTable-item {
   height: 56px;
+/*  height: 72px;*/
   position: relative;
   display: block;
   color: rgba(0,0,0,0.87);

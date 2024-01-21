@@ -13,7 +13,7 @@
   <meta property="og:description" content="Locked coins in contracts and posts rankings on Bitcoin SV (BSV)" />
   <meta property="og:image" content="https://trends.cash/assets/images/logo-large.png" />
 
-  <link rel="stylesheet" href="/assets/css/styles.css?240123">
+  <link rel="stylesheet" href="/assets/css/styles.css?240127">
   <link rel="apple-touch-icon" sizes="57x57" href="/assets/icons/apple-icon-57x57.png">
   <link rel="apple-touch-icon" sizes="60x60" href="/assets/icons/apple-icon-60x60.png">
   <link rel="apple-touch-icon" sizes="72x72" href="/assets/icons/apple-icon-72x72.png">
@@ -68,13 +68,32 @@
         var url = dataURL + "rankingsAll.json"
         fetch(url).then(function(r) {
           return r.json()
-        }).then(response => {
+        }).then(async (response) => {
+
+          let rBSV20 = await fetch(dataURL + "bsv-20Cached.json");
+          let resultBSV20 = await rBSV20.json()
+          let rLRC20 = await fetch(dataURL + "lrc-20Cached.json");
+          let resultLRC20 = await rLRC20.json()
+          let rHodlocker = await fetch(dataURL + "hodlockerCached.json");
+          let resultHodlocker = await rHodlocker.json()
+          let rMaplocks = await fetch(dataURL + "maplocksCached.json");
+          let resultMaplocks = await rMaplocks.json()
+
           let text = "";
           let i = 1;
           for (let x in response) {
             if (response[x].txid !== "undefined") {
+              let name = ""
+              if (response[x].dataType === 'bsv-20') name = resultBSV20[response[x].txid]; else 
+              if (response[x].dataType === 'lrc-20') name = resultLRC20[response[x].txid]; else 
+              if (response[x].dataType === 'hodlocker.com') name = resultHodlocker[response[x].txid]; else 
+              if (response[x].dataType === 'maplocks.com') name = resultMaplocks[response[x].txid];
+
               text += `<div class="resultTable-item resultTable-container resultTable-separator">`
-              text += `  <div class="label-line-number">${i}.</div><div class="label-text"><a href="/result/?search=${btoa(response[x].txid)}"><span class="dataType">${response[x].dataType}</span> ${response[x].txid}</a></div><div class="label-value"><span class="pill amount">${parseFloat(response[x].sumSatoshis)} ₿</span><br />`;
+              text += `  <div class="label-line-number">${i}.</div>
+              <div class="label-text"><span style="color:#000">${name}</span> <br/>
+
+              <a href="/result/?search=${btoa(response[x].txid)}"><span class="dataType">${response[x].dataType}</span> ${response[x].txid}</a></div><div class="label-value"><span class="pill amount">${parseFloat(response[x].sumSatoshis)} ₿</span><br />`;
               const txId = response[x].txid.split('_')[0]
               const isHodlocker = !(response[x].txid.includes('_'))
               if (isHodlocker) {
