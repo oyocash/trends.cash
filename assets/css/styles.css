@@ -147,7 +147,8 @@ div.main {
     padding-bottom: 10px;
 }
 div.main input {
-    width: 503px;
+/*    width: 503px;*/
+    margin:5px;
     max-width: 90%;
     height: 34px;
     text-align: left;

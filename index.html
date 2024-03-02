@@ -14,7 +14,7 @@
   <meta property="og:description" content="Chart locked coins on the Bitcoin SV blockchain.  Chart individual posts, overall locked coins, and more." />
   <meta property="og:image" content="https://trends.cash/assets/images/logo-large.png" />
 
-  <link rel="stylesheet" href="/assets/css/styles.css?240104">
+  <link rel="stylesheet" href="/assets/css/styles.css?240106">
   <link rel="apple-touch-icon" sizes="57x57" href="/assets/icons/apple-icon-57x57.png">
   <link rel="apple-touch-icon" sizes="60x60" href="/assets/icons/apple-icon-60x60.png">
   <link rel="apple-touch-icon" sizes="72x72" href="/assets/icons/apple-icon-72x72.png">
@@ -113,6 +113,9 @@
     loadFooter()
 
     const period = 144*7;
+    function formatNumberWithCommas(number) {
+      return number.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
 
     function populateButtons(lockedBSV) {
       return new Promise(function(resolve, reject) {
@@ -122,10 +125,10 @@
         }).then(response => {
 
           // populate buttons
-          const trimmedLockedBSV = lockedBSV.toString().split('.')[0] + "." + lockedBSV.toString().split('.')[1].substring(0,2);
+          let trimmedLockedBSV = formatNumberWithCommas(lockedBSV.toString().split('.')[0]) + "." + lockedBSV.toString().split('.')[1].substring(0,2);
           const usdLocked = lockedBSV * response.rate
-          const trimmedLockedUSD = usdLocked.toString().split('.')[0] + "." + usdLocked.toString().split('.')[1].substring(0,2);
-          const trimmedPrice = response.rate.toString().split('.')[0] + "." + response.rate.toString().split('.')[1].substring(0,2);
+          let trimmedLockedUSD = formatNumberWithCommas(usdLocked.toString().split('.')[0]) + "." + usdLocked.toString().split('.')[1].substring(0,2);
+          let trimmedPrice = formatNumberWithCommas(response.rate.toString().split('.')[0]) + "." + response.rate.toString().split('.')[1].substring(0,2);
           document.getElementById('totalBSVLocked').value = "₿" + trimmedLockedBSV + " Locked";
           document.getElementById('totalUSDLocked').value = "$" + trimmedLockedUSD + " Locked";
           document.getElementById('price').value = "Price: $" + trimmedPrice;
