@@ -63,7 +63,7 @@
     loadNav()
     loadFooter()
 
-    function populateTable(currentBlock) {
+    function populateTable() {
       return new Promise(function(resolve, reject) {
         var url = dataURL + "rankingsAll.json"
         fetch(url).then(function(r) {
@@ -115,11 +115,7 @@
     }
 
     (async () => {
-      const b = await fetch(`${dataURL}lockcrawl`);
-      const bres = await b.json();
-      const currentBlock = bres?.height || 825000;
-
-      populateTable(currentBlock)
+      populateTable()
     })().catch(e => console.log("Caught: " + e)); // Catches it.
 
   })

@@ -21,9 +21,6 @@ html, body {
   }
 }
 
-body{
-	margin: 0;
-}
 .grid {
   min-height: 100%;
   max-width: 100%;
@@ -142,30 +139,11 @@ h1{
     border: 1px solid #4d90fe;
 }
 
-/* landing page */
-center {
-    padding-top: 89px;
-}
-#landingPage h1 {
-    color: #5f6368;
-    font-family:"Google Sans Display", Heebo, Arial, sans-serif;
-    font-size:3em;
-    letter-spacing:normal;
-    line-height:46px;
-    font-weight: 400;
-    padding: 13px 8px 8px 5px;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    margin-block-start: 0.67em;
-    margin-block-end: 0.67em;
-    margin-inline-start: 0px;
-    margin-inline-end: 0px;
-}
 div.main {
     width:calc(100% - 25px);
     max-width:calc(100% - 25px);
     text-align: center;
-    margin-top: 50px;
+    margin-top: 20px;
     padding-bottom: 10px;
 }
 div.main input {
@@ -208,19 +186,6 @@ div.main input[type="submit"]:hover {
 }
 div.main input[type="submit"]:focus {
     border: 1px solid #4d90fe;
-}
-.promo {
-  padding-bottom:20px;
-}
-.promo a {
-  padding-left:10px;
-  padding-right:10px;
-}
-.featured-search{
-  grid-column: span 6;
-  font-family: arial, sans-serif;
-  margin: 15px 15px 51px 15px;
-  background: #ffffff;
 }
 
 @media screen and (max-width: 1024px) {

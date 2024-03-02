@@ -14,7 +14,7 @@
   <meta property="og:description" content="Chart locked coins on the Bitcoin SV blockchain.  Chart individual posts, overall locked coins, and more." />
   <meta property="og:image" content="https://trends.cash/assets/images/logo-large.png" />
 
-  <link rel="stylesheet" href="/assets/css/styles.css?240101">
+  <link rel="stylesheet" href="/assets/css/styles.css?240104">
   <link rel="apple-touch-icon" sizes="57x57" href="/assets/icons/apple-icon-57x57.png">
   <link rel="apple-touch-icon" sizes="60x60" href="/assets/icons/apple-icon-60x60.png">
   <link rel="apple-touch-icon" sizes="72x72" href="/assets/icons/apple-icon-72x72.png">
@@ -39,18 +39,14 @@
 <body>
   <noscript>Trends.cash is charting tool for locked coins the Bitcoin SV blockchain.</noscript>
   <div id="app" class="container">
-    <div id="landingPage">
+      <div id="nav"></div>
       <center>
-        <img src="/assets/images/logo-large.png" srcset="/assets/images/logo-large@2x.png 2x, /assets/images/logo-large@3x.png 3x">
-        <h1>Chart Bitcoin SV Locks</h1>
       	<div class="main">
-      		<div class="sbox">
-      			<input type="text" name="searchText" id="searchText" title="Chart Bitcoin Locks" placeholder="Enter transaction id" autocomplete="off">
-      		</div>
-
       		<div class="buttons">
-      			<input value="Search" type="submit" id="searchButton">
-            <a href="/ranking/"><input value="🏆 Ranking 🏆" type="submit" id="searchButton"></a>
+            <input value="" type="submit" id="price">
+            <input value="" type="submit" id="totalBSVLocked">
+            <input value="" type="submit" id="totalUSDLocked">
+            <a href="/ranking/"><input value="🏆 Ranking 🏆" type="submit" id="rankingButton"></a>
       		</div>
       	</div>
 
@@ -108,7 +104,6 @@
       </center>
 
       <div id="footer"></div>
-    </div>
   </div>
 
 <script language='javascript'>
@@ -116,18 +111,32 @@
     loadHead()
     loadNav()
     loadFooter()
-    // Search clicked
-    document.getElementById('searchButton').addEventListener("click", function() {
-      window.open('/result/?search=' + btoa(document.getElementById('searchText').value), "_self")
-    })
-    document.getElementById('searchText').addEventListener("keydown", function(event) {
-      if (event.keyCode === 13) {
-       event.preventDefault();
-       document.getElementById("searchButton").click();
-      }
-    });
 
     const period = 144*7;
+
+    function populateButtons(lockedBSV) {
+      return new Promise(function(resolve, reject) {
+        var url = "https://api.whatsonchain.com/v1/bsv/main/exchangerate"
+        fetch(url).then(function(r) {
+          return r.json()
+        }).then(response => {
+
+          // populate buttons
+          const trimmedLockedBSV = lockedBSV.toString().split('.')[0] + "." + lockedBSV.toString().split('.')[1].substring(0,2);
+          const usdLocked = lockedBSV * response.rate
+          const trimmedLockedUSD = usdLocked.toString().split('.')[0] + "." + usdLocked.toString().split('.')[1].substring(0,2);
+          const trimmedPrice = response.rate.toString().split('.')[0] + "." + response.rate.toString().split('.')[1].substring(0,2);
+          document.getElementById('totalBSVLocked').value = "₿" + trimmedLockedBSV + " Locked";
+          document.getElementById('totalUSDLocked').value = "$" + trimmedLockedUSD + " Locked";
+          document.getElementById('price').value = "Price: $" + trimmedPrice;
+
+        })
+        .catch(error => {
+          console.log(error)
+          reject(error)
+        })
+      })
+    }
 
     function populateLocksChart(currentBlock, period) {
       return new Promise(function(resolve, reject) {
@@ -144,6 +153,9 @@
                 break;
               }
             }
+
+            // populate buttons
+            populateButtons(lockedCoinsChartData[lockedCoinsChartData.length - 1][1])
 
             let lockCoinsDatasets = []
             lockCoinsDatasets.push({name: "Locked coins", data: lockedCoinsChartData, color: window.colors[0]})
