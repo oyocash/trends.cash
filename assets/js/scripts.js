@@ -53,6 +53,7 @@ var lineChartHomeConfig = {
     },
     plotOptions: {
         series: {
+          step: 'left',
           states: {
             inactive: {
               opacity: 1
